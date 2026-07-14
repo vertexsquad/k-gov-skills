@@ -1,0 +1,9 @@
+{
+  "items": [
+    {
+      "capability": "disaster-geospatial-brief",
+      "id": "fixture-1",
+      "source": "repository-fixture"
+    }
+  ]
+}

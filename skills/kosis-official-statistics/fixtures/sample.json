@@ -1,0 +1,9 @@
+{
+  "items": [
+    {
+      "capability": "kosis-official-statistics",
+      "id": "fixture-1",
+      "source": "repository-fixture"
+    }
+  ]
+}
