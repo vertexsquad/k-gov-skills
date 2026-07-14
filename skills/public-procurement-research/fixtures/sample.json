@@ -1,0 +1,9 @@
+{
+  "items": [
+    {
+      "capability": "public-procurement-research",
+      "id": "fixture-1",
+      "source": "repository-fixture"
+    }
+  ]
+}
