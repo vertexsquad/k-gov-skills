@@ -41,17 +41,30 @@ EVIDENCE = {"direct", "adjacent", "new", "sensitive"}
 BOUNDARIES = {"read-only", "draft-only", "manual-review-only"}
 CREDENTIAL_CLASSES = {"none", "user-held", "operator-held", "mixed"}
 PROXY_MODES = {"none", "optional", "required", "mixed"}
-SIDE_EFFECT_CLASSES = {"read-only", "document-read"}
+SIDE_EFFECT_CLASSES = {"read-only", "document-read", "draft-only"}
 EXECUTION_STATUSES = {"planned", "fixture-verified", "live-verified", "blocked"}
 LIVE_SMOKE_STATUSES = {"not-run", "passed", "failed", "blocked"}
 SLUG = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 
+def collect_used_capabilities(domains: list[dict[str, Any]]) -> set[str]:
+    capabilities = {
+        item["shared_capability"]
+        for item in domains
+        if isinstance(item.get("shared_capability"), str)
+    }
+    for item in domains:
+        additional_capabilities = item.get("additional_capabilities", [])
+        if isinstance(additional_capabilities, list):
+            capabilities.update(value for value in additional_capabilities if isinstance(value, str))
+    return capabilities
+
+
 def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
     errors: list[str] = []
     domains = data.get("domains")
-    if data.get("schema_version") != 2:
-        errors.append("schema_version must be 2")
+    if data.get("schema_version") != 3:
+        errors.append("schema_version must be 3")
     if not isinstance(domains, list):
         return errors + ["domains must be a list"]
     if len(domains) != 60:
@@ -60,8 +73,8 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
     raw_capabilities = data.get("shared_capabilities")
     if not isinstance(raw_capabilities, list):
         return errors + ["shared_capabilities must be a list"]
-    if len(raw_capabilities) != 8:
-        errors.append(f"catalog must contain 8 shared capabilities, got {len(raw_capabilities)}")
+    if len(raw_capabilities) != 9:
+        errors.append(f"catalog must contain 9 shared capabilities, got {len(raw_capabilities)}")
 
     capability_slugs: set[str] = set()
     capability_by_slug: dict[str, dict[str, Any]] = {}
@@ -110,6 +123,7 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
         slug = item["slug"]
         evidence = item["evidence"]
         references = item["reference_skills"]
+        additional_capabilities = item.get("additional_capabilities", [])
         if domain in seen_domains:
             errors.append(f"duplicate domain: {domain}")
         seen_domains.add(domain)
@@ -128,6 +142,18 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
             errors.append(f"{domain}: invalid shared capability {item['shared_capability']}")
         elif item["shared_capability"] not in capability_slugs:
             errors.append(f"{domain}: unknown shared capability {item['shared_capability']}")
+        if not isinstance(additional_capabilities, list) or not all(
+            isinstance(value, str) and SLUG.fullmatch(value) for value in additional_capabilities
+        ):
+            errors.append(f"{domain}: invalid additional_capabilities")
+            additional_capabilities = []
+        elif len(additional_capabilities) != len(set(additional_capabilities)):
+            errors.append(f"{domain}: duplicate additional capability")
+        for additional in additional_capabilities:
+            if additional == item["shared_capability"]:
+                errors.append(f"{domain}: additional capability {additional} duplicates primary capability")
+            elif additional not in capability_slugs:
+                errors.append(f"{domain}: unknown additional capability {additional}")
         if not isinstance(references, list) or not all(isinstance(value, str) and SLUG.fullmatch(value) for value in references):
             errors.append(f"{domain}: invalid reference_skills")
         if evidence in {"direct", "adjacent"} and not references:
@@ -143,7 +169,7 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
             f"domain folder/catalog mismatch missing={sorted(actual_domains - seen_domains)} extra={sorted(seen_domains - actual_domains)}"
         )
 
-    capabilities = {item["shared_capability"] for item in domains}
+    capabilities = collect_used_capabilities(domains)
     if capabilities != capability_slugs:
         errors.append(
             f"declared/used capability mismatch unused={sorted(capability_slugs - capabilities)} "
@@ -198,7 +224,7 @@ def main() -> int:
             print(f"ERROR {error}")
         return 1
     counts = Counter(item["evidence"] for item in data["domains"])
-    capabilities = {item["shared_capability"] for item in data["domains"]}
+    capabilities = collect_used_capabilities(data["domains"])
     print(
         "PASS "
         f"domains={len(data['domains'])} capabilities={len(capabilities)} "

@@ -17,9 +17,11 @@ domains/<한글 domain>/              # 업무 분야 taxonomy
 
 `domain`은 법적 임용·직렬 분류가 아니라 실제 공무 수행 분야를 뜻합니다. 하나의 Skill은 여러 domain에서 공유할 수 있고, domain별 차이는 검증된 반복 업무가 생길 때 얇은 wrapper로 추가합니다.
 
+Catalog schema v3에서 `shared_capability`는 domain의 기본 capability이고, 선택적 `additional_capabilities`는 기본 후보를 대체하지 않는 교차 domain workflow입니다. 추가 capability의 credential·side effect·manual handoff 경계는 공통 capability runtime manifest를 따릅니다.
+
 ## 현재 구현
 
-1차 MVP는 다음 8개 공통 capability와 read-only adapter를 제공합니다.
+현재 다음 9개 공통 capability와 read-only/draft-only adapter를 제공합니다.
 
 - `public-document-hwpx`
 - `korean-law-bill-research`
@@ -29,12 +31,13 @@ domains/<한글 domain>/              # 업무 분야 taxonomy
 - `welfare-health-safety-research`
 - `land-housing-geospatial-research`
 - `official-source-research`
+- `civil-complaint-triage-draft`
 
 60개 domain 후보는 `direct`, `adjacent`, `new`, `sensitive`로 구분합니다. 이는 구현 완료도가 아니라 **근거 강도와 도입 경계**입니다.
 
 각 capability는 `scripts/adapter.py`, `tests/test_adapter.py`, `fixtures/sample.json`,
-`references/runtime-contract.md`를 가집니다. 현재 상태는 credential이 필요한 6개 API adapter와 HWPX가
-`fixture-verified / live_smoke: not-run`, `official-source-research`가
+`references/runtime-contract.md`를 가집니다. 현재 상태는 credential이 필요한 6개 API adapter, HWPX,
+민원 draft admission adapter가 `fixture-verified / live_smoke: not-run`, `official-source-research`가
 `live-verified / live_smoke: passed`입니다. fixture 성공을 공식 endpoint·credential 검증으로 해석하지 않습니다.
 
 ```bash

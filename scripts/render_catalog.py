@@ -47,6 +47,7 @@ def render_catalog(data: dict[str, Any]) -> str:
         f"- 인접 capability 활용: **{counts['adjacent']}개**",
         f"- 신규 설계 필요: **{counts['new']}개**",
         f"- 민감업무 제한: **{counts['sensitive']}개**",
+        f"- 공통 capability: **{len(data['shared_capabilities'])}개**",
         "- 구현 상태: 모든 domain 항목은 후보이며, 실제 API·인증·약관 검증 후 승격합니다.",
         "",
         "## Evidence 등급",
@@ -78,17 +79,20 @@ def render_catalog(data: dict[str, Any]) -> str:
                 "",
                 f"## {group}",
                 "",
-                "| Domain | Evidence | Skill 후보 | 권장 slug | 공통 capability | Reference Skill | 실행 경계 |",
-                "|---|---|---|---|---|---|---|",
+                "| Domain | Evidence | Skill 후보 | 권장 slug | 공통 capability | 추가 capability | Reference Skill | 실행 경계 |",
+                "|---|---|---|---|---|---|---|---|",
             ]
         )
         for item in domains:
             if item["group"] != group:
                 continue
             references = ", ".join(f"`{name}`" for name in item["reference_skills"]) or "—"
+            raw_additional = item.get("additional_capabilities", [])
+            additional_values = raw_additional if isinstance(raw_additional, list) else []
+            additional = ", ".join(f"`{name}`" for name in additional_values) or "—"
             lines.append(
-                "| {domain} | `{evidence}` | {candidate} | `{slug}` | `{shared_capability}` | {references} | `{boundary}` |".format(
-                    **item, references=references
+                "| {domain} | `{evidence}` | {candidate} | `{slug}` | `{shared_capability}` | {additional} | {references} | `{boundary}` |".format(
+                    **item, additional=additional, references=references
                 )
             )
 

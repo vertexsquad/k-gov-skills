@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "research_source": {
     "wiki_authority": "domains/harness-engineering/korea-local-agent-skillpack-runtime-contract.md",
     "wiki_source_map": "raw/2026-05-28-nomadamas-k-skill-source-map.md",
@@ -129,6 +129,22 @@
       ],
       "execution_status": "live-verified",
       "live_smoke": "passed"
+    },
+    {
+      "slug": "civil-complaint-triage-draft",
+      "locale": "ko-KR",
+      "jurisdiction": "KR",
+      "service": "국민신문고·기관 민원 분류 및 답변 초안 admission",
+      "credential_class": "none",
+      "proxy_mode": "none",
+      "side_effect_class": "draft-only",
+      "manual_handoff_gate": "소관 확정·처분 판단·답변 발송은 담당 공무원 승인",
+      "source_provenance": [
+        "https://www.epeople.go.kr/",
+        "https://www.acrc.go.kr/"
+      ],
+      "execution_status": "fixture-verified",
+      "live_smoke": "not-run"
     }
   ],
   "domains": [
@@ -143,7 +159,10 @@
         "hwp",
         "rhwp-edit"
       ],
-      "boundary": "draft-only"
+      "boundary": "draft-only",
+      "additional_capabilities": [
+        "civil-complaint-triage-draft"
+      ]
     },
     {
       "domain": "재정",
@@ -853,7 +872,10 @@
         "local-election-candidate-search",
         "kakao-map"
       ],
-      "boundary": "read-only"
+      "boundary": "read-only",
+      "additional_capabilities": [
+        "civil-complaint-triage-draft"
+      ]
     },
     {
       "domain": "지역개발",
