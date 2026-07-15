@@ -73,8 +73,8 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
     raw_capabilities = data.get("shared_capabilities")
     if not isinstance(raw_capabilities, list):
         return errors + ["shared_capabilities must be a list"]
-    if len(raw_capabilities) != 9:
-        errors.append(f"catalog must contain 9 shared capabilities, got {len(raw_capabilities)}")
+    if len(raw_capabilities) != 10:
+        errors.append(f"catalog must contain 10 shared capabilities, got {len(raw_capabilities)}")
 
     capability_slugs: set[str] = set()
     capability_by_slug: dict[str, dict[str, Any]] = {}

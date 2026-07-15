@@ -145,6 +145,22 @@
       ],
       "execution_status": "fixture-verified",
       "live_smoke": "not-run"
+    },
+    {
+      "slug": "administrative-document-draft-review",
+      "locale": "ko-KR",
+      "jurisdiction": "KR",
+      "service": "비식별 행정문서 초안·검토 admission",
+      "credential_class": "none",
+      "proxy_mode": "none",
+      "side_effect_class": "draft-only",
+      "manual_handoff_gate": "기관 서식·근거 확정·결재·발송은 담당 공무원 승인",
+      "source_provenance": [
+        "https://gnews.gg.go.kr/",
+        "https://www.suwon.go.kr/"
+      ],
+      "execution_status": "fixture-verified",
+      "live_smoke": "not-run"
     }
   ],
   "domains": [
@@ -161,7 +177,8 @@
       ],
       "boundary": "draft-only",
       "additional_capabilities": [
-        "civil-complaint-triage-draft"
+        "civil-complaint-triage-draft",
+        "administrative-document-draft-review"
       ]
     },
     {
@@ -874,7 +891,8 @@
       ],
       "boundary": "read-only",
       "additional_capabilities": [
-        "civil-complaint-triage-draft"
+        "civil-complaint-triage-draft",
+        "administrative-document-draft-review"
       ]
     },
     {
