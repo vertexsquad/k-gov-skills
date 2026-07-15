@@ -77,7 +77,13 @@ def _source_url(value: Any) -> str:
     normalized = _required_string(
         value, "source_url", max_characters=MAX_SOURCE_URL_CHARACTERS
     )
-    parsed = urlsplit(normalized)
+    if any(ord(character) < 32 or ord(character) == 127 for character in normalized):
+        raise ValueError("source_url must be a credential-free HTTPS URL")
+    try:
+        parsed = urlsplit(normalized)
+        parsed.port
+    except ValueError as exc:
+        raise ValueError("source_url must be a credential-free HTTPS URL") from exc
     if (
         parsed.scheme != "https"
         or not parsed.hostname
