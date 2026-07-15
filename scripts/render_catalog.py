@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Render the machine-readable domain Skill candidate catalog as Markdown."""
+"""Render the machine-readable domain-owned Skill catalog as Markdown."""
 
 from __future__ import annotations
 
+import argparse
 import json
 from collections import Counter
 from pathlib import Path
@@ -34,21 +35,25 @@ def load_catalog(path: Path) -> dict[str, Any]:
 def render_catalog(data: dict[str, Any]) -> str:
     domains = data["domains"]
     counts = Counter(item["evidence"] for item in domains)
+    skills = [skill for domain in domains for skill in domain["skills"]]
+    role_counts = Counter(skill["role"] for skill in skills)
     lines = [
-        "# Domain별 Skill 후보",
+        "# Domain별 Skill",
         "",
         "> 이 문서는 `catalog/domain-skills.json`에서 생성합니다. 직접 편집하지 마세요.",
-        "> 외부 reference의 코드·문서를 복사하지 않으며, 독립 구현을 위한 capability 근거로만 사용합니다.",
+        "> 공개 Skill은 `domains/<domain>/skills/<unique-slug>/SKILL.md`만 소유합니다.",
+        "> 공통 구현은 `kgov_runtime/capabilities/`에 있고 top-level `skills/`는 금지합니다.",
         "",
         "## 요약",
         "",
         f"- 전체 domain: **{len(domains)}개**",
+        f"- domain-owned Skill: **{len(skills)}개** (primary {role_counts['primary']} / additional {role_counts['additional']})",
         f"- 직접 reference 확인: **{counts['direct']}개**",
         f"- 인접 capability 활용: **{counts['adjacent']}개**",
         f"- 신규 설계 필요: **{counts['new']}개**",
         f"- 민감업무 제한: **{counts['sensitive']}개**",
-        f"- 공통 capability: **{len(data['shared_capabilities'])}개**",
-        "- 구현 상태: 모든 domain 항목은 후보이며, 실제 API·인증·약관 검증 후 승격합니다.",
+        f"- 내부 공통 capability: **{len(data['shared_capabilities'])}개**",
+        "- Domain Skill의 live 검증 상태는 연결된 capability manifest보다 강하게 주장하지 않습니다.",
         "",
         "## Evidence 등급",
         "",
@@ -61,7 +66,7 @@ def render_catalog(data: dict[str, Any]) -> str:
     lines.extend(
         [
             "",
-            "## 공통 capability runtime manifest",
+            "## 내부 capability runtime manifest",
             "",
             "| Capability | Credential | Proxy | Side effect | Execution | Live smoke |",
             "|---|---|---|---|---|---|",
@@ -79,22 +84,19 @@ def render_catalog(data: dict[str, Any]) -> str:
                 "",
                 f"## {group}",
                 "",
-                "| Domain | Evidence | Skill 후보 | 권장 slug | 공통 capability | 추가 capability | Reference Skill | 실행 경계 |",
+                "| Domain | Evidence | Role | Skill | Slug | Capability | Reference Skill | 경계 |",
                 "|---|---|---|---|---|---|---|---|",
             ]
         )
-        for item in domains:
-            if item["group"] != group:
+        for domain in domains:
+            if domain["group"] != group:
                 continue
-            references = ", ".join(f"`{name}`" for name in item["reference_skills"]) or "—"
-            raw_additional = item.get("additional_capabilities", [])
-            additional_values = raw_additional if isinstance(raw_additional, list) else []
-            additional = ", ".join(f"`{name}`" for name in additional_values) or "—"
-            lines.append(
-                "| {domain} | `{evidence}` | {candidate} | `{slug}` | `{shared_capability}` | {additional} | {references} | `{boundary}` |".format(
-                    **item, additional=additional, references=references
+            for skill in domain["skills"]:
+                references = ", ".join(f"`{name}`" for name in skill["reference_skills"]) or "—"
+                lines.append(
+                    f"| {domain['domain']} | `{domain['evidence']}` | `{skill['role']}` | {skill['title']} | "
+                    f"`{skill['name']}` | `{skill['capability']}` | {references} | `{skill['boundary']}` |"
                 )
-            )
 
     source = data["research_source"]
     lines.extend(
@@ -107,7 +109,7 @@ def render_catalog(data: dict[str, Any]) -> str:
             f"- Live reference repository: {source['reference_repository']}",
             f"- 확인한 reference HEAD: `{source['reference_head']}`",
             "- Reference Skill 이름은 capability 존재 근거일 뿐이며 코드·프롬프트를 가져오지 않습니다.",
-            "- `sensitive` 후보는 공개정보 기반 manual-review만 허용하고 운영·보호 세부사항을 자동화하지 않습니다.",
+            "- `sensitive` domain은 공개정보 기반 manual-review만 허용하고 운영·보호 세부사항을 자동화하지 않습니다.",
             "",
         ]
     )
@@ -115,10 +117,20 @@ def render_catalog(data: dict[str, Any]) -> str:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--check", action="store_true", help="fail when generated Markdown is missing or stale")
+    args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
-    source = root / "catalog" / "domain-skills.json"
-    output = root / "docs" / "domain-skill-candidates.md"
-    output.write_text(render_catalog(load_catalog(source)), encoding="utf-8")
+    source = root / "catalog/domain-skills.json"
+    output = root / "docs/domain-skill-candidates.md"
+    expected = render_catalog(load_catalog(source))
+    if args.check:
+        if not output.is_file() or output.read_text(encoding="utf-8") != expected:
+            print(f"ERROR stale generated document: {output.relative_to(root)}")
+            return 1
+        print(f"PASS generated={output.relative_to(root)}")
+        return 0
+    output.write_text(expected, encoding="utf-8")
     print(f"rendered={output.relative_to(root)}")
     return 0
 

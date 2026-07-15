@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the domain taxonomy, Skill candidate catalog, and generated documentation."""
+"""Validate the domain-owned Skill topology, capability runtime, and generated docs."""
 
 from __future__ import annotations
 
@@ -13,17 +13,10 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from render_catalog import GROUP_ORDER, render_catalog  # noqa: E402
+from render_domain_skills import expected_domain_skills  # noqa: E402
 
-REQUIRED_KEYS = {
-    "domain",
-    "group",
-    "evidence",
-    "candidate",
-    "slug",
-    "shared_capability",
-    "reference_skills",
-    "boundary",
-}
+DOMAIN_REQUIRED_KEYS = {"domain", "group", "evidence", "skills"}
+SKILL_REQUIRED_KEYS = {"name", "title", "capability", "role", "reference_skills", "boundary"}
 CAPABILITY_REQUIRED_KEYS = {
     "slug",
     "locale",
@@ -39,6 +32,7 @@ CAPABILITY_REQUIRED_KEYS = {
 }
 EVIDENCE = {"direct", "adjacent", "new", "sensitive"}
 BOUNDARIES = {"read-only", "draft-only", "manual-review-only"}
+ROLES = {"primary", "additional"}
 CREDENTIAL_CLASSES = {"none", "user-held", "operator-held", "mixed"}
 PROXY_MODES = {"none", "optional", "required", "mixed"}
 SIDE_EFFECT_CLASSES = {"read-only", "document-read", "draft-only"}
@@ -48,48 +42,48 @@ SLUG = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 
 def collect_used_capabilities(domains: list[dict[str, Any]]) -> set[str]:
-    capabilities = {
-        item["shared_capability"]
-        for item in domains
-        if isinstance(item.get("shared_capability"), str)
-    }
-    for item in domains:
-        additional_capabilities = item.get("additional_capabilities", [])
-        if isinstance(additional_capabilities, list):
-            capabilities.update(value for value in additional_capabilities if isinstance(value, str))
-    return capabilities
+    used: set[str] = set()
+    for domain in domains:
+        skills = domain.get("skills", [])
+        if not isinstance(skills, list):
+            continue
+        used.update(
+            skill["capability"]
+            for skill in skills
+            if isinstance(skill, dict) and isinstance(skill.get("capability"), str)
+        )
+    return used
 
 
-def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
-    errors: list[str] = []
-    domains = data.get("domains")
-    if data.get("schema_version") != 3:
-        errors.append("schema_version must be 3")
-    if not isinstance(domains, list):
-        return errors + ["domains must be a list"]
-    if len(domains) != 60:
-        errors.append(f"catalog must contain 60 domains, got {len(domains)}")
 
-    raw_capabilities = data.get("shared_capabilities")
+def _validate_capabilities(
+    raw_capabilities: Any,
+    root: Path,
+    errors: list[str],
+) -> tuple[set[str], dict[str, dict[str, Any]]]:
     if not isinstance(raw_capabilities, list):
-        return errors + ["shared_capabilities must be a list"]
+        errors.append("shared_capabilities must be a list")
+        return set(), {}
     if len(raw_capabilities) != 11:
         errors.append(f"catalog must contain 11 shared capabilities, got {len(raw_capabilities)}")
-
-    capability_slugs: set[str] = set()
-    capability_by_slug: dict[str, dict[str, Any]] = {}
+    slugs: set[str] = set()
+    by_slug: dict[str, dict[str, Any]] = {}
     for index, capability in enumerate(raw_capabilities):
+        if not isinstance(capability, dict):
+            errors.append(f"shared_capabilities[{index}] must be an object")
+            continue
         missing = CAPABILITY_REQUIRED_KEYS - set(capability)
         if missing:
             errors.append(f"shared_capabilities[{index}] missing keys: {sorted(missing)}")
             continue
         slug = capability["slug"]
-        if slug in capability_slugs:
-            errors.append(f"duplicate shared capability: {slug}")
-        capability_slugs.add(slug)
-        capability_by_slug[slug] = capability
-        if not SLUG.fullmatch(slug):
+        if not isinstance(slug, str) or not SLUG.fullmatch(slug):
             errors.append(f"invalid shared capability slug: {slug}")
+            continue
+        if slug in slugs:
+            errors.append(f"duplicate shared capability: {slug}")
+        slugs.add(slug)
+        by_slug[slug] = capability
         if capability["locale"] != "ko-KR" or capability["jurisdiction"] != "KR":
             errors.append(f"{slug}: locale/jurisdiction must be ko-KR/KR")
         if capability["credential_class"] not in CREDENTIAL_CLASSES:
@@ -112,108 +106,168 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
         ):
             errors.append(f"{slug}: source_provenance must contain HTTPS URLs")
 
+        module = slug.replace("-", "_")
+        required_paths = [
+            root / "kgov_runtime" / "capabilities" / f"{module}.py",
+            root / "tests" / "capabilities" / f"test_{module}.py",
+            root / "tests" / "fixtures" / "capabilities" / f"{slug}.json",
+            root / "docs" / "capabilities" / slug / "procedure.md",
+            root / "docs" / "capabilities" / slug / "runtime-contract.md",
+        ]
+        for path in required_paths:
+            if not path.is_file():
+                errors.append(f"{slug}: missing internal capability artifact {path.relative_to(root)}")
+        if capability["execution_status"] == "live-verified":
+            path = root / "docs" / "capabilities" / slug / "live-smoke.md"
+            if not path.is_file():
+                errors.append(f"{slug}: missing live smoke evidence {path.relative_to(root)}")
+    return slugs, by_slug
+
+
+def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
+    errors: list[str] = []
+    if data.get("schema_version") != 4:
+        errors.append("schema_version must be 4")
+    domains = data.get("domains")
+    if not isinstance(domains, list):
+        return errors + ["domains must be a list"]
+    if len(domains) != 60:
+        errors.append(f"catalog must contain 60 domains, got {len(domains)}")
+
+    capability_slugs, capability_by_slug = _validate_capabilities(data.get("shared_capabilities"), root, errors)
     seen_domains: set[str] = set()
-    seen_slugs: set[str] = set()
+    seen_names: set[str] = set()
+    declared_entrypoints: set[Path] = set()
+    total_skills = 0
+
     for index, item in enumerate(domains):
-        missing = REQUIRED_KEYS - set(item)
+        if not isinstance(item, dict):
+            errors.append(f"domains[{index}] must be an object")
+            continue
+        missing = DOMAIN_REQUIRED_KEYS - set(item)
         if missing:
             errors.append(f"domains[{index}] missing keys: {sorted(missing)}")
             continue
         domain = item["domain"]
-        slug = item["slug"]
         evidence = item["evidence"]
-        references = item["reference_skills"]
-        additional_capabilities = item.get("additional_capabilities", [])
+        skills = item["skills"]
+        if not isinstance(domain, str) or not domain:
+            errors.append(f"domains[{index}]: invalid domain")
+            continue
         if domain in seen_domains:
             errors.append(f"duplicate domain: {domain}")
         seen_domains.add(domain)
-        if slug in seen_slugs:
-            errors.append(f"duplicate candidate slug: {slug}")
-        seen_slugs.add(slug)
         if item["group"] not in GROUP_ORDER:
             errors.append(f"{domain}: invalid group {item['group']}")
         if evidence not in EVIDENCE:
             errors.append(f"{domain}: invalid evidence {evidence}")
-        if item["boundary"] not in BOUNDARIES:
-            errors.append(f"{domain}: invalid boundary {item['boundary']}")
-        if not SLUG.fullmatch(slug):
-            errors.append(f"{domain}: invalid candidate slug {slug}")
-        if not SLUG.fullmatch(item["shared_capability"]):
-            errors.append(f"{domain}: invalid shared capability {item['shared_capability']}")
-        elif item["shared_capability"] not in capability_slugs:
-            errors.append(f"{domain}: unknown shared capability {item['shared_capability']}")
-        if not isinstance(additional_capabilities, list) or not all(
-            isinstance(value, str) and SLUG.fullmatch(value) for value in additional_capabilities
-        ):
-            errors.append(f"{domain}: invalid additional_capabilities")
-            additional_capabilities = []
-        elif len(additional_capabilities) != len(set(additional_capabilities)):
-            errors.append(f"{domain}: duplicate additional capability")
-        for additional in additional_capabilities:
-            if additional == item["shared_capability"]:
-                errors.append(f"{domain}: additional capability {additional} duplicates primary capability")
-            elif additional not in capability_slugs:
-                errors.append(f"{domain}: unknown additional capability {additional}")
-        if not isinstance(references, list) or not all(isinstance(value, str) and SLUG.fullmatch(value) for value in references):
-            errors.append(f"{domain}: invalid reference_skills")
-        if evidence in {"direct", "adjacent"} and not references:
-            errors.append(f"{domain}: {evidence} evidence requires reference_skills")
-        if evidence in {"new", "sensitive"} and references:
-            errors.append(f"{domain}: {evidence} evidence must not claim reference_skills")
-        if evidence == "sensitive" and item["boundary"] != "manual-review-only":
-            errors.append(f"{domain}: sensitive evidence requires manual-review-only")
+        if not isinstance(skills, list) or not skills:
+            errors.append(f"{domain}: skills must be a non-empty list")
+            continue
+        total_skills += len(skills)
+        primary_count = sum(isinstance(skill, dict) and skill.get("role") == "primary" for skill in skills)
+        if primary_count != 1:
+            errors.append(f"{domain}: requires exactly one primary Skill, got {primary_count}")
+        for skill_index, skill in enumerate(skills):
+            if not isinstance(skill, dict):
+                errors.append(f"{domain}.skills[{skill_index}] must be an object")
+                continue
+            missing_skill = SKILL_REQUIRED_KEYS - set(skill)
+            if missing_skill:
+                errors.append(f"{domain}.skills[{skill_index}] missing keys: {sorted(missing_skill)}")
+                continue
+            name = skill["name"]
+            capability = skill["capability"]
+            role = skill["role"]
+            boundary = skill["boundary"]
+            references = skill["reference_skills"]
+            if not isinstance(name, str) or not SLUG.fullmatch(name):
+                errors.append(f"{domain}: invalid Skill name {name}")
+                continue
+            if name in seen_names:
+                errors.append(f"duplicate domain Skill name: {name}")
+            seen_names.add(name)
+            if role not in ROLES:
+                errors.append(f"{domain}/{name}: invalid role {role}")
+            if not isinstance(capability, str) or not SLUG.fullmatch(capability):
+                errors.append(f"{domain}/{name}: invalid capability {capability}")
+            elif capability not in capability_slugs:
+                errors.append(f"{domain}/{name}: unknown capability {capability}")
+            if boundary not in BOUNDARIES:
+                errors.append(f"{domain}/{name}: invalid boundary {boundary}")
+            if not isinstance(references, list) or not all(
+                isinstance(value, str) and SLUG.fullmatch(value) for value in references
+            ):
+                errors.append(f"{domain}/{name}: invalid reference_skills")
+                references = []
+            if role == "primary":
+                if evidence in {"direct", "adjacent"} and not references:
+                    errors.append(f"{domain}: {evidence} evidence requires primary reference_skills")
+                if evidence in {"new", "sensitive"} and references:
+                    errors.append(f"{domain}: {evidence} evidence must not claim primary reference_skills")
+                if evidence == "sensitive" and boundary != "manual-review-only":
+                    errors.append(f"{domain}: sensitive evidence requires manual-review-only")
+            declared_entrypoints.add(Path("domains") / domain / "skills" / name / "SKILL.md")
 
-    actual_domains = {path.name for path in (root / "domains").iterdir() if path.is_dir()}
+    if total_skills != 66:
+        errors.append(f"catalog must declare 66 domain Skills, got {total_skills}")
+    domains_root = root / "domains"
+    actual_domains = {path.name for path in domains_root.iterdir() if path.is_dir()} if domains_root.is_dir() else set()
     if actual_domains != seen_domains:
         errors.append(
-            f"domain folder/catalog mismatch missing={sorted(actual_domains - seen_domains)} extra={sorted(seen_domains - actual_domains)}"
+            f"domain folder/catalog mismatch missing={sorted(seen_domains - actual_domains)} extra={sorted(actual_domains - seen_domains)}"
         )
+    if (root / "skills").exists():
+        errors.append("top-level skills/ is forbidden; public Skills must be owned by domains")
 
-    capabilities = collect_used_capabilities(domains)
-    if capabilities != capability_slugs:
+    actual_entrypoints = {path.relative_to(root) for path in domains_root.glob("*/skills/*/SKILL.md")}
+    if actual_entrypoints != declared_entrypoints:
         errors.append(
-            f"declared/used capability mismatch unused={sorted(capability_slugs - capabilities)} "
-            f"undeclared={sorted(capabilities - capability_slugs)}"
+            f"domain Skill/catalog mismatch missing={sorted(map(str, declared_entrypoints - actual_entrypoints))} "
+            f"extra={sorted(map(str, actual_entrypoints - declared_entrypoints))}"
         )
-    for capability in sorted(capabilities):
-        skill_path = root / "skills" / capability / "SKILL.md"
-        if not skill_path.is_file():
-            errors.append(f"missing shared capability Skill: {skill_path.relative_to(root)}")
+    for gitkeep in domains_root.glob("*/.gitkeep"):
+        errors.append(f"stale empty-domain marker is forbidden: {gitkeep.relative_to(root)}")
+
+    used = collect_used_capabilities(domains)
+    if used != capability_slugs:
+        errors.append(
+            f"declared/used capability mismatch unused={sorted(capability_slugs - used)} undeclared={sorted(used - capability_slugs)}"
+        )
+    try:
+        expected_skills = expected_domain_skills(data, root)
+    except (KeyError, TypeError) as exc:
+        errors.append(f"cannot render domain Skills from catalog: {exc}")
+        expected_skills = {}
+    for path, expected in expected_skills.items():
+        if not path.is_file():
             continue
-        skill_text = skill_path.read_text(encoding="utf-8")
-        name_match = re.search(r"^name:\s*([^\s]+)\s*$", skill_text, re.MULTILINE)
-        description_match = re.search(r"^description:\s*(.+)\s*$", skill_text, re.MULTILINE)
-        if not name_match or name_match.group(1) != capability:
-            errors.append(f"{skill_path.relative_to(root)}: frontmatter name must be {capability}")
+        text = path.read_text(encoding="utf-8")
+        if text != expected:
+            errors.append(f"stale generated domain Skill: {path.relative_to(root)}")
+        name_match = re.search(r"^name:\s*([^\s]+)\s*$", text, re.MULTILINE)
+        description_match = re.search(r"^description:\s*(.+)\s*$", text, re.MULTILINE)
+        if not name_match or name_match.group(1) != path.parent.name:
+            errors.append(f"{path.relative_to(root)}: frontmatter name must match directory")
         if not description_match:
-            errors.append(f"{skill_path.relative_to(root)}: missing frontmatter description")
-        manifest = capability_by_slug.get(capability)
-        if manifest and manifest["execution_status"] in {"fixture-verified", "live-verified"}:
-            required_paths = [
-                skill_path.parent / "scripts" / "adapter.py",
-                skill_path.parent / "tests" / "test_adapter.py",
-                skill_path.parent / "fixtures" / "sample.json",
-                skill_path.parent / "references" / "runtime-contract.md",
-            ]
-            for required_path in required_paths:
-                if not required_path.is_file():
-                    errors.append(f"{capability}: missing verified artifact {required_path.relative_to(root)}")
-            if manifest["execution_status"] == "live-verified":
-                live_evidence = skill_path.parent / "references" / "live-smoke.md"
-                if not live_evidence.is_file():
-                    errors.append(f"{capability}: missing live smoke evidence {live_evidence.relative_to(root)}")
+            errors.append(f"{path.relative_to(root)}: missing frontmatter description")
 
     generated = root / "docs" / "domain-skill-candidates.md"
-    expected = render_catalog(data)
-    if not generated.is_file():
-        errors.append("missing generated docs/domain-skill-candidates.md")
-    elif generated.read_text(encoding="utf-8") != expected:
-        errors.append("docs/domain-skill-candidates.md is stale; run scripts/render_catalog.py")
+    try:
+        expected_catalog = render_catalog(data)
+    except (KeyError, TypeError) as exc:
+        errors.append(f"cannot render generated catalog: {exc}")
+    else:
+        if not generated.is_file():
+            errors.append("missing generated docs/domain-skill-candidates.md")
+        elif generated.read_text(encoding="utf-8") != expected_catalog:
+            errors.append("docs/domain-skill-candidates.md is stale; run scripts/render_catalog.py")
+
     return errors
 
 
 def main() -> int:
-    catalog_path = ROOT / "catalog" / "domain-skills.json"
+    catalog_path = ROOT / "catalog/domain-skills.json"
     if not catalog_path.is_file():
         print("ERROR missing catalog/domain-skills.json")
         return 1
@@ -225,9 +279,10 @@ def main() -> int:
         return 1
     counts = Counter(item["evidence"] for item in data["domains"])
     capabilities = collect_used_capabilities(data["domains"])
+    domain_skills = sum(len(item["skills"]) for item in data["domains"])
     print(
         "PASS "
-        f"domains={len(data['domains'])} capabilities={len(capabilities)} "
+        f"domains={len(data['domains'])} domain_skills={domain_skills} capabilities={len(capabilities)} top_level_skills=0 "
         + " ".join(f"{name}={counts[name]}" for name in ("direct", "adjacent", "new", "sensitive"))
     )
     return 0

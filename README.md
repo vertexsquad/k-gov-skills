@@ -5,23 +5,29 @@
 ## 구조
 
 ```text
-catalog/domain-skills.json          # 60개 domain과 Skill 후보의 단일 원본
-skills/<shared-capability>/SKILL.md # 여러 domain이 공유하는 실행 계약
-scripts/render_catalog.py           # 사람용 후보 문서 생성
-scripts/validate_catalog.py         # taxonomy·catalog·Skill·문서 정합성 검증
-scripts/check.py                    # 전체 deterministic 검증 진입점
-kgov_runtime/                       # HTTPS·allowlist·응답크기 공통 안전 계층
-docs/domain-skill-candidates.md     # 생성된 전체 후보표
-domains/<한글 domain>/              # 업무 분야 taxonomy
+catalog/domain-skills.json                     # 60 domain·66 Skill·11 capability SSOT
+domains/<한글 domain>/skills/<slug>/SKILL.md   # 공개 Skill 진입점
+kgov_runtime/capabilities/<module>.py           # domain 간 공유하는 내부 실행 구현
+docs/capabilities/<capability>/                 # 절차·runtime contract·live 증거
+tests/capabilities/                             # capability별 unit test
+tests/fixtures/capabilities/                    # 합성 deterministic fixture
+scripts/render_domain_skills.py                 # domain Skill 생성기
+scripts/render_catalog.py                       # 사람용 catalog 문서 생성기
+scripts/validate_catalog.py                     # topology·catalog·instruction 검증기
+scripts/check.py                                # 전체 deterministic 검증 진입점
 ```
 
-`domain`은 법적 임용·직렬 분류가 아니라 실제 공무 수행 분야를 뜻합니다. 하나의 Skill은 여러 domain에서 공유할 수 있고, domain별 차이는 검증된 반복 업무가 생길 때 얇은 wrapper로 추가합니다.
+`domain`은 단순 taxonomy가 아니라 **Skill 소유·배포 경계**입니다. 공개 Skill은 반드시
+`domains/<domain>/skills/` 하위에 있어야 하며 별도 top-level `skills/`는 허용하지 않습니다.
+공통 adapter 코드는 `kgov_runtime/capabilities/`에서 한 번만 구현하고 domain Skill이 이를 호출합니다.
 
-Catalog schema v3에서 `shared_capability`는 domain의 기본 capability이고, 선택적 `additional_capabilities`는 기본 후보를 대체하지 않는 교차 domain workflow입니다. 추가 capability의 credential·side effect·manual handoff 경계는 공통 capability runtime manifest를 따릅니다.
+Catalog schema v4의 domain `skills[]`는 `primary` 하나와 선택적 `additional` Skill을 명시합니다.
+모든 `name`은 저장소 전체에서 고유합니다. 60개 domain에 primary 60개와 additional 6개,
+총 66개 domain-owned Skill 진입점이 있습니다.
 
-## 현재 구현
+## 현재 capability
 
-현재 다음 11개 공통 capability와 read-only/draft-only adapter를 제공합니다.
+다음 11개 read-only/document-read/draft-only 내부 capability를 제공합니다.
 
 - `public-document-hwpx`
 - `korean-law-bill-research`
@@ -35,36 +41,37 @@ Catalog schema v3에서 `shared_capability`는 domain의 기본 capability이고
 - `administrative-document-draft-review`
 - `public-policy-evidence-pack`
 
-60개 domain 후보는 `direct`, `adjacent`, `new`, `sensitive`로 구분합니다. 이는 구현 완료도가 아니라 **근거 강도와 도입 경계**입니다.
-
-각 capability는 `scripts/adapter.py`, `tests/test_adapter.py`, `fixtures/sample.json`,
-`references/runtime-contract.md`를 가집니다. 현재 10개 capability가 `fixture-verified / live_smoke: not-run`이고,
-`official-source-research`가 `live-verified / live_smoke: passed`입니다. credential이 필요한 API adapter,
-local draft/evidence admission adapter, HWPX fixture의 성공을 공식 endpoint·실제 기관 workflow 검증으로 해석하지 않습니다.
+Domain의 `direct`, `adjacent`, `new`, `sensitive`는 구현 완료도가 아니라 **근거 강도와 도입 경계**입니다.
+10개 capability는 `fixture-verified / live_smoke: not-run`이고 `official-source-research`만
+`live-verified / live_smoke: passed`입니다. Domain Skill은 연결된 capability보다 강한 검증 상태를
+주장하지 않습니다.
 
 ```bash
-# 네트워크·credential 없이 모든 adapter의 deterministic fixture 실행
-python3 scripts/check.py
+# capability 하나의 합성 fixture 실행
+python3 -m kgov_runtime.capabilities.kosis_official_statistics --fixture
 
-# capability 하나의 fixture 실행; live 전 runtime-contract.md를 검토
-python3 skills/kosis-official-statistics/scripts/adapter.py --fixture
+# 생성물 drift 확인
+python3 scripts/render_domain_skills.py --check
+python3 scripts/render_catalog.py --check
+
+# 네트워크·credential 없이 전체 검증
+python3 scripts/check.py
 ```
 
-실제 조회는 각 runtime contract의 공식 endpoint, 환경변수, 필수 query parameter를
-확인한 뒤 실행합니다. credential 값은 인자·fixture·로그·저장소에 기록하지 않습니다.
-
-## 검증
+Catalog를 변경한 경우 다음 순서로 생성물을 갱신합니다.
 
 ```bash
+python3 scripts/render_domain_skills.py
 python3 scripts/render_catalog.py
-python3 scripts/validate_catalog.py
-python3 -m unittest discover -s tests -v
 python3 scripts/check.py
 ```
+
+실제 조회 전 `docs/capabilities/<capability>/runtime-contract.md`의 공식 endpoint, 환경변수,
+필수 query parameter를 확인합니다. credential 값은 인자·fixture·로그·저장소에 기록하지 않습니다.
 
 ## 외부 reference 경계
 
 - `mouseco/k-gov-skills`와 `NomaDamas/k-skill`은 별개 프로젝트이며 참고 자료로만 사용합니다.
 - 외부 코드·프롬프트·문서를 복사하거나 미러링하지 않습니다.
-- 실제 adapter 구현 전 공식 API, 이용약관, 인증정보 소유자, proxy, 개인정보, side effect를 다시 검증합니다.
+- 실제 adapter 변경 전 공식 API, 이용약관, 인증정보 소유자, proxy, 개인정보, side effect를 재검증합니다.
 - 예약·결제·제출·메시지·문서 원본 변경·민감 경호업무는 명시 승인과 manual handoff 없이는 자동화하지 않습니다.
