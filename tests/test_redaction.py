@@ -11,6 +11,7 @@ class RedactionTest(unittest.TestCase):
             "연락처 010-1234-5678",
             "주민번호 900101-1234567",
             "회신 user@example.org",
+            "담당자 user@example.org의 요청",
         )
         for sample in samples:
             with self.subTest(sample=sample):
