@@ -5,6 +5,8 @@
 ## 구조
 
 ```text
+CLAUDE.md                                      # canonical 저장소 작업 계약
+AGENTS.md                                      # cross-runtime thin adapter
 catalog/domain-skills.json                     # 60 domain·66 Skill·11 capability SSOT
 domains/<한글 domain>/skills/<slug>/SKILL.md   # 공개 Skill 진입점
 kgov_runtime/capabilities/<module>.py           # domain 간 공유하는 내부 실행 구현

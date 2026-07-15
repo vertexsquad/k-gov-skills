@@ -55,6 +55,44 @@ def collect_used_capabilities(domains: list[dict[str, Any]]) -> set[str]:
     return used
 
 
+def _validate_instructions(root: Path, errors: list[str]) -> None:
+    contracts = {
+        "CLAUDE.md": {
+            "max_lines": 80,
+            "anchors": (
+                "domains/<domain>/skills/<unique-slug>/SKILL.md",
+                "top-level `skills/`",
+                "catalog/domain-skills.json",
+                "python3 scripts/check.py",
+                "비밀값",
+                "명시적 승인",
+            ),
+        },
+        "AGENTS.md": {
+            "max_lines": 20,
+            "anchors": (
+                "CLAUDE.md",
+                "domains/<domain>/skills/",
+                "top-level `skills/`",
+                "python3 scripts/check.py",
+            ),
+        },
+    }
+    for name, contract in contracts.items():
+        path = root / name
+        if not path.is_file():
+            errors.append(f"missing root instruction contract: {name}")
+            continue
+        text = path.read_text(encoding="utf-8")
+        if len(text.splitlines()) > contract["max_lines"]:
+            errors.append(f"{name}: exceeds {contract['max_lines']} line budget")
+        for anchor in contract["anchors"]:
+            if anchor not in text:
+                errors.append(f"{name}: missing required anchor {anchor!r}")
+    for typo in ("Agent.md", "Cluade.md"):
+        if (root / typo).exists():
+            errors.append(f"non-standard instruction filename is forbidden: {typo}")
+
 
 def _validate_capabilities(
     raw_capabilities: Any,
@@ -263,6 +301,7 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
         elif generated.read_text(encoding="utf-8") != expected_catalog:
             errors.append("docs/domain-skill-candidates.md is stale; run scripts/render_catalog.py")
 
+    _validate_instructions(root, errors)
     return errors
 
 

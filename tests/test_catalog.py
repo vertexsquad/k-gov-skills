@@ -162,6 +162,18 @@ class CatalogContractTest(unittest.TestCase):
         errors = validate(self.data, root)
         self.assertTrue(any(error.startswith("domain Skill/catalog mismatch") for error in errors))
 
+    def test_instruction_contract_mutation_fails_closed(self) -> None:
+        temp = self.copied_repo()
+        self.addCleanup(temp.cleanup)
+        root = Path(temp.name) / "repo"
+        claude = root / "CLAUDE.md"
+        claude.write_text(
+            claude.read_text(encoding="utf-8").replace("top-level `skills/`", "root capability surface"),
+            encoding="utf-8",
+        )
+        errors = validate(self.data, root)
+        self.assertIn("CLAUDE.md: missing required anchor 'top-level `skills/`'", errors)
+
     def test_validator_cli_reports_owned_topology(self) -> None:
         result = subprocess.run(
             [sys.executable, str(ROOT / "scripts/validate_catalog.py")],
