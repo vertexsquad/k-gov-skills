@@ -189,6 +189,9 @@ class AdapterTest(unittest.TestCase):
         for source_url in (
             "http://www.gov.kr/",
             "https://user:secret@www.gov.kr/",
+            "https://www.gov.kr:bad/path",
+            "https://www.gov.kr:99999/path",
+            "https://www.gov.kr/\npath",
             "not-a-url",
         ):
             changed = copy.deepcopy(self.valid)
