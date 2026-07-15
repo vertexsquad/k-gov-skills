@@ -1,0 +1,54 @@
+{
+  "question": "공공시설 개선 검토에 필요한 공개 근거를 정리합니다.",
+  "as_of_date": "2026-07-15",
+  "jurisdiction": "KR",
+  "redaction_status": "redacted",
+  "claims": [
+    {
+      "claim_id": "C1",
+      "statement": "공개 통계에 시설 이용 증가가 나타납니다.",
+      "evidence": [
+        {
+          "source_url": "https://kosis.kr/openapi/",
+          "source_kind": "official-primary",
+          "retrieved_on": "2026-07-15",
+          "relationship": "supports",
+          "receipt_status": "retrieved"
+        }
+      ]
+    },
+    {
+      "claim_id": "C2",
+      "statement": "관련 기준의 적용 범위가 서로 다르게 제시됩니다.",
+      "evidence": [
+        {
+          "source_url": "https://www.law.go.kr/",
+          "source_kind": "official-primary",
+          "retrieved_on": "2026-07-15",
+          "relationship": "supports",
+          "receipt_status": "retrieved"
+        },
+        {
+          "source_url": "https://www.gov.kr/",
+          "source_kind": "official-primary",
+          "retrieved_on": "2026-07-15",
+          "relationship": "contradicts",
+          "receipt_status": "retrieved"
+        }
+      ]
+    },
+    {
+      "claim_id": "C3",
+      "statement": "추가 확인이 필요한 보조 설명입니다.",
+      "evidence": [
+        {
+          "source_url": "https://example.org/context",
+          "source_kind": "official-secondary",
+          "retrieved_on": "2026-07-15",
+          "relationship": "supports",
+          "receipt_status": "retrieved"
+        }
+      ]
+    }
+  ]
+}

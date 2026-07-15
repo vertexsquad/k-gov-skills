@@ -8,7 +8,9 @@ import re
 DIRECT_IDENTIFIER_PATTERNS = (
     re.compile(r"(?<!\d)01[016789][-\s]?\d{3,4}[-\s]?\d{4}(?!\d)"),
     re.compile(r"(?<!\d)\d{6}[-\s]?[1-4]\d{6}(?!\d)"),
-    re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"),
+    re.compile(
+        r"(?<![A-Za-z0-9._%+-])[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}(?![A-Za-z])"
+    ),
 )
 
 

@@ -10,7 +10,7 @@
 - 인접 capability 활용: **16개**
 - 신규 설계 필요: **8개**
 - 민감업무 제한: **1개**
-- 공통 capability: **10개**
+- 공통 capability: **11개**
 - 구현 상태: 모든 domain 항목은 후보이며, 실제 API·인증·약관 검증 후 승격합니다.
 
 ## Evidence 등급
@@ -36,12 +36,13 @@
 | `official-source-research` | `none` | `none` | `read-only` | `live-verified` | `passed` |
 | `civil-complaint-triage-draft` | `none` | `none` | `draft-only` | `fixture-verified` | `not-run` |
 | `administrative-document-draft-review` | `none` | `none` | `draft-only` | `fixture-verified` | `not-run` |
+| `public-policy-evidence-pack` | `mixed` | `optional` | `draft-only` | `fixture-verified` | `not-run` |
 
 ## 국가운영
 
 | Domain | Evidence | Skill 후보 | 권장 slug | 공통 capability | 추가 capability | Reference Skill | 실행 경계 |
 |---|---|---|---|---|---|---|---|
-| 행정 | `direct` | 공공문서·HWPX 검토 | `government-document-hwpx-review` | `public-document-hwpx` | `civil-complaint-triage-draft`, `administrative-document-draft-review` | `hwp`, `rhwp-edit` | `draft-only` |
+| 행정 | `direct` | 공공문서·HWPX 검토 | `government-document-hwpx-review` | `public-document-hwpx` | `civil-complaint-triage-draft`, `administrative-document-draft-review`, `public-policy-evidence-pack` | `hwp`, `rhwp-edit` | `draft-only` |
 | 재정 | `adjacent` | 예산·결산 비교 | `budget-settlement-comparison` | `kosis-official-statistics` | — | `kosis-stats`, `k-dart` | `read-only` |
 | 세무 | `direct` | 사업자·체납 상태조회 | `business-tax-status-lookup` | `official-source-research` | — | `nts-business-registration`, `nts-tax-delinquency` | `read-only` |
 | 관세 | `new` | HS 품목·관세율 조사 | `tariff-hs-code-research` | `official-source-research` | — | — | `read-only` |
@@ -137,7 +138,7 @@
 
 | Domain | Evidence | Skill 후보 | 권장 slug | 공통 capability | 추가 capability | Reference Skill | 실행 경계 |
 |---|---|---|---|---|---|---|---|
-| 지방자치 | `direct` | 지방행정 인허가·생활정보 조회 | `local-government-business-status` | `official-source-research` | `civil-complaint-triage-draft`, `administrative-document-draft-review` | `localdata-business-status`, `local-election-candidate-search`, `kakao-map` | `read-only` |
+| 지방자치 | `direct` | 지방행정 인허가·생활정보 조회 | `local-government-business-status` | `official-source-research` | `civil-complaint-triage-draft`, `administrative-document-draft-review`, `public-policy-evidence-pack` | `localdata-business-status`, `local-election-candidate-search`, `kakao-map` | `read-only` |
 | 지역개발 | `direct` | 주택·토지·혼잡도 개발정보 조회 | `regional-development-housing-land` | `land-housing-geospatial-research` | — | `lh-notice-search`, `sh-notice-search`, `gongsijiga-search`, `seoul-density` | `read-only` |
 | 지방의회 | `adjacent` | 회의록·조례안 조사 | `local-council-minutes-ordinance` | `korean-law-bill-research` | — | `assembly-bill-vote-search`, `korean-law-search` | `read-only` |
 | 우정 | `direct` | 우편번호·배송조회 | `postal-code-delivery-tracking` | `official-source-research` | — | `delivery-tracking`, `zipcode-search` | `read-only` |

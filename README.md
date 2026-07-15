@@ -21,7 +21,7 @@ Catalog schema v3에서 `shared_capability`는 domain의 기본 capability이고
 
 ## 현재 구현
 
-현재 다음 10개 공통 capability와 read-only/draft-only adapter를 제공합니다.
+현재 다음 11개 공통 capability와 read-only/draft-only adapter를 제공합니다.
 
 - `public-document-hwpx`
 - `korean-law-bill-research`
@@ -33,13 +33,14 @@ Catalog schema v3에서 `shared_capability`는 domain의 기본 capability이고
 - `official-source-research`
 - `civil-complaint-triage-draft`
 - `administrative-document-draft-review`
+- `public-policy-evidence-pack`
 
 60개 domain 후보는 `direct`, `adjacent`, `new`, `sensitive`로 구분합니다. 이는 구현 완료도가 아니라 **근거 강도와 도입 경계**입니다.
 
 각 capability는 `scripts/adapter.py`, `tests/test_adapter.py`, `fixtures/sample.json`,
-`references/runtime-contract.md`를 가집니다. 현재 상태는 credential이 필요한 6개 API adapter, HWPX,
-민원·행정문서 draft admission adapter가 `fixture-verified / live_smoke: not-run`, `official-source-research`가
-`live-verified / live_smoke: passed`입니다. fixture 성공을 공식 endpoint·credential 검증으로 해석하지 않습니다.
+`references/runtime-contract.md`를 가집니다. 현재 10개 capability가 `fixture-verified / live_smoke: not-run`이고,
+`official-source-research`가 `live-verified / live_smoke: passed`입니다. credential이 필요한 API adapter,
+local draft/evidence admission adapter, HWPX fixture의 성공을 공식 endpoint·실제 기관 workflow 검증으로 해석하지 않습니다.
 
 ```bash
 # 네트워크·credential 없이 모든 adapter의 deterministic fixture 실행

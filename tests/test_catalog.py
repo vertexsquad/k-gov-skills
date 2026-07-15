@@ -34,7 +34,7 @@ class CatalogContractTest(unittest.TestCase):
         self.assertEqual(3, self.data["schema_version"])
         self.assertIn("shared_capabilities", self.data)
         capabilities = self.data["shared_capabilities"]
-        self.assertEqual(10, len(capabilities))
+        self.assertEqual(11, len(capabilities))
         required = {
             "slug",
             "locale",
@@ -62,6 +62,11 @@ class CatalogContractTest(unittest.TestCase):
         for domain in ("행정", "지방자치"):
             item = next(entry for entry in self.data["domains"] if entry["domain"] == domain)
             self.assertIn("administrative-document-draft-review", item.get("additional_capabilities", []))
+
+    def test_public_policy_evidence_pack_is_additional_for_relevant_domains(self) -> None:
+        for domain in ("행정", "지방자치"):
+            item = next(entry for entry in self.data["domains"] if entry["domain"] == domain)
+            self.assertIn("public-policy-evidence-pack", item.get("additional_capabilities", []))
 
     def test_unknown_additional_capability_is_rejected(self) -> None:
         changed = copy.deepcopy(self.data)
@@ -109,7 +114,7 @@ class CatalogContractTest(unittest.TestCase):
             capture_output=True,
             text=True,
         )
-        self.assertIn("capabilities=10", result.stdout)
+        self.assertIn("capabilities=11", result.stdout)
 
 
 if __name__ == "__main__":
