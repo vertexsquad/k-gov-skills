@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 import sys
@@ -31,7 +32,7 @@ def run(command: list[str], *, quiet: bool = False) -> None:
 def scan_secrets() -> None:
     hits: list[str] = []
     for path in ROOT.rglob("*"):
-        if not path.is_file() or ".git" in path.parts:
+        if not path.is_file() or any(part in {".git", ".ruff_cache", "__pycache__"} for part in path.parts):
             continue
         try:
             body = path.read_bytes()
@@ -45,21 +46,32 @@ def scan_secrets() -> None:
 
 def main() -> int:
     python = sys.executable
+    run([python, "scripts/render_domain_skills.py", "--check"])
+    run([python, "scripts/render_catalog.py", "--check"])
     run([python, "scripts/validate_catalog.py"])
-    run([python, "-m", "unittest", "discover", "-s", "tests", "-v"])
-    suites = 0
-    for skill_dir in sorted((ROOT / "skills").iterdir()):
-        test_file = skill_dir / "tests" / "test_adapter.py"
-        if not test_file.is_file():
-            continue
-        run([python, "-m", "unittest", "discover", "-s", str(test_file.parent), "-v"])
-        run([python, str(skill_dir / "scripts" / "adapter.py"), "--fixture"], quiet=True)
-        suites += 1
-    run([python, "-m", "compileall", "-q", "kgov_runtime", "scripts", "tests", "skills"])
+
+    root_suites = 0
+    for test_file in sorted((ROOT / "tests").glob("test_*.py")):
+        run([python, "-m", "unittest", f"tests.{test_file.stem}", "-v"])
+        root_suites += 1
+
+    data = json.loads((ROOT / "catalog/domain-skills.json").read_text(encoding="utf-8"))
+    capability_suites = 0
+    for capability in sorted(data["shared_capabilities"], key=lambda item: item["slug"]):
+        slug = capability["slug"]
+        module = slug.replace("-", "_")
+        run([python, "-m", "unittest", f"tests.capabilities.test_{module}", "-v"])
+        run([python, "-m", f"kgov_runtime.capabilities.{module}", "--fixture"], quiet=True)
+        capability_suites += 1
+
+    run([python, "-m", "compileall", "-q", "kgov_runtime", "scripts", "tests"])
     scan_secrets()
     if (ROOT / ".git").exists():
         run(["git", "diff", "--check"])
-    print(f"CHECK PASS root_suite=1 adapter_suites={suites} fixtures={suites} secret_hits=0")
+    print(
+        f"CHECK PASS root_suites={root_suites} capability_suites={capability_suites} "
+        f"fixtures={capability_suites} domain_skills=66 secret_hits=0"
+    )
     return 0
 
 

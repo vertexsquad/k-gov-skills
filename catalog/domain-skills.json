@@ -1,5 +1,5 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "research_source": {
     "wiki_authority": "domains/harness-engineering/korea-local-agent-skillpack-runtime-contract.md",
     "wiki_source_map": "raw/2026-05-28-nomadamas-k-skill-source-map.md",
@@ -185,775 +185,1113 @@
       "domain": "행정",
       "group": "국가운영",
       "evidence": "direct",
-      "candidate": "공공문서·HWPX 검토",
-      "slug": "government-document-hwpx-review",
-      "shared_capability": "public-document-hwpx",
-      "reference_skills": [
-        "hwp",
-        "rhwp-edit"
-      ],
-      "boundary": "draft-only",
-      "additional_capabilities": [
-        "civil-complaint-triage-draft",
-        "administrative-document-draft-review",
-        "public-policy-evidence-pack"
+      "skills": [
+        {
+          "name": "government-document-hwpx-review",
+          "title": "공공문서·HWPX 검토",
+          "capability": "public-document-hwpx",
+          "role": "primary",
+          "reference_skills": [
+            "hwp",
+            "rhwp-edit"
+          ],
+          "boundary": "draft-only"
+        },
+        {
+          "name": "public-administration-civil-complaint-triage-draft",
+          "title": "민원 분류·답변 초안",
+          "capability": "civil-complaint-triage-draft",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only"
+        },
+        {
+          "name": "public-administration-administrative-document-draft-review",
+          "title": "행정문서 초안·검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only"
+        },
+        {
+          "name": "public-administration-public-policy-evidence-pack",
+          "title": "정책 근거 묶음",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only"
+        }
       ]
     },
     {
       "domain": "재정",
       "group": "국가운영",
       "evidence": "adjacent",
-      "candidate": "예산·결산 비교",
-      "slug": "budget-settlement-comparison",
-      "shared_capability": "kosis-official-statistics",
-      "reference_skills": [
-        "kosis-stats",
-        "k-dart"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "budget-settlement-comparison",
+          "title": "예산·결산 비교",
+          "capability": "kosis-official-statistics",
+          "role": "primary",
+          "reference_skills": [
+            "kosis-stats",
+            "k-dart"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "세무",
       "group": "국가운영",
       "evidence": "direct",
-      "candidate": "사업자·체납 상태조회",
-      "slug": "business-tax-status-lookup",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "nts-business-registration",
-        "nts-tax-delinquency"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "business-tax-status-lookup",
+          "title": "사업자·체납 상태조회",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "nts-business-registration",
+            "nts-tax-delinquency"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "관세",
       "group": "국가운영",
       "evidence": "new",
-      "candidate": "HS 품목·관세율 조사",
-      "slug": "tariff-hs-code-research",
-      "shared_capability": "official-source-research",
-      "reference_skills": [],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "tariff-hs-code-research",
+          "title": "HS 품목·관세율 조사",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "감사",
       "group": "국가운영",
       "evidence": "adjacent",
-      "candidate": "감사 증빙 교차검증",
-      "slug": "audit-evidence-cross-check",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "biz-health-check",
-        "g2b-sanctioned-supplier"
-      ],
-      "boundary": "draft-only"
+      "skills": [
+        {
+          "name": "audit-evidence-cross-check",
+          "title": "감사 증빙 교차검증",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "biz-health-check",
+            "g2b-sanctioned-supplier"
+          ],
+          "boundary": "draft-only"
+        }
+      ]
     },
     {
       "domain": "통계",
       "group": "국가운영",
       "evidence": "direct",
-      "candidate": "KOSIS 공식통계 조회",
-      "slug": "kosis-statistics-lookup",
-      "shared_capability": "kosis-official-statistics",
-      "reference_skills": [
-        "kosis-stats"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "kosis-statistics-lookup",
+          "title": "KOSIS 공식통계 조회",
+          "capability": "kosis-official-statistics",
+          "role": "primary",
+          "reference_skills": [
+            "kosis-stats"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "조달",
       "group": "국가운영",
       "evidence": "direct",
-      "candidate": "나라장터 발주·제재 조회",
-      "slug": "public-procurement-plan-check",
-      "shared_capability": "public-procurement-research",
-      "reference_skills": [
-        "g2b-order-plan-search",
-        "g2b-sanctioned-supplier"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "public-procurement-plan-check",
+          "title": "나라장터 발주·제재 조회",
+          "capability": "public-procurement-research",
+          "role": "primary",
+          "reference_skills": [
+            "g2b-order-plan-search",
+            "g2b-sanctioned-supplier"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "외교",
       "group": "국가운영",
       "evidence": "new",
-      "candidate": "공식 국가·외교 브리프",
-      "slug": "official-country-brief",
-      "shared_capability": "official-source-research",
-      "reference_skills": [],
-      "boundary": "draft-only"
+      "skills": [
+        {
+          "name": "official-country-brief",
+          "title": "공식 국가·외교 브리프",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [],
+          "boundary": "draft-only"
+        }
+      ]
     },
     {
       "domain": "통일",
       "group": "국가운영",
       "evidence": "new",
-      "candidate": "북한·통일정책 공식자료 검색",
-      "slug": "unification-policy-source-search",
-      "shared_capability": "official-source-research",
-      "reference_skills": [],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "unification-policy-source-search",
+          "title": "북한·통일정책 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "선거관리",
       "group": "국가운영",
       "evidence": "direct",
-      "candidate": "지방선거 후보자 조회",
-      "slug": "local-election-candidate-lookup",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "local-election-candidate-search"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "local-election-candidate-lookup",
+          "title": "지방선거 후보자 조회",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "local-election-candidate-search"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "입법",
       "group": "국가운영",
       "evidence": "direct",
-      "candidate": "국회 의안·표결 조회",
-      "slug": "assembly-bill-vote-lookup",
-      "shared_capability": "korean-law-bill-research",
-      "reference_skills": [
-        "assembly-bill-vote-search"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "assembly-bill-vote-lookup",
+          "title": "국회 의안·표결 조회",
+          "capability": "korean-law-bill-research",
+          "role": "primary",
+          "reference_skills": [
+            "assembly-bill-vote-search"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "사법",
       "group": "법무·치안",
       "evidence": "direct",
-      "candidate": "법령·법원공고·등기 조사",
-      "slug": "law-court-registry-research",
-      "shared_capability": "korean-law-bill-research",
-      "reference_skills": [
-        "korean-law-search",
-        "court-auction-notice-search",
-        "iros-registry-automation",
-        "court-payment-order-assistant"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "law-court-registry-research",
+          "title": "법령·법원공고·등기 조사",
+          "capability": "korean-law-bill-research",
+          "role": "primary",
+          "reference_skills": [
+            "korean-law-search",
+            "court-auction-notice-search",
+            "iros-registry-automation",
+            "court-payment-order-assistant"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "검찰",
       "group": "법무·치안",
       "evidence": "adjacent",
-      "candidate": "검찰업무 법적 근거 조사",
-      "slug": "prosecution-legal-basis-research",
-      "shared_capability": "korean-law-bill-research",
-      "reference_skills": [
-        "korean-law-search"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "prosecution-legal-basis-research",
+          "title": "검찰업무 법적 근거 조사",
+          "capability": "korean-law-bill-research",
+          "role": "primary",
+          "reference_skills": [
+            "korean-law-search"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "교정",
       "group": "법무·치안",
       "evidence": "new",
-      "candidate": "교정 관련 규정 검색",
-      "slug": "corrections-regulation-search",
-      "shared_capability": "korean-law-bill-research",
-      "reference_skills": [],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "corrections-regulation-search",
+          "title": "교정 관련 규정 검색",
+          "capability": "korean-law-bill-research",
+          "role": "primary",
+          "reference_skills": [],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "보호관찰",
       "group": "법무·치안",
       "evidence": "new",
-      "candidate": "보호관찰 처분·준수사항 검색",
-      "slug": "probation-compliance-search",
-      "shared_capability": "korean-law-bill-research",
-      "reference_skills": [],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "probation-compliance-search",
+          "title": "보호관찰 처분·준수사항 검색",
+          "capability": "korean-law-bill-research",
+          "role": "primary",
+          "reference_skills": [],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "출입국",
       "group": "법무·치안",
       "evidence": "new",
-      "candidate": "체류·비자 절차 검색",
-      "slug": "immigration-procedure-search",
-      "shared_capability": "official-source-research",
-      "reference_skills": [],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "immigration-procedure-search",
+          "title": "체류·비자 절차 검색",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "경찰",
       "group": "법무·치안",
       "evidence": "direct",
-      "candidate": "LOST112 유실물 조회",
-      "slug": "police-lost-property-lookup",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "subway-lost-property"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "police-lost-property-lookup",
+          "title": "LOST112 유실물 조회",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "subway-lost-property"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "해양경찰",
       "group": "법무·치안",
       "evidence": "adjacent",
-      "candidate": "해양기상·안전상황 브리프",
-      "slug": "maritime-safety-brief",
-      "shared_capability": "disaster-geospatial-brief",
-      "reference_skills": [
-        "korea-weather",
-        "han-river-water-level"
-      ],
-      "boundary": "draft-only"
+      "skills": [
+        {
+          "name": "maritime-safety-brief",
+          "title": "해양기상·안전상황 브리프",
+          "capability": "disaster-geospatial-brief",
+          "role": "primary",
+          "reference_skills": [
+            "korea-weather",
+            "han-river-water-level"
+          ],
+          "boundary": "draft-only"
+        }
+      ]
     },
     {
       "domain": "소방",
       "group": "안전·국방",
       "evidence": "adjacent",
-      "candidate": "응급실·재난자원 브리프",
-      "slug": "fire-emergency-resource-brief",
-      "shared_capability": "disaster-geospatial-brief",
-      "reference_skills": [
-        "emergency-room-beds",
-        "korea-weather"
-      ],
-      "boundary": "draft-only"
+      "skills": [
+        {
+          "name": "fire-emergency-resource-brief",
+          "title": "응급실·재난자원 브리프",
+          "capability": "disaster-geospatial-brief",
+          "role": "primary",
+          "reference_skills": [
+            "emergency-room-beds",
+            "korea-weather"
+          ],
+          "boundary": "draft-only"
+        }
+      ]
     },
     {
       "domain": "재난안전",
       "group": "안전·국방",
       "evidence": "direct",
-      "candidate": "기상·수위·대기 재난브리프",
-      "slug": "disaster-situation-brief",
-      "shared_capability": "disaster-geospatial-brief",
-      "reference_skills": [
-        "korea-weather",
-        "fine-dust-location",
-        "han-river-water-level",
-        "emergency-room-beds"
-      ],
-      "boundary": "draft-only"
+      "skills": [
+        {
+          "name": "disaster-situation-brief",
+          "title": "기상·수위·대기 재난브리프",
+          "capability": "disaster-geospatial-brief",
+          "role": "primary",
+          "reference_skills": [
+            "korea-weather",
+            "fine-dust-location",
+            "han-river-water-level",
+            "emergency-room-beds"
+          ],
+          "boundary": "draft-only"
+        }
+      ]
     },
     {
       "domain": "국방",
       "group": "안전·국방",
       "evidence": "direct",
-      "candidate": "국방조달 공개공고 조회",
-      "slug": "defense-procurement-notice-search",
-      "shared_capability": "public-procurement-research",
-      "reference_skills": [
-        "d2b-notice-search"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "defense-procurement-notice-search",
+          "title": "국방조달 공개공고 조회",
+          "capability": "public-procurement-research",
+          "role": "primary",
+          "reference_skills": [
+            "d2b-notice-search"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "군무",
       "group": "안전·국방",
       "evidence": "new",
-      "candidate": "군무 관련 규정 검색",
-      "slug": "civilian-military-regulation-search",
-      "shared_capability": "official-source-research",
-      "reference_skills": [],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "civilian-military-regulation-search",
+          "title": "군무 관련 규정 검색",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "경호",
       "group": "안전·국방",
       "evidence": "sensitive",
-      "candidate": "공개행사 안전점검",
-      "slug": "public-event-security-review",
-      "shared_capability": "official-source-research",
-      "reference_skills": [],
-      "boundary": "manual-review-only"
+      "skills": [
+        {
+          "name": "public-event-security-review",
+          "title": "공개행사 안전점검",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [],
+          "boundary": "manual-review-only"
+        }
+      ]
     },
     {
       "domain": "교육",
       "group": "사회서비스",
       "evidence": "direct",
-      "candidate": "교육 공공데이터·장학 조회",
-      "slug": "education-public-data-search",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "k-schoollunch-menu",
-        "korean-scholarship-search"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "education-public-data-search",
+          "title": "교육 공공데이터·장학 조회",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "k-schoollunch-menu",
+            "korean-scholarship-search"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "교육행정",
       "group": "사회서비스",
       "evidence": "direct",
-      "candidate": "학교장터 공고·학교정보 조회",
-      "slug": "education-procurement-notice-search",
-      "shared_capability": "public-procurement-research",
-      "reference_skills": [
-        "s2b-notice-search",
-        "k-schoollunch-menu"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "education-procurement-notice-search",
+          "title": "학교장터 공고·학교정보 조회",
+          "capability": "public-procurement-research",
+          "role": "primary",
+          "reference_skills": [
+            "s2b-notice-search",
+            "k-schoollunch-menu"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "사회복지",
       "group": "사회서비스",
       "evidence": "direct",
-      "candidate": "복지·연금·지원정보 조회",
-      "slug": "welfare-pension-support-search",
-      "shared_capability": "welfare-health-safety-research",
-      "reference_skills": [
-        "national-pension-workplace",
-        "donation-place-search",
-        "korean-scholarship-search"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "welfare-pension-support-search",
+          "title": "복지·연금·지원정보 조회",
+          "capability": "welfare-health-safety-research",
+          "role": "primary",
+          "reference_skills": [
+            "national-pension-workplace",
+            "donation-place-search",
+            "korean-scholarship-search"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "고용노동",
       "group": "사회서비스",
       "evidence": "direct",
-      "candidate": "채용공고·노동법 조사",
-      "slug": "labor-job-law-research",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "job-posting-match",
-        "daangn-jobs-search",
-        "korean-law-search"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "labor-job-law-research",
+          "title": "채용공고·노동법 조사",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "job-posting-match",
+            "daangn-jobs-search",
+            "korean-law-search"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "보건의료",
       "group": "사회서비스",
       "evidence": "direct",
-      "candidate": "응급실·검진·장기요양기관 조회",
-      "slug": "healthcare-facility-search",
-      "shared_capability": "welfare-health-safety-research",
-      "reference_skills": [
-        "emergency-room-beds",
-        "nhis-care-checkup-search"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "healthcare-facility-search",
+          "title": "응급실·검진·장기요양기관 조회",
+          "capability": "welfare-health-safety-research",
+          "role": "primary",
+          "reference_skills": [
+            "emergency-room-beds",
+            "nhis-care-checkup-search"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "식품의약",
       "group": "사회서비스",
       "evidence": "direct",
-      "candidate": "식품·의약 안전정보 확인",
-      "slug": "food-drug-safety-check",
-      "shared_capability": "welfare-health-safety-research",
-      "reference_skills": [
-        "mfds-food-safety",
-        "mfds-drug-safety"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "food-drug-safety-check",
+          "title": "식품·의약 안전정보 확인",
+          "capability": "welfare-health-safety-research",
+          "role": "primary",
+          "reference_skills": [
+            "mfds-food-safety",
+            "mfds-drug-safety"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "농업",
       "group": "농림·해양·환경",
       "evidence": "adjacent",
-      "candidate": "농업통계·기상 조회",
-      "slug": "agriculture-weather-statistics",
-      "shared_capability": "kosis-official-statistics",
-      "reference_skills": [
-        "kosis-stats",
-        "korea-weather"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "agriculture-weather-statistics",
+          "title": "농업통계·기상 조회",
+          "capability": "kosis-official-statistics",
+          "role": "primary",
+          "reference_skills": [
+            "kosis-stats",
+            "korea-weather"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "축산",
       "group": "농림·해양·환경",
       "evidence": "adjacent",
-      "candidate": "가축질병·축산통계 조회",
-      "slug": "livestock-disease-statistics",
-      "shared_capability": "kosis-official-statistics",
-      "reference_skills": [
-        "kosis-stats",
-        "korea-weather"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "livestock-disease-statistics",
+          "title": "가축질병·축산통계 조회",
+          "capability": "kosis-official-statistics",
+          "role": "primary",
+          "reference_skills": [
+            "kosis-stats",
+            "korea-weather"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "농촌지도",
       "group": "농림·해양·환경",
       "evidence": "adjacent",
-      "candidate": "영농지도 근거 브리프",
-      "slug": "rural-extension-brief",
-      "shared_capability": "kosis-official-statistics",
-      "reference_skills": [
-        "kosis-stats",
-        "korea-weather"
-      ],
-      "boundary": "draft-only"
+      "skills": [
+        {
+          "name": "rural-extension-brief",
+          "title": "영농지도 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "primary",
+          "reference_skills": [
+            "kosis-stats",
+            "korea-weather"
+          ],
+          "boundary": "draft-only"
+        }
+      ]
     },
     {
       "domain": "산림",
       "group": "농림·해양·환경",
       "evidence": "direct",
-      "candidate": "산림휴양·기상 조회",
-      "slug": "forest-recreation-weather",
-      "shared_capability": "disaster-geospatial-brief",
-      "reference_skills": [
-        "foresttrip-vacancy",
-        "korea-weather"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "forest-recreation-weather",
+          "title": "산림휴양·기상 조회",
+          "capability": "disaster-geospatial-brief",
+          "role": "primary",
+          "reference_skills": [
+            "foresttrip-vacancy",
+            "korea-weather"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "해양수산",
       "group": "농림·해양·환경",
       "evidence": "adjacent",
-      "candidate": "해양기상·수산통계 조회",
-      "slug": "fisheries-weather-statistics",
-      "shared_capability": "kosis-official-statistics",
-      "reference_skills": [
-        "kosis-stats",
-        "korea-weather",
-        "han-river-water-level"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "fisheries-weather-statistics",
+          "title": "해양기상·수산통계 조회",
+          "capability": "kosis-official-statistics",
+          "role": "primary",
+          "reference_skills": [
+            "kosis-stats",
+            "korea-weather",
+            "han-river-water-level"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "환경",
       "group": "농림·해양·환경",
       "evidence": "direct",
-      "candidate": "대기·수위·폐기물 정보 조회",
-      "slug": "environment-air-water-waste",
-      "shared_capability": "disaster-geospatial-brief",
-      "reference_skills": [
-        "fine-dust-location",
-        "han-river-water-level",
-        "household-waste-info",
-        "korea-weather"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "environment-air-water-waste",
+          "title": "대기·수위·폐기물 정보 조회",
+          "capability": "disaster-geospatial-brief",
+          "role": "primary",
+          "reference_skills": [
+            "fine-dust-location",
+            "han-river-water-level",
+            "household-waste-info",
+            "korea-weather"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "기상",
       "group": "농림·해양·환경",
       "evidence": "direct",
-      "candidate": "기상청 예보 조회",
-      "slug": "kma-weather-forecast",
-      "shared_capability": "disaster-geospatial-brief",
-      "reference_skills": [
-        "korea-weather"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "kma-weather-forecast",
+          "title": "기상청 예보 조회",
+          "capability": "disaster-geospatial-brief",
+          "role": "primary",
+          "reference_skills": [
+            "korea-weather"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "국토교통",
       "group": "국토·산업",
       "evidence": "direct",
-      "candidate": "대중교통·지도 경로 조사",
-      "slug": "public-transit-map-research",
-      "shared_capability": "land-housing-geospatial-research",
-      "reference_skills": [
-        "korean-transit-route",
-        "kakao-map"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "public-transit-map-research",
+          "title": "대중교통·지도 경로 조사",
+          "capability": "land-housing-geospatial-research",
+          "role": "primary",
+          "reference_skills": [
+            "korean-transit-route",
+            "kakao-map"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "토목시설",
       "group": "국토·산업",
       "evidence": "adjacent",
-      "candidate": "공사·시설점검 자료 조사",
-      "slug": "civil-facility-project-review",
-      "shared_capability": "land-housing-geospatial-research",
-      "reference_skills": [
-        "kakao-map",
-        "gongsijiga-search"
-      ],
-      "boundary": "draft-only"
+      "skills": [
+        {
+          "name": "civil-facility-project-review",
+          "title": "공사·시설점검 자료 조사",
+          "capability": "land-housing-geospatial-research",
+          "role": "primary",
+          "reference_skills": [
+            "kakao-map",
+            "gongsijiga-search"
+          ],
+          "boundary": "draft-only"
+        }
+      ]
     },
     {
       "domain": "건축",
       "group": "국토·산업",
       "evidence": "direct",
-      "candidate": "토지·등기·공공주택 조사",
-      "slug": "land-building-housing-research",
-      "shared_capability": "land-housing-geospatial-research",
-      "reference_skills": [
-        "gongsijiga-search",
-        "iros-registry-automation",
-        "lh-notice-search",
-        "sh-notice-search"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "land-building-housing-research",
+          "title": "토지·등기·공공주택 조사",
+          "capability": "land-housing-geospatial-research",
+          "role": "primary",
+          "reference_skills": [
+            "gongsijiga-search",
+            "iros-registry-automation",
+            "lh-notice-search",
+            "sh-notice-search"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "도시계획",
       "group": "국토·산업",
       "evidence": "direct",
-      "candidate": "혼잡도·토지·주택 조사",
-      "slug": "urban-planning-density-land",
-      "shared_capability": "land-housing-geospatial-research",
-      "reference_skills": [
-        "seoul-density",
-        "gongsijiga-search",
-        "lh-notice-search",
-        "sh-notice-search"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "urban-planning-density-land",
+          "title": "혼잡도·토지·주택 조사",
+          "capability": "land-housing-geospatial-research",
+          "role": "primary",
+          "reference_skills": [
+            "seoul-density",
+            "gongsijiga-search",
+            "lh-notice-search",
+            "sh-notice-search"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "산업",
       "group": "국토·산업",
       "evidence": "direct",
-      "candidate": "기업공시·산업정보 조회",
-      "slug": "corporate-industry-information",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "k-dart",
-        "fsc-corporate-info"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "corporate-industry-information",
+          "title": "기업공시·산업정보 조회",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "k-dart",
+            "fsc-corporate-info"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "에너지",
       "group": "국토·산업",
       "evidence": "direct",
-      "candidate": "유가·에너지통계 조회",
-      "slug": "fuel-energy-statistics",
-      "shared_capability": "kosis-official-statistics",
-      "reference_skills": [
-        "cheap-gas-nearby",
-        "kosis-stats"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "fuel-energy-statistics",
+          "title": "유가·에너지통계 조회",
+          "capability": "kosis-official-statistics",
+          "role": "primary",
+          "reference_skills": [
+            "cheap-gas-nearby",
+            "kosis-stats"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "중소기업",
       "group": "국토·산업",
       "evidence": "direct",
-      "candidate": "창업지원·사업자 실사",
-      "slug": "sme-startup-due-diligence",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "kstartup-search",
-        "biz-health-check",
-        "nts-business-registration"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "sme-startup-due-diligence",
+          "title": "창업지원·사업자 실사",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "kstartup-search",
+            "biz-health-check",
+            "nts-business-registration"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "과학기술",
       "group": "과학·디지털",
       "evidence": "adjacent",
-      "candidate": "과학기술 특허·동향 조사",
-      "slug": "science-technology-trend-search",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "korean-patent-search",
-        "kosis-stats"
-      ],
-      "boundary": "draft-only"
+      "skills": [
+        {
+          "name": "science-technology-trend-search",
+          "title": "과학기술 특허·동향 조사",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "korean-patent-search",
+            "kosis-stats"
+          ],
+          "boundary": "draft-only"
+        }
+      ]
     },
     {
       "domain": "특허",
       "group": "과학·디지털",
       "evidence": "direct",
-      "candidate": "KIPRIS 특허 조회",
-      "slug": "korean-patent-lookup",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "korean-patent-search"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "korean-patent-lookup",
+          "title": "KIPRIS 특허 조회",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "korean-patent-search"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "정보통신",
       "group": "과학·디지털",
       "evidence": "adjacent",
-      "candidate": "WHOIS·정보통신 정책 조사",
-      "slug": "ict-policy-domain-research",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "kr-whois-lookup",
-        "korean-privacy-terms"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "ict-policy-domain-research",
+          "title": "WHOIS·정보통신 정책 조사",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "kr-whois-lookup",
+            "korean-privacy-terms"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "전산",
       "group": "과학·디지털",
       "evidence": "new",
-      "candidate": "공공시스템 운영점검",
-      "slug": "public-it-operations-check",
-      "shared_capability": "official-source-research",
-      "reference_skills": [],
-      "boundary": "draft-only"
+      "skills": [
+        {
+          "name": "public-it-operations-check",
+          "title": "공공시스템 운영점검",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [],
+          "boundary": "draft-only"
+        }
+      ]
     },
     {
       "domain": "사이버보안",
       "group": "과학·디지털",
       "evidence": "adjacent",
-      "candidate": "개인정보·보안기준 검토",
-      "slug": "privacy-security-baseline-review",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "korean-privacy-terms"
-      ],
-      "boundary": "draft-only"
+      "skills": [
+        {
+          "name": "privacy-security-baseline-review",
+          "title": "개인정보·보안기준 검토",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "korean-privacy-terms"
+          ],
+          "boundary": "draft-only"
+        }
+      ]
     },
     {
       "domain": "문화예술",
       "group": "문화·지식",
       "evidence": "direct",
-      "candidate": "공연예술·시설 조회",
-      "slug": "performance-arts-search",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "kopis-performance-search"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "performance-arts-search",
+          "title": "공연예술·시설 조회",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "kopis-performance-search"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "체육",
       "group": "문화·지식",
       "evidence": "direct",
-      "candidate": "경기결과·체육정보 조회",
-      "slug": "sports-results-facility-search",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "kbo-results",
-        "kbl-results",
-        "kleague-results",
-        "korean-marathon-schedule"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "sports-results-facility-search",
+          "title": "경기결과·체육정보 조회",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "kbo-results",
+            "kbl-results",
+            "kleague-results",
+            "korean-marathon-schedule"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "관광",
       "group": "문화·지식",
       "evidence": "direct",
-      "candidate": "공공 관광정보 조사",
-      "slug": "public-tourism-information",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "foresttrip-vacancy",
-        "kakao-map",
-        "myrealtrip-search"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "public-tourism-information",
+          "title": "공공 관광정보 조사",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "foresttrip-vacancy",
+            "kakao-map",
+            "myrealtrip-search"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "문화유산",
       "group": "문화·지식",
       "evidence": "direct",
-      "candidate": "문화유산 공식자료 검색",
-      "slug": "cultural-heritage-source-search",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "joseon-sillok-search"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "cultural-heritage-source-search",
+          "title": "문화유산 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "joseon-sillok-search"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "기록관리",
       "group": "문화·지식",
       "evidence": "adjacent",
-      "candidate": "기록물분류·HWPX 검토",
-      "slug": "records-classification-hwpx",
-      "shared_capability": "public-document-hwpx",
-      "reference_skills": [
-        "hwp",
-        "rhwp-edit",
-        "joseon-sillok-search"
-      ],
-      "boundary": "draft-only"
+      "skills": [
+        {
+          "name": "records-classification-hwpx",
+          "title": "기록물분류·HWPX 검토",
+          "capability": "public-document-hwpx",
+          "role": "primary",
+          "reference_skills": [
+            "hwp",
+            "rhwp-edit",
+            "joseon-sillok-search"
+          ],
+          "boundary": "draft-only"
+        }
+      ]
     },
     {
       "domain": "도서관",
       "group": "문화·지식",
       "evidence": "direct",
-      "candidate": "공공도서관 소장자료 조회",
-      "slug": "public-library-holdings-search",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "library-book-search"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "public-library-holdings-search",
+          "title": "공공도서관 소장자료 조회",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "library-book-search"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "학예연구",
       "group": "문화·지식",
       "evidence": "adjacent",
-      "candidate": "유물·자료 출처 조사",
-      "slug": "museum-object-provenance-research",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "joseon-sillok-search",
-        "library-book-search"
-      ],
-      "boundary": "draft-only"
+      "skills": [
+        {
+          "name": "museum-object-provenance-research",
+          "title": "유물·자료 출처 조사",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "joseon-sillok-search",
+            "library-book-search"
+          ],
+          "boundary": "draft-only"
+        }
+      ]
     },
     {
       "domain": "연구",
       "group": "문화·지식",
       "evidence": "direct",
-      "candidate": "공식출처 연구 브리프",
-      "slug": "official-research-brief",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "kosis-stats",
-        "k-dart",
-        "naver-news-search",
-        "daishin-report-search"
-      ],
-      "boundary": "draft-only"
+      "skills": [
+        {
+          "name": "official-research-brief",
+          "title": "공식출처 연구 브리프",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "kosis-stats",
+            "k-dart",
+            "naver-news-search",
+            "daishin-report-search"
+          ],
+          "boundary": "draft-only"
+        }
+      ]
     },
     {
       "domain": "지방자치",
       "group": "지역·생활행정",
       "evidence": "direct",
-      "candidate": "지방행정 인허가·생활정보 조회",
-      "slug": "local-government-business-status",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "localdata-business-status",
-        "local-election-candidate-search",
-        "kakao-map"
-      ],
-      "boundary": "read-only",
-      "additional_capabilities": [
-        "civil-complaint-triage-draft",
-        "administrative-document-draft-review",
-        "public-policy-evidence-pack"
+      "skills": [
+        {
+          "name": "local-government-business-status",
+          "title": "지방행정 인허가·생활정보 조회",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "localdata-business-status",
+            "local-election-candidate-search",
+            "kakao-map"
+          ],
+          "boundary": "read-only"
+        },
+        {
+          "name": "local-government-civil-complaint-triage-draft",
+          "title": "민원 분류·답변 초안",
+          "capability": "civil-complaint-triage-draft",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only"
+        },
+        {
+          "name": "local-government-administrative-document-draft-review",
+          "title": "행정문서 초안·검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only"
+        },
+        {
+          "name": "local-government-public-policy-evidence-pack",
+          "title": "정책 근거 묶음",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only"
+        }
       ]
     },
     {
       "domain": "지역개발",
       "group": "지역·생활행정",
       "evidence": "direct",
-      "candidate": "주택·토지·혼잡도 개발정보 조회",
-      "slug": "regional-development-housing-land",
-      "shared_capability": "land-housing-geospatial-research",
-      "reference_skills": [
-        "lh-notice-search",
-        "sh-notice-search",
-        "gongsijiga-search",
-        "seoul-density"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "regional-development-housing-land",
+          "title": "주택·토지·혼잡도 개발정보 조회",
+          "capability": "land-housing-geospatial-research",
+          "role": "primary",
+          "reference_skills": [
+            "lh-notice-search",
+            "sh-notice-search",
+            "gongsijiga-search",
+            "seoul-density"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "지방의회",
       "group": "지역·생활행정",
       "evidence": "adjacent",
-      "candidate": "회의록·조례안 조사",
-      "slug": "local-council-minutes-ordinance",
-      "shared_capability": "korean-law-bill-research",
-      "reference_skills": [
-        "assembly-bill-vote-search",
-        "korean-law-search"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "local-council-minutes-ordinance",
+          "title": "회의록·조례안 조사",
+          "capability": "korean-law-bill-research",
+          "role": "primary",
+          "reference_skills": [
+            "assembly-bill-vote-search",
+            "korean-law-search"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     },
     {
       "domain": "우정",
       "group": "지역·생활행정",
       "evidence": "direct",
-      "candidate": "우편번호·배송조회",
-      "slug": "postal-code-delivery-tracking",
-      "shared_capability": "official-source-research",
-      "reference_skills": [
-        "delivery-tracking",
-        "zipcode-search"
-      ],
-      "boundary": "read-only"
+      "skills": [
+        {
+          "name": "postal-code-delivery-tracking",
+          "title": "우편번호·배송조회",
+          "capability": "official-source-research",
+          "role": "primary",
+          "reference_skills": [
+            "delivery-tracking",
+            "zipcode-search"
+          ],
+          "boundary": "read-only"
+        }
+      ]
     }
   ]
 }
