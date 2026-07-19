@@ -70,7 +70,7 @@ def main() -> int:
         run(["git", "diff", "--check"])
     print(
         f"CHECK PASS root_suites={root_suites} capability_suites={capability_suites} "
-        f"fixtures={capability_suites} domain_skills=66 secret_hits=0"
+        f"fixtures={capability_suites} domain_skills=75 secret_hits=0"
     )
     return 0
 

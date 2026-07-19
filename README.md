@@ -7,7 +7,7 @@
 ```text
 CLAUDE.md                                      # canonical 저장소 작업 계약
 AGENTS.md                                      # cross-runtime thin adapter
-catalog/domain-skills.json                     # 60 domain·66 Skill·11 capability SSOT
+catalog/domain-skills.json                     # 60 domain·75 Skill·11 capability SSOT
 domains/<한글 domain>/skills/<slug>/SKILL.md   # 공개 Skill 진입점
 kgov_runtime/capabilities/<module>.py           # domain 간 공유하는 내부 실행 구현
 docs/capabilities/<capability>/                 # 절차·runtime contract·live 증거
@@ -24,8 +24,8 @@ scripts/check.py                                # 전체 deterministic 검증 �
 공통 adapter 코드는 `kgov_runtime/capabilities/`에서 한 번만 구현하고 domain Skill이 이를 호출합니다.
 
 Catalog schema v4의 domain `skills[]`는 `primary` 하나와 선택적 `additional` Skill을 명시합니다.
-모든 `name`은 저장소 전체에서 고유합니다. 60개 domain에 primary 60개와 additional 6개,
-총 66개 domain-owned Skill 진입점이 있습니다.
+모든 `name`은 저장소 전체에서 고유합니다. 60개 domain에 primary 60개와 additional 15개,
+총 75개 domain-owned Skill 진입점이 있습니다.
 
 ## 현재 capability
 

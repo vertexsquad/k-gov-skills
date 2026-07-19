@@ -256,6 +256,78 @@
             "nts-tax-delinquency"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "tax-law-interpretation-research",
+          "title": "세법·유권해석 조사",
+          "capability": "korean-law-bill-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "read-only"
+        },
+        {
+          "name": "national-tax-statistics-lookup",
+          "title": "국세통계 조회",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "read-only"
+        },
+        {
+          "name": "property-tax-land-housing-research",
+          "title": "재산세 토지·주택 기초조사",
+          "capability": "land-housing-geospatial-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "read-only"
+        },
+        {
+          "name": "hometax-official-guidance-search",
+          "title": "국세청·홈택스 공식안내 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "read-only"
+        },
+        {
+          "name": "tax-office-procurement-notice-check",
+          "title": "세무관서 조달 공고 조회",
+          "capability": "public-procurement-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "read-only"
+        },
+        {
+          "name": "tax-civil-complaint-triage-draft",
+          "title": "세무 민원 분류·답변 초안",
+          "capability": "civil-complaint-triage-draft",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only"
+        },
+        {
+          "name": "tax-administrative-document-draft-review",
+          "title": "세무 행정문서 초안·검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only"
+        },
+        {
+          "name": "tax-policy-evidence-pack",
+          "title": "세정 정책 근거 묶음",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only"
+        },
+        {
+          "name": "tax-document-hwpx-review",
+          "title": "세무 공문서 HWPX 검토",
+          "capability": "public-document-hwpx",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only"
         }
       ]
     },
