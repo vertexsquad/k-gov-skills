@@ -50,11 +50,11 @@
 | 행정 | `direct` | `additional` | 정책 근거 묶음 | `public-administration-public-policy-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
 | 재정 | `adjacent` | `primary` | 예산·결산 비교 | `budget-settlement-comparison` | `kosis-official-statistics` | `kosis-stats`, `k-dart` | `read-only` |
 | 세무 | `direct` | `primary` | 사업자·체납 상태조회 | `business-tax-status-lookup` | `official-source-research` | `nts-business-registration`, `nts-tax-delinquency` | `read-only` |
-| 세무 | `direct` | `additional` | 세법·유권해석 조사 | `tax-law-interpretation-research` | `korean-law-bill-research` | — | `read-only` |
+| 세무 | `direct` | `additional` | 세법령·개정 의안 조사 | `tax-law-bill-research` | `korean-law-bill-research` | — | `read-only` |
 | 세무 | `direct` | `additional` | 국세통계 조회 | `national-tax-statistics-lookup` | `kosis-official-statistics` | — | `read-only` |
 | 세무 | `direct` | `additional` | 재산세 토지·주택 기초조사 | `property-tax-land-housing-research` | `land-housing-geospatial-research` | — | `read-only` |
-| 세무 | `direct` | `additional` | 국세청·홈택스 공식안내 검색 | `hometax-official-guidance-search` | `official-source-research` | — | `read-only` |
-| 세무 | `direct` | `additional` | 세무관서 조달 공고 조회 | `tax-office-procurement-notice-check` | `public-procurement-research` | — | `read-only` |
+| 세무 | `direct` | `additional` | 국세청·홈택스 공식안내·유권해석 검색 | `hometax-official-guidance-search` | `official-source-research` | — | `read-only` |
+| 세무 | `direct` | `additional` | 지방세 조례·세율 검색 | `local-tax-ordinance-search` | `korean-law-bill-research` | — | `read-only` |
 | 세무 | `direct` | `additional` | 세무 민원 분류·답변 초안 | `tax-civil-complaint-triage-draft` | `civil-complaint-triage-draft` | — | `draft-only` |
 | 세무 | `direct` | `additional` | 세무 행정문서 초안·검토 | `tax-administrative-document-draft-review` | `administrative-document-draft-review` | — | `draft-only` |
 | 세무 | `direct` | `additional` | 세정 정책 근거 묶음 | `tax-policy-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
