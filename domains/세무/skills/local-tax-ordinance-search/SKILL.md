@@ -1,6 +1,6 @@
 ---
-name: tax-law-interpretation-research
-description: "세무 업무의 세법·유권해석 조사 절차. 내부 korean-law-bill-research capability를 사용하며 read-only 경계를 지킵니다."
+name: local-tax-ordinance-search
+description: "세무 업무의 지방세 조례·세율 검색 절차. 내부 korean-law-bill-research capability를 사용하며 read-only 경계를 지킵니다."
 metadata:
   kgov:
     domain: "세무"
@@ -10,7 +10,7 @@ metadata:
 
 <!-- generated from catalog/domain-skills.json; do not edit -->
 
-# 세법·유권해석 조사
+# 지방세 조례·세율 검색
 
 - Domain: **세무**
 - 내부 capability: `korean-law-bill-research`

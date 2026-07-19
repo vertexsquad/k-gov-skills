@@ -258,8 +258,8 @@
           "boundary": "read-only"
         },
         {
-          "name": "tax-law-interpretation-research",
-          "title": "세법·유권해석 조사",
+          "name": "tax-law-bill-research",
+          "title": "세법령·개정 의안 조사",
           "capability": "korean-law-bill-research",
           "role": "additional",
           "reference_skills": [],
@@ -283,16 +283,16 @@
         },
         {
           "name": "hometax-official-guidance-search",
-          "title": "국세청·홈택스 공식안내 검색",
+          "title": "국세청·홈택스 공식안내·유권해석 검색",
           "capability": "official-source-research",
           "role": "additional",
           "reference_skills": [],
           "boundary": "read-only"
         },
         {
-          "name": "tax-office-procurement-notice-check",
-          "title": "세무관서 조달 공고 조회",
-          "capability": "public-procurement-research",
+          "name": "local-tax-ordinance-search",
+          "title": "지방세 조례·세율 검색",
+          "capability": "korean-law-bill-research",
           "role": "additional",
           "reference_skills": [],
           "boundary": "read-only"

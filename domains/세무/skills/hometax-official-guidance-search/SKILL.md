@@ -1,6 +1,6 @@
 ---
 name: hometax-official-guidance-search
-description: "세무 업무의 국세청·홈택스 공식안내 검색 절차. 내부 official-source-research capability를 사용하며 read-only 경계를 지킵니다."
+description: "세무 업무의 국세청·홈택스 공식안내·유권해석 검색 절차. 내부 official-source-research capability를 사용하며 read-only 경계를 지킵니다."
 metadata:
   kgov:
     domain: "세무"
@@ -10,7 +10,7 @@ metadata:
 
 <!-- generated from catalog/domain-skills.json; do not edit -->
 
-# 국세청·홈택스 공식안내 검색
+# 국세청·홈택스 공식안내·유권해석 검색
 
 - Domain: **세무**
 - 내부 capability: `official-source-research`
