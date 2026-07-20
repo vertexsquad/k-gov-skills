@@ -49,6 +49,77 @@ Domain의 `direct`, `adjacent`, `new`, `sensitive`는 구현 완료도가 아니
 `korean-legal-citation-verification`은 `live-verified / live_smoke: passed`입니다. Domain Skill은 연결된 capability보다 강한 검증 상태를
 주장하지 않습니다.
 
+## 법령·판례 인용 검증 Skill 사용법
+
+[`public-administration-legal-citation-verification`](domains/행정/skills/public-administration-legal-citation-verification/SKILL.md)은 보고서·민원 답변·정책 검토 초안에 넣을 **법령 조문과 판례 인용 후보**를 국가법령정보 공식 원문과 대조하는 행정 Domain Skill입니다. 문장을 대신 작성하거나 법률 판단을 내리는 도구가 아니라, 존재하지 않는 판례번호·잘못된 조항·다른 항목의 문구가 근거처럼 들어가는 것을 막는 draft-only evidence gate입니다.
+
+### 언제 사용하나요?
+
+- 보고서나 민원 답변에 법령 조·항·호·목을 인용하기 전
+- 판례번호·법원·선고일·판결요지 인용이 실제 공식 판례와 같은지 확인할 때
+- 특정 기준일 당시 적용되는 법령 연혁을 골라야 할 때
+- LLM이나 검색 결과가 제시한 법적 근거를 그대로 믿지 않고 공식 원문으로 재검증할 때
+
+Agent에게는 다음처럼 요청할 수 있습니다.
+
+> `public-administration-legal-citation-verification` Skill을 사용해서 이 초안의 법령·판례 인용 후보만 검증해 줘. 원문 개인정보는 입력하지 말고, 공식 원문과 일치한 인용만 초안용 근거표로 정리해 줘. 불일치나 복수 후보는 자동 보완하지 말고 차단 상태로 알려 줘.
+
+### 빠른 시작
+
+1. 합성 fixture로 로컬 실행 계약을 먼저 확인합니다. fixture 성공은 live 원문 검증 성공을 뜻하지 않습니다.
+
+   ```bash
+   python3 -m kgov_runtime.capabilities.korean_legal_citation_verification --fixture
+   ```
+
+2. 국가법령정보 사용자 소유 인증값을 환경변수로만 설정합니다. 값은 명령 인수·URL·fixture·로그·커밋에 넣지 않습니다.
+
+   ```bash
+   export LAW_OC='사용자 소유 인증값'
+   ```
+
+3. 공식 목록에서 법령 ID 또는 판례일련번호를 찾습니다.
+
+   ```bash
+   # 정확한 법령명과 6자리 법령 ID 확인
+   python3 -m kgov_runtime.capabilities.korean_legal_citation_verification \
+     --search-law --param 'query=개인정보 보호법' --param display=100
+
+   # 사건번호로 판례 후보 검색
+   python3 -m kgov_runtime.capabilities.korean_legal_citation_verification \
+     --search-precedent --param 'nb=2024다12345'
+
+   # 선택한 판례일련번호의 안전한 metadata 재조회
+   python3 -m kgov_runtime.capabilities.korean_legal_citation_verification \
+     --precedent-id 228541
+   ```
+
+4. 이름·연락처·민원 원문을 제거한 뒤 후보 ledger를 `citations.json`으로 준비합니다. 법령은 `law_id`, `article_code`, 항·호·목 순번과 실제 인용문을, 판례는 판례일련번호·사건번호·법원·선고일과 실제 인용문을 기록합니다. 전체 JSON 예시는 [procedure 문서](docs/capabilities/korean-legal-citation-verification/procedure.md#입력-예시)에 있습니다.
+
+5. trusted live 검증을 실행합니다.
+
+   ```bash
+   python3 -m kgov_runtime.capabilities.korean_legal_citation_verification citations.json
+   ```
+
+6. `admission_passed=true`이면서 항목 상태가 `verified-official-live-match`인 인용만 **초안용 후보**로 사용합니다. `mismatch-blocked`, `official-source-not-found`, `ambiguous-candidates-manual-selection-required`는 자동으로 고쳐 쓰거나 추정하지 말고 입력과 공식 원문을 사람이 다시 확인합니다.
+
+### 사용했을 때의 장점
+
+| 장점 | 실제로 달라지는 점 |
+|---|---|
+| 공식 1차 출처 직접 검증 | 검색 snippet·블로그·LLM의 주장 대신 실행 중 국가법령정보 원문을 다시 조회합니다. |
+| 잘못된 인용 차단 | 법령 ID·기준일·조·항·호·목과 판례일련번호·사건번호·법원·선고일·인용문이 함께 맞아야 통과합니다. |
+| 기준일에 맞는 법령 선택 | `as_of_date` 이하의 정확한 법령명 중 최신 단일 연혁을 선택해 현재법과 과거 시점의 법을 섞는 위험을 줄입니다. |
+| 그럴듯한 자동 보완 방지 | 검색 0건, 복수 후보, API/schema 오류, metadata 불일치를 추정으로 메우지 않고 fail-closed 처리합니다. |
+| 개인정보·credential 노출 축소 | 원문 대신 비식별 인용 후보만 받고, 직접 식별자와 credential 반사를 차단하며 raw 공식 본문을 결과에 내보내지 않습니다. |
+| 검토 가능한 결과 | 통과·불일치·미존재·모호성 상태와 credential-free 공식 URL을 분리해 담당자가 최종 문맥을 확인할 수 있습니다. |
+| 모델 독립적 안전장치 | 특정 LLM의 자신감이나 기억에 의존하지 않고 같은 deterministic 검증 절차를 적용합니다. |
+
+이 Skill이 보증하는 것은 **실행 시점에 조회한 공식 record와 후보 인용의 구조적 일치**입니다. 법률 해석, 사실관계 적용, 판례의 현재 효력, 반대·제한 판례 검색의 완전성, 최종 문서의 법적 적합성은 보증하지 않습니다. 최종 인용·결재·제출·발송은 담당 공무원 또는 법무 검토자가 승인해야 합니다. 세부 입력 필드와 종료 코드는 [runtime contract](docs/capabilities/korean-legal-citation-verification/runtime-contract.md)를 참고하세요.
+
+## 개발·검증
+
 ```bash
 # capability 하나의 합성 fixture 실행
 python3 -m kgov_runtime.capabilities.kosis_official_statistics --fixture
