@@ -102,8 +102,8 @@ def _validate_capabilities(
     if not isinstance(raw_capabilities, list):
         errors.append("shared_capabilities must be a list")
         return set(), {}
-    if len(raw_capabilities) != 11:
-        errors.append(f"catalog must contain 11 shared capabilities, got {len(raw_capabilities)}")
+    if len(raw_capabilities) != 12:
+        errors.append(f"catalog must contain 12 shared capabilities, got {len(raw_capabilities)}")
     slugs: set[str] = set()
     by_slug: dict[str, dict[str, Any]] = {}
     for index, capability in enumerate(raw_capabilities):
@@ -247,8 +247,8 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
                     errors.append(f"{domain}: sensitive evidence requires manual-review-only")
             declared_entrypoints.add(Path("domains") / domain / "skills" / name / "SKILL.md")
 
-    if total_skills != 75:
-        errors.append(f"catalog must declare 75 domain Skills, got {total_skills}")
+    if total_skills != 76:
+        errors.append(f"catalog must declare 76 domain Skills, got {total_skills}")
     domains_root = root / "domains"
     actual_domains = {path.name for path in domains_root.iterdir() if path.is_dir()} if domains_root.is_dir() else set()
     if actual_domains != seen_domains:

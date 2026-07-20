@@ -7,12 +7,12 @@
 ## 요약
 
 - 전체 domain: **60개**
-- domain-owned Skill: **75개** (primary 60 / additional 15)
+- domain-owned Skill: **76개** (primary 60 / additional 16)
 - 직접 reference 확인: **35개**
 - 인접 capability 활용: **16개**
 - 신규 설계 필요: **8개**
 - 민감업무 제한: **1개**
-- 내부 공통 capability: **11개**
+- 내부 공통 capability: **12개**
 - Domain Skill의 live 검증 상태는 연결된 capability manifest보다 강하게 주장하지 않습니다.
 
 ## Evidence 등급
@@ -39,6 +39,7 @@
 | `civil-complaint-triage-draft` | `none` | `none` | `draft-only` | `fixture-verified` | `not-run` |
 | `administrative-document-draft-review` | `none` | `none` | `draft-only` | `fixture-verified` | `not-run` |
 | `public-policy-evidence-pack` | `mixed` | `optional` | `draft-only` | `fixture-verified` | `not-run` |
+| `korean-legal-citation-verification` | `mixed` | `optional` | `draft-only` | `live-verified` | `passed` |
 
 ## 국가운영
 
@@ -48,6 +49,7 @@
 | 행정 | `direct` | `additional` | 민원 분류·답변 초안 | `public-administration-civil-complaint-triage-draft` | `civil-complaint-triage-draft` | — | `draft-only` |
 | 행정 | `direct` | `additional` | 행정문서 초안·검토 | `public-administration-administrative-document-draft-review` | `administrative-document-draft-review` | — | `draft-only` |
 | 행정 | `direct` | `additional` | 정책 근거 묶음 | `public-administration-public-policy-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
+| 행정 | `direct` | `additional` | 법령 조문·판례 인용 검증 | `public-administration-legal-citation-verification` | `korean-legal-citation-verification` | `korean-law-search`, `legalize-kr`, `legal-kr` | `draft-only` |
 | 재정 | `adjacent` | `primary` | 예산·결산 비교 | `budget-settlement-comparison` | `kosis-official-statistics` | `kosis-stats`, `k-dart` | `read-only` |
 | 세무 | `direct` | `primary` | 사업자·체납 상태조회 | `business-tax-status-lookup` | `official-source-research` | `nts-business-registration`, `nts-tax-delinquency` | `read-only` |
 | 세무 | `direct` | `additional` | 세법령·개정 의안 조사 | `tax-law-bill-research` | `korean-law-bill-research` | — | `read-only` |
