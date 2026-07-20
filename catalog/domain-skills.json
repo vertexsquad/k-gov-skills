@@ -178,6 +178,25 @@
       ],
       "execution_status": "fixture-verified",
       "live_smoke": "not-run"
+    },
+    {
+      "slug": "korean-legal-citation-verification",
+      "locale": "ko-KR",
+      "jurisdiction": "KR",
+      "service": "국가법령정보 법령 조문·판례 조회 및 인용 정합성 검증",
+      "credential_class": "mixed",
+      "proxy_mode": "optional",
+      "side_effect_class": "draft-only",
+      "manual_handoff_gate": "법률적 판단·최종 인용·결재·발송은 담당 공무원 또는 법무 검토 승인",
+      "source_provenance": [
+        "https://www.law.go.kr/",
+        "https://open.law.go.kr/LSO/openApi/guideResult.do?htmlName=lsEfYdListGuide",
+        "https://open.law.go.kr/LSO/openApi/guideResult.do?htmlName=lsEfYdJoListGuide",
+        "https://open.law.go.kr/LSO/openApi/guideResult.do?htmlName=precListGuide",
+        "https://open.law.go.kr/LSO/openApi/guideResult.do?htmlName=precInfoGuide"
+      ],
+      "execution_status": "live-verified",
+      "live_smoke": "passed"
     }
   ],
   "domains": [
@@ -219,6 +238,18 @@
           "capability": "public-policy-evidence-pack",
           "role": "additional",
           "reference_skills": [],
+          "boundary": "draft-only"
+        },
+        {
+          "name": "public-administration-legal-citation-verification",
+          "title": "법령 조문·판례 인용 검증",
+          "capability": "korean-legal-citation-verification",
+          "role": "additional",
+          "reference_skills": [
+            "korean-law-search",
+            "legalize-kr",
+            "legal-kr"
+          ],
           "boundary": "draft-only"
         }
       ]

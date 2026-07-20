@@ -7,7 +7,7 @@
 ```text
 CLAUDE.md                                      # canonical 저장소 작업 계약
 AGENTS.md                                      # cross-runtime thin adapter
-catalog/domain-skills.json                     # 60 domain·75 Skill·11 capability SSOT
+catalog/domain-skills.json                     # 60 domain·76 Skill·12 capability SSOT
 domains/<한글 domain>/skills/<slug>/SKILL.md   # 공개 Skill 진입점
 kgov_runtime/capabilities/<module>.py           # domain 간 공유하는 내부 실행 구현
 docs/capabilities/<capability>/                 # 절차·runtime contract·live 증거
@@ -24,12 +24,12 @@ scripts/check.py                                # 전체 deterministic 검증 �
 공통 adapter 코드는 `kgov_runtime/capabilities/`에서 한 번만 구현하고 domain Skill이 이를 호출합니다.
 
 Catalog schema v4의 domain `skills[]`는 `primary` 하나와 선택적 `additional` Skill을 명시합니다.
-모든 `name`은 저장소 전체에서 고유합니다. 60개 domain에 primary 60개와 additional 15개,
-총 75개 domain-owned Skill 진입점이 있습니다.
+모든 `name`은 저장소 전체에서 고유합니다. 60개 domain에 primary 60개와 additional 16개,
+총 76개 domain-owned Skill 진입점이 있습니다.
 
 ## 현재 capability
 
-다음 11개 read-only/document-read/draft-only 내부 capability를 제공합니다.
+다음 12개 read-only/document-read/draft-only 내부 capability를 제공합니다.
 
 - `public-document-hwpx`
 - `korean-law-bill-research`
@@ -42,10 +42,11 @@ Catalog schema v4의 domain `skills[]`는 `primary` 하나와 선택적 `additio
 - `civil-complaint-triage-draft`
 - `administrative-document-draft-review`
 - `public-policy-evidence-pack`
+- `korean-legal-citation-verification`
 
 Domain의 `direct`, `adjacent`, `new`, `sensitive`는 구현 완료도가 아니라 **근거 강도와 도입 경계**입니다.
-10개 capability는 `fixture-verified / live_smoke: not-run`이고 `official-source-research`만
-`live-verified / live_smoke: passed`입니다. Domain Skill은 연결된 capability보다 강한 검증 상태를
+10개 capability는 `fixture-verified / live_smoke: not-run`이고 `official-source-research`와
+`korean-legal-citation-verification`은 `live-verified / live_smoke: passed`입니다. Domain Skill은 연결된 capability보다 강한 검증 상태를
 주장하지 않습니다.
 
 ```bash
@@ -73,7 +74,8 @@ python3 scripts/check.py
 
 ## 외부 reference 경계
 
-- `mouseco/k-gov-skills`와 `NomaDamas/k-skill`은 별개 프로젝트이며 참고 자료로만 사용합니다.
+- `mouseco/k-gov-skills`, `NomaDamas/k-skill`, `legalize-kr/agent-skills`,
+  `Sungmin-Cho/skill-legal-kr`는 별개 프로젝트이며 참고 자료로만 사용합니다.
 - 외부 코드·프롬프트·문서를 복사하거나 미러링하지 않습니다.
 - 실제 adapter 변경 전 공식 API, 이용약관, 인증정보 소유자, proxy, 개인정보, side effect를 재검증합니다.
 - 예약·결제·제출·메시지·문서 원본 변경·민감 경호업무는 명시 승인과 manual handoff 없이는 자동화하지 않습니다.

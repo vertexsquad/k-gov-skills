@@ -39,8 +39,8 @@ class CatalogContractTest(unittest.TestCase):
     def test_public_skills_are_owned_by_domains(self) -> None:
         self.assertFalse((ROOT / "skills").exists())
         entrypoints = sorted(ROOT.glob("domains/*/skills/*/SKILL.md"))
-        self.assertEqual(75, len(entrypoints))
-        self.assertEqual(75, len({path.parent.name for path in entrypoints}))
+        self.assertEqual(76, len(entrypoints))
+        self.assertEqual(76, len({path.parent.name for path in entrypoints}))
         self.assertFalse(list(ROOT.glob("domains/*/.gitkeep")))
 
     def test_evidence_distribution_matches_review(self) -> None:
@@ -50,7 +50,7 @@ class CatalogContractTest(unittest.TestCase):
     def test_capability_runtime_manifest_is_complete(self) -> None:
         self.assertEqual(4, self.data["schema_version"])
         capabilities = self.data["shared_capabilities"]
-        self.assertEqual(11, len(capabilities))
+        self.assertEqual(12, len(capabilities))
         required = {
             "slug",
             "locale",
@@ -74,11 +74,11 @@ class CatalogContractTest(unittest.TestCase):
         for domain in self.data["domains"]:
             self.assertEqual(1, sum(skill["role"] == "primary" for skill in domain["skills"]))
             names.extend(skill["name"] for skill in domain["skills"])
-        self.assertEqual(75, len(names))
+        self.assertEqual(76, len(names))
         self.assertEqual(len(names), len(set(names)))
 
     def test_additional_capabilities_are_domain_owned(self) -> None:
-        expected = {
+        shared_expected = {
             "civil-complaint-triage-draft",
             "administrative-document-draft-review",
             "public-policy-evidence-pack",
@@ -86,6 +86,9 @@ class CatalogContractTest(unittest.TestCase):
         for domain_name in ("행정", "지방자치"):
             domain = next(item for item in self.data["domains"] if item["domain"] == domain_name)
             additions = {skill["capability"] for skill in domain["skills"] if skill["role"] == "additional"}
+            expected = set(shared_expected)
+            if domain_name == "행정":
+                expected.add("korean-legal-citation-verification")
             self.assertEqual(expected, additions)
 
     def test_unknown_capability_is_rejected(self) -> None:
@@ -133,11 +136,11 @@ class CatalogContractTest(unittest.TestCase):
         current = (ROOT / "docs/domain-skill-candidates.md").read_text(encoding="utf-8")
         self.assertEqual(render_catalog(self.data), current)
         self.assertIn("전체 domain: **60개**", current)
-        self.assertIn("domain-owned Skill: **75개**", current)
+        self.assertIn("domain-owned Skill: **76개**", current)
 
     def test_generated_domain_skills_match_catalog(self) -> None:
         expected = expected_domain_skills(self.data, ROOT)
-        self.assertEqual(75, len(expected))
+        self.assertEqual(76, len(expected))
         for path, content in expected.items():
             self.assertEqual(content, path.read_text(encoding="utf-8"))
 
@@ -181,7 +184,7 @@ class CatalogContractTest(unittest.TestCase):
             capture_output=True,
             text=True,
         )
-        self.assertIn("domains=60 domain_skills=75 capabilities=11 top_level_skills=0", result.stdout)
+        self.assertIn("domains=60 domain_skills=76 capabilities=12 top_level_skills=0", result.stdout)
 
 
 if __name__ == "__main__":
