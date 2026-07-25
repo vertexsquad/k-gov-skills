@@ -45,24 +45,58 @@ class AdapterTest(ReviewAdmissionContractMixin, unittest.TestCase):
             return _Response()
 
         result = adapter.inspect_patent_source(
-            "https://www.kipris.or.kr/khome/main.do",
+            "https://www.kipris.or.kr/khome/main.do?doc=A",
             opener=opener,
             resolver=lambda _: ["1.1.1.1"],
         )
         self.assertEqual("KIPRIS 특허정보", result["title"])
         self.assertEqual(hashlib.sha256(_Response.body).hexdigest(), result["sha256"])
+        self.assertEqual("https://www.kipris.or.kr/khome/main.do", result["url"])
+        self.assertNotIn("doc=A", result["url"])
+        self.assertEqual(
+            {"url", "status", "content_type", "title", "content_length", "sha256"},
+            set(result),
+        )
         self.assertEqual(1, len(opened))
+        self.assertEqual("https://www.kipris.or.kr/khome/main.do?doc=A", opened[0])
 
     def test_lookup_rejects_nonofficial_and_credential_bearing_urls(self) -> None:
         for url in (
             "https://example.org/",
+            "https://evil.kipris.or.kr/",
+            "https://evil.kipo.go.kr/",
             "https://www.kipris.or.kr/?api_key=SYNTHETIC_TOKEN",
             "https://user:secret@www.kipris.or.kr/",
             "https://www.kipris.or.kr/#internal",
+            "https://www.kipris.or.kr/search?q=user@example.org",
         ):
             with self.subTest(url=url):
                 with self.assertRaises((ValueError, RuntimeError)):
                     adapter.inspect_patent_source(url, resolver=lambda _: ["1.1.1.1"])
+
+    def test_lookup_rejects_direct_identifier_without_echo(self) -> None:
+        marker = "user@example.org"
+        with self.assertRaises(ValueError) as raised:
+            adapter.inspect_patent_source(
+                f"https://www.kipris.or.kr/search?q={marker}",
+                resolver=lambda _: ["1.1.1.1"],
+            )
+        self.assertNotIn(marker, str(raised.exception))
+
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(ADAPTER_PATH),
+                "--lookup-url",
+                f"https://www.kipris.or.kr/search?q={marker}",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(2, result.returncode)
+        self.assertNotIn(marker, result.stdout)
+        self.assertNotIn(marker, result.stderr)
 
     def test_lookup_cli_does_not_echo_credential_value(self) -> None:
         result = subprocess.run(

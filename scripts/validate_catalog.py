@@ -164,6 +164,8 @@ def _validate_capabilities(
 
 def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
     errors: list[str] = []
+    if not isinstance(data, dict):
+        return ["catalog root must be a JSON object"]
     if data.get("schema_version") != 4:
         errors.append("schema_version must be 4")
     domains = data.get("domains")

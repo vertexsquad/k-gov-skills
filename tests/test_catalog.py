@@ -157,6 +157,12 @@ class CatalogContractTest(unittest.TestCase):
         errors = validate(changed, ROOT)
         self.assertTrue(any("skills must be a non-empty list" in error for error in errors))
 
+    def test_non_object_catalog_root_is_rejected_without_crashing(self) -> None:
+        for bad in (None, 123, "x", ["domains"]):
+            with self.subTest(bad=type(bad).__name__):
+                errors = validate(bad, ROOT)  # type: ignore[arg-type]
+                self.assertEqual(["catalog root must be a JSON object"], errors)
+
     def test_duplicate_domain_skill_name_is_rejected(self) -> None:
         changed = copy.deepcopy(self.data)
         changed["domains"][1]["skills"][0]["name"] = changed["domains"][0]["skills"][0]["name"]
