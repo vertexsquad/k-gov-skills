@@ -68,8 +68,15 @@ def _validate_source_refs(value: Any) -> int:
     for source_ref in value:
         if not isinstance(source_ref, str) or not source_ref.strip():
             raise ValueError("source_refs entries must be non-empty HTTPS URLs")
-        parsed = urlsplit(source_ref.strip())
-        if contains_direct_identifier(source_ref):
+        normalized = source_ref.strip()
+        try:
+            parsed = urlsplit(normalized)
+            port = parsed.port
+        except ValueError as exc:
+            raise ValueError(
+                "source_refs entries must be credential-free allowlisted HTTPS URLs without query or fragment"
+            ) from exc
+        if contains_direct_identifier(normalized):
             raise ValueError("source_refs entries must not contain direct identifiers")
         if (
             parsed.scheme != "https"
@@ -77,6 +84,7 @@ def _validate_source_refs(value: Any) -> int:
             or parsed.hostname.lower().rstrip(".") not in ALLOWED_SOURCE_HOSTS
             or parsed.username is not None
             or parsed.password is not None
+            or port not in (None, 443)
             or bool(parsed.query)
             or bool(parsed.fragment)
         ):
