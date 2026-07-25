@@ -18,6 +18,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from kgov_runtime.http import fetch_text  # noqa: E402
+from kgov_runtime.redaction import contains_direct_identifier  # noqa: E402
 from kgov_runtime.review_admission import (  # noqa: E402
     ReviewContract,
     admit_review,
@@ -47,7 +48,11 @@ FIXTURE = (
     / "capabilities"
     / "patent-prior-art-evidence-pack.json"
 )
-LOOKUP_ALLOWED_HOSTS = {"kipris.or.kr", "kipo.go.kr"}
+# Exact official hosts only. Do not use parent-domain suffix matching here.
+LOOKUP_ALLOWED_HOSTS = set(CONTRACT.allowed_hosts)
+LOOKUP_OUTPUT_KEYS = frozenset(
+    {"url", "status", "content_type", "title", "content_length", "sha256"}
+)
 CREDENTIAL_QUERY_KEYS = frozenset(
     {
         "access_token",
@@ -69,13 +74,33 @@ def review_case(payload: Mapping[str, Any]) -> dict[str, Any]:
     return admit_review(payload, CONTRACT)
 
 
+def _safe_lookup_display_url(url: str) -> str:
+    """Return only scheme/host/path so query values never appear in receipts."""
+
+    parsed = urlsplit(url)
+    return f"{parsed.scheme}://{parsed.hostname}{parsed.path or '/'}"
+
+
 def _validated_lookup_url(url: str) -> str:
     parsed = urlsplit(url)
+    host = (parsed.hostname or "").lower().rstrip(".")
+    if parsed.scheme != "https":
+        raise ValueError("only HTTPS lookup URLs are allowed")
+    if parsed.username or parsed.password:
+        raise ValueError("embedded URL credentials are forbidden")
+    if host not in LOOKUP_ALLOWED_HOSTS:
+        raise ValueError(f"host is not allowlisted: {host or '<missing>'}")
     if parsed.fragment:
         raise ValueError("lookup URL fragments are forbidden")
-    query_keys = {key.lower() for key, _ in parse_qsl(parsed.query, keep_blank_values=True)}
+    if contains_direct_identifier(url):
+        raise ValueError("lookup URL contains a supported direct identifier")
+    query_items = parse_qsl(parsed.query, keep_blank_values=True)
+    query_keys = {key.lower() for key, _ in query_items}
     if query_keys & CREDENTIAL_QUERY_KEYS:
         raise ValueError("credential-bearing lookup query parameters are forbidden")
+    for key, value in query_items:
+        if contains_direct_identifier(f"{key}={value}"):
+            raise ValueError("lookup URL contains a supported direct identifier")
     return url
 
 
@@ -87,22 +112,29 @@ def inspect_patent_source(
 ) -> dict[str, Any]:
     """Read one public KIPRIS/KIPO page with bounded, redirect-rejecting HTTP."""
 
+    validated = _validated_lookup_url(url)
     kwargs: dict[str, Any] = {"allowed_hosts": LOOKUP_ALLOWED_HOSTS}
     if opener is not None:
         kwargs["opener"] = opener
     if resolver is not None:
         kwargs["resolver"] = resolver
-    response = fetch_text(_validated_lookup_url(url), **kwargs)
+    response = fetch_text(validated, **kwargs)
     text = response.pop("text")
     match = re.search(r"<title[^>]*>(.*?)</title>", text, flags=re.IGNORECASE | re.DOTALL)
     title = re.sub(r"\s+", " ", unescape(match.group(1))).strip() if match else ""
     body = text.encode("utf-8")
-    return {
-        **response,
+    result = {
+        "url": _safe_lookup_display_url(validated),
+        "status": response.get("status"),
+        "content_type": response.get("content_type"),
         "title": title,
         "content_length": len(body),
         "sha256": hashlib.sha256(body).hexdigest(),
     }
+    unexpected = set(result) - LOOKUP_OUTPUT_KEYS
+    if unexpected:
+        raise RuntimeError("lookup receipt schema drifted")
+    return result
 
 
 def main() -> int:
