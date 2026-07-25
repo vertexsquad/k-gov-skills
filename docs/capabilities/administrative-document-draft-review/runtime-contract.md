@@ -4,11 +4,12 @@
 
 JSON object with exactly these fields:
 
-- `document_type`: `official-letter`, `report`, `meeting-material`, or `press-release`
+- `document_type`: `official-letter`, `report`, `meeting-material`, `press-release`,
+  `audit-response`, `council-agenda`, or `education-notice`
 - `title`: non-empty string, at most 200 characters
 - `body`: non-empty string, at most 30,000 characters
 - `purpose`: non-empty string, at most 500 characters
-- `source_refs`: at most 20 credential-free HTTPS URLs
+- `source_refs`: at most 20 credential-free HTTPS URLs on the exact administrative-source host allowlist; query strings and fragments are forbidden
 - `redaction_status`: literal `redacted`
 
 The direct-identifier scan covers common Korean mobile-number, resident-registration-number-shaped, and email patterns. A no-match is not proof of complete redaction.
@@ -16,7 +17,7 @@ The direct-identifier scan covers common Korean mobile-number, resident-registra
 ## Execution boundary
 
 - Local JSON validation only; no network, credential, proxy, or file-format mutation.
-- Unsupported document types, unknown or missing fields, oversized values, invalid source references, unredacted input, and detected direct identifiers fail closed.
+- Unsupported document types, unknown or missing fields, oversized values, non-allowlisted or credential-bearing source references, unredacted input, and detected direct identifiers fail closed.
 - Fixture data is synthetic and contains no actual administrative or personal data.
 
 ## Output

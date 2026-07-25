@@ -102,8 +102,8 @@ def _validate_capabilities(
     if not isinstance(raw_capabilities, list):
         errors.append("shared_capabilities must be a list")
         return set(), {}
-    if len(raw_capabilities) != 12:
-        errors.append(f"catalog must contain 12 shared capabilities, got {len(raw_capabilities)}")
+    if len(raw_capabilities) != 20:
+        errors.append(f"catalog must contain 20 shared capabilities, got {len(raw_capabilities)}")
     slugs: set[str] = set()
     by_slug: dict[str, dict[str, Any]] = {}
     for index, capability in enumerate(raw_capabilities):
@@ -219,6 +219,7 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
             role = skill["role"]
             boundary = skill["boundary"]
             references = skill["reference_skills"]
+            task_checks = skill.get("task_checks")
             if not isinstance(name, str) or not SLUG.fullmatch(name):
                 errors.append(f"{domain}: invalid Skill name {name}")
                 continue
@@ -233,11 +234,29 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
                 errors.append(f"{domain}/{name}: unknown capability {capability}")
             if boundary not in BOUNDARIES:
                 errors.append(f"{domain}/{name}: invalid boundary {boundary}")
+            capability_manifest = capability_by_slug.get(capability)
+            if (
+                boundary == "read-only"
+                and capability_manifest is not None
+                and capability_manifest.get("side_effect_class") == "draft-only"
+            ):
+                errors.append(
+                    f"{domain}/{name}: read-only boundary is incompatible with draft-only capability"
+                )
             if not isinstance(references, list) or not all(
                 isinstance(value, str) and SLUG.fullmatch(value) for value in references
             ):
                 errors.append(f"{domain}/{name}: invalid reference_skills")
                 references = []
+            if task_checks is not None and (
+                not isinstance(task_checks, list)
+                or not 1 <= len(task_checks) <= 8
+                or not all(
+                    isinstance(check, str) and check.strip() and len(check) <= 200
+                    for check in task_checks
+                )
+            ):
+                errors.append(f"{domain}/{name}: invalid task_checks")
             if role == "primary":
                 if evidence in {"direct", "adjacent"} and not references:
                     errors.append(f"{domain}: {evidence} evidence requires primary reference_skills")
@@ -247,8 +266,8 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
                     errors.append(f"{domain}: sensitive evidence requires manual-review-only")
             declared_entrypoints.add(Path("domains") / domain / "skills" / name / "SKILL.md")
 
-    if total_skills != 76:
-        errors.append(f"catalog must declare 76 domain Skills, got {total_skills}")
+    if total_skills != 95:
+        errors.append(f"catalog must declare 95 domain Skills, got {total_skills}")
     domains_root = root / "domains"
     actual_domains = {path.name for path in domains_root.iterdir() if path.is_dir()} if domains_root.is_dir() else set()
     if actual_domains != seen_domains:

@@ -3,7 +3,8 @@
 ## 사용 조건
 
 - 입력 문서는 synthetic이거나 사용자 권한 아래 비식별 처리된 자료여야 합니다.
-- 지원 유형은 `official-letter`, `report`, `meeting-material`, `press-release`입니다.
+- 지원 유형은 `official-letter`, `report`, `meeting-material`, `press-release`,
+  `audit-response`, `council-agenda`, `education-notice`입니다.
 - 기관별 서식, 보안등급, 공개 범위와 결재선은 담당자가 별도로 확인합니다.
 
 ## 절차

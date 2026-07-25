@@ -39,8 +39,8 @@ class CatalogContractTest(unittest.TestCase):
     def test_public_skills_are_owned_by_domains(self) -> None:
         self.assertFalse((ROOT / "skills").exists())
         entrypoints = sorted(ROOT.glob("domains/*/skills/*/SKILL.md"))
-        self.assertEqual(76, len(entrypoints))
-        self.assertEqual(76, len({path.parent.name for path in entrypoints}))
+        self.assertEqual(95, len(entrypoints))
+        self.assertEqual(95, len({path.parent.name for path in entrypoints}))
         self.assertFalse(list(ROOT.glob("domains/*/.gitkeep")))
 
     def test_evidence_distribution_matches_review(self) -> None:
@@ -50,7 +50,7 @@ class CatalogContractTest(unittest.TestCase):
     def test_capability_runtime_manifest_is_complete(self) -> None:
         self.assertEqual(4, self.data["schema_version"])
         capabilities = self.data["shared_capabilities"]
-        self.assertEqual(12, len(capabilities))
+        self.assertEqual(20, len(capabilities))
         required = {
             "slug",
             "locale",
@@ -74,7 +74,7 @@ class CatalogContractTest(unittest.TestCase):
         for domain in self.data["domains"]:
             self.assertEqual(1, sum(skill["role"] == "primary" for skill in domain["skills"]))
             names.extend(skill["name"] for skill in domain["skills"])
-        self.assertEqual(76, len(names))
+        self.assertEqual(95, len(names))
         self.assertEqual(len(names), len(set(names)))
 
     def test_additional_capabilities_are_domain_owned(self) -> None:
@@ -88,14 +88,68 @@ class CatalogContractTest(unittest.TestCase):
             additions = {skill["capability"] for skill in domain["skills"] if skill["role"] == "additional"}
             expected = set(shared_expected)
             if domain_name == "행정":
-                expected.add("korean-legal-citation-verification")
+                expected.update(
+                    {
+                        "korean-legal-citation-verification",
+                        "public-ai-governance-review",
+                        "official-notice-multilingual-translation-review",
+                    }
+                )
+            else:
+                expected.add("local-ordinance-draft-review")
             self.assertEqual(expected, additions)
+
+    def test_skill_expansion_19_plus_patent_merge_contract(self) -> None:
+        expected_additions = {
+            "public-ai-impact-assessment-draft-review",
+            "public-ai-risk-management-plan-review",
+            "ai-product-procurement-readiness-check",
+            "public-it-project-procedure-check",
+            "local-finance-evidence-pack",
+            "audit-finding-response-draft-review",
+            "public-record-disclosure-redaction-review",
+            "local-council-agenda-draft-review",
+            "local-ordinance-draft-review",
+            "procurement-specification-hwpx-review",
+            "education-administrative-document-draft-review",
+            "immigration-civil-complaint-triage-draft",
+            "police-civil-complaint-triage-draft",
+            "welfare-civil-complaint-triage-draft",
+            "labor-civil-complaint-triage-draft",
+            "disaster-public-message-draft-review",
+            "construction-standard-bim-compliance-precheck",
+            "building-permit-document-precheck",
+            "official-notice-multilingual-translation-review",
+        }
+        skills = [skill for domain in self.data["domains"] for skill in domain["skills"]]
+        by_name = {skill["name"]: skill for skill in skills}
+        self.assertTrue(expected_additions.issubset(by_name))
+        self.assertTrue(all(len(by_name[name]["task_checks"]) == 3 for name in expected_additions))
+        self.assertEqual(
+            "patent-prior-art-evidence-pack",
+            by_name["korean-patent-lookup"]["capability"],
+        )
 
     def test_unknown_capability_is_rejected(self) -> None:
         changed = copy.deepcopy(self.data)
         changed["domains"][0]["skills"][0]["capability"] = "unknown-capability"
         errors = validate(changed, ROOT)
         self.assertTrue(any("unknown capability unknown-capability" in error for error in errors))
+
+    def test_read_only_skill_cannot_route_to_draft_only_capability(self) -> None:
+        changed = copy.deepcopy(self.data)
+        skill = next(
+            skill
+            for domain in changed["domains"]
+            for skill in domain["skills"]
+            if skill["name"] == "audit-finding-response-draft-review"
+        )
+        skill["boundary"] = "read-only"
+        errors = validate(changed, ROOT)
+        self.assertIn(
+            "감사/audit-finding-response-draft-review: read-only boundary is incompatible with draft-only capability",
+            errors,
+        )
 
     def test_invalid_skill_container_is_rejected_without_crashing(self) -> None:
         changed = copy.deepcopy(self.data)
@@ -136,11 +190,11 @@ class CatalogContractTest(unittest.TestCase):
         current = (ROOT / "docs/domain-skill-candidates.md").read_text(encoding="utf-8")
         self.assertEqual(render_catalog(self.data), current)
         self.assertIn("전체 domain: **60개**", current)
-        self.assertIn("domain-owned Skill: **76개**", current)
+        self.assertIn("domain-owned Skill: **95개**", current)
 
     def test_generated_domain_skills_match_catalog(self) -> None:
         expected = expected_domain_skills(self.data, ROOT)
-        self.assertEqual(76, len(expected))
+        self.assertEqual(95, len(expected))
         for path, content in expected.items():
             self.assertEqual(content, path.read_text(encoding="utf-8"))
 
@@ -184,7 +238,7 @@ class CatalogContractTest(unittest.TestCase):
             capture_output=True,
             text=True,
         )
-        self.assertIn("domains=60 domain_skills=76 capabilities=12 top_level_skills=0", result.stdout)
+        self.assertIn("domains=60 domain_skills=95 capabilities=20 top_level_skills=0", result.stdout)
 
 
 if __name__ == "__main__":

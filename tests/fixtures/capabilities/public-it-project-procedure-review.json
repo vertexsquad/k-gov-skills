@@ -1,0 +1,16 @@
+{
+  "case_id": "PUBLIC-001",
+  "review_type": "project-stage-check",
+  "summary": "정보화사업 단계와 산출물 후보를 점검합니다.",
+  "facts": [
+    "기관별 적용 규정과 승인 주체는 담당자가 확인합니다."
+  ],
+  "source_refs": [
+    {
+      "url": "https://www.mois.go.kr/",
+      "retrieved_on": "2026-07-25"
+    }
+  ],
+  "as_of_date": "2026-07-25",
+  "redaction_status": "redacted"
+}

@@ -1,0 +1,16 @@
+{
+  "case_id": "LOCAL-001",
+  "review_type": "ordinance-draft-review",
+  "summary": "자치법규안의 상위법 근거와 조문 구조를 검토합니다.",
+  "facts": [
+    "법률 해석과 조례안 확정은 법무·의회 담당자가 수행합니다."
+  ],
+  "source_refs": [
+    {
+      "url": "https://www.elis.go.kr/",
+      "retrieved_on": "2026-07-25"
+    }
+  ],
+  "as_of_date": "2026-07-25",
+  "redaction_status": "redacted"
+}
