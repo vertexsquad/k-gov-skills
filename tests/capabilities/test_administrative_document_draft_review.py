@@ -95,6 +95,8 @@ class AdapterTest(unittest.TestCase):
             ["https://attacker.example/"],
             ["https://www.suwon.go.kr/?api_key=SYNTHETIC_TOKEN"],
             ["https://www.suwon.go.kr/#internal"],
+            ["https://www.law.go.kr:4443/path"],
+            ["https://www.law.go.kr:bad/path"],
             ["not-a-url"],
         ):
             with self.subTest(source_refs=source_refs):

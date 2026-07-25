@@ -66,6 +66,8 @@ class AdapterTest(ReviewAdmissionContractMixin, unittest.TestCase):
             "https://evil.kipris.or.kr/",
             "https://evil.kipo.go.kr/",
             "https://www.kipris.or.kr/?api_key=SYNTHETIC_TOKEN",
+            "https://www.kipris.or.kr/?client_secret=SYNTHETIC_TOKEN",
+            "https://www.kipris.or.kr/?password=SYNTHETIC_TOKEN",
             "https://user:secret@www.kipris.or.kr/",
             "https://www.kipris.or.kr/#internal",
             "https://www.kipris.or.kr/search?q=user@example.org",
