@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+"""Fail-closed local admission guard for public-ai-governance-review."""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+from typing import Any, Mapping
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from kgov_runtime.review_admission import ReviewContract, admit_review, run_cli  # noqa: E402
+
+CONTRACT = ReviewContract(
+    slug='public-ai-governance-review',
+    review_types=frozenset(['impact-assessment', 'risk-management-plan']),
+    allowed_hosts=frozenset(['www.law.go.kr', 'www.msit.go.kr', 'www.pipc.go.kr']),
+    required_checks=('purpose-data-impact-ledger', 'responsibility-and-log-controls', 'incident-stop-appeal-plan'),
+    prohibited_decisions=('final-risk-rating', 'automated-service-approval', 'automated-rights-decision'),
+    permitted_output='governance-review-draft-only',
+)
+FIXTURE = ROOT / "tests" / "fixtures" / "capabilities" / 'public-ai-governance-review.json'
+
+
+def review_case(payload: Mapping[str, Any]) -> dict[str, Any]:
+    return admit_review(payload, CONTRACT)
+
+
+def main() -> int:
+    return run_cli(CONTRACT, FIXTURE)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

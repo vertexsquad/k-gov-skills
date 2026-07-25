@@ -1,0 +1,16 @@
+{
+  "case_id": "OFFICIAL-001",
+  "review_type": "multilingual-translation-review",
+  "summary": "공공안내문의 다국어 번역과 용어 일관성을 검토합니다.",
+  "facts": [
+    "게시 전 언어별 전문 감수자가 의미와 용어를 확인합니다."
+  ],
+  "source_refs": [
+    {
+      "url": "https://www.korean.go.kr/",
+      "retrieved_on": "2026-07-25"
+    }
+  ],
+  "as_of_date": "2026-07-25",
+  "redaction_status": "redacted"
+}

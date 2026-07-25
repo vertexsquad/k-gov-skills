@@ -1,0 +1,16 @@
+{
+  "case_id": "PUBLIC-001",
+  "review_type": "impact-assessment",
+  "summary": "공공 AI 서비스의 영향과 위험관리 초안을 검토합니다.",
+  "facts": [
+    "권리 영향과 운영 중단 조건은 담당자가 확인합니다."
+  ],
+  "source_refs": [
+    {
+      "url": "https://www.pipc.go.kr/",
+      "retrieved_on": "2026-07-25"
+    }
+  ],
+  "as_of_date": "2026-07-25",
+  "redaction_status": "redacted"
+}

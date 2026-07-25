@@ -156,7 +156,14 @@
       "side_effect_class": "draft-only",
       "manual_handoff_gate": "기관 서식·근거 확정·결재·발송은 담당 공무원 승인",
       "source_provenance": [
+        "https://www.archives.go.kr/",
+        "https://www.bai.go.kr/",
+        "https://www.elis.go.kr/",
         "https://gnews.gg.go.kr/",
+        "https://www.law.go.kr/",
+        "https://www.moe.go.kr/",
+        "https://www.mois.go.kr/",
+        "https://www.open.go.kr/",
         "https://www.suwon.go.kr/"
       ],
       "execution_status": "fixture-verified",
@@ -197,6 +204,134 @@
       ],
       "execution_status": "live-verified",
       "live_smoke": "passed"
+    },
+    {
+      "slug": "public-ai-governance-review",
+      "locale": "ko-KR",
+      "jurisdiction": "KR",
+      "service": "공공 AI 영향평가·위험관리계획 초안 admission",
+      "credential_class": "none",
+      "proxy_mode": "none",
+      "side_effect_class": "draft-only",
+      "manual_handoff_gate": "영향·위험 등급, 운영 중단, 이의제기, 최종 승인 판단은 기관 책임자가 수행",
+      "source_provenance": [
+        "https://www.law.go.kr/",
+        "https://www.msit.go.kr/",
+        "https://www.pipc.go.kr/"
+      ],
+      "execution_status": "fixture-verified",
+      "live_smoke": "not-run"
+    },
+    {
+      "slug": "public-it-project-procedure-review",
+      "locale": "ko-KR",
+      "jurisdiction": "KR",
+      "service": "공공 정보화사업 단계·산출물 절차 점검 admission",
+      "credential_class": "none",
+      "proxy_mode": "none",
+      "side_effect_class": "draft-only",
+      "manual_handoff_gate": "기관별 적용 규정, 사업 단계 확정, 결재와 조달 착수는 담당 공무원이 승인",
+      "source_provenance": [
+        "https://www.mois.go.kr/",
+        "https://www.law.go.kr/"
+      ],
+      "execution_status": "fixture-verified",
+      "live_smoke": "not-run"
+    },
+    {
+      "slug": "public-record-disclosure-redaction-review",
+      "locale": "ko-KR",
+      "jurisdiction": "KR",
+      "service": "공공기록 공개·비공개·부분공개·마스킹 검토 admission",
+      "credential_class": "none",
+      "proxy_mode": "none",
+      "side_effect_class": "draft-only",
+      "manual_handoff_gate": "비공개 사유, 공개 범위, 원문 마스킹과 공개 결정은 정보공개 담당자가 승인",
+      "source_provenance": [
+        "https://www.open.go.kr/",
+        "https://www.archives.go.kr/"
+      ],
+      "execution_status": "fixture-verified",
+      "live_smoke": "not-run"
+    },
+    {
+      "slug": "local-ordinance-draft-review",
+      "locale": "ko-KR",
+      "jurisdiction": "KR",
+      "service": "자치법규 상위법·조문구조·입안점검 admission",
+      "credential_class": "none",
+      "proxy_mode": "none",
+      "side_effect_class": "draft-only",
+      "manual_handoff_gate": "상위법 적합성, 자치사무 범위, 법률 해석과 조례안 확정은 법무·의회 담당자가 승인",
+      "source_provenance": [
+        "https://www.elis.go.kr/",
+        "https://www.law.go.kr/"
+      ],
+      "execution_status": "fixture-verified",
+      "live_smoke": "not-run"
+    },
+    {
+      "slug": "construction-standard-bim-compliance-precheck",
+      "locale": "ko-KR",
+      "jurisdiction": "KR",
+      "service": "KCSC·BIM 기준 사전점검 admission",
+      "credential_class": "none",
+      "proxy_mode": "none",
+      "side_effect_class": "draft-only",
+      "manual_handoff_gate": "설계 적합성, 구조·시공 안전성과 준공 판단은 자격 있는 기술자와 발주기관이 승인",
+      "source_provenance": [
+        "https://www.kcsc.re.kr/"
+      ],
+      "execution_status": "fixture-verified",
+      "live_smoke": "not-run"
+    },
+    {
+      "slug": "building-permit-document-precheck",
+      "locale": "ko-KR",
+      "jurisdiction": "KR",
+      "service": "건축 인허가 제출 전 서류 누락 점검 admission",
+      "credential_class": "none",
+      "proxy_mode": "none",
+      "side_effect_class": "draft-only",
+      "manual_handoff_gate": "허가 대상, 법정 요건, 도면 적합성과 실제 신청·제출은 건축사와 허가권자가 확인",
+      "source_provenance": [
+        "https://www.eais.go.kr/",
+        "https://www.law.go.kr/"
+      ],
+      "execution_status": "fixture-verified",
+      "live_smoke": "blocked"
+    },
+    {
+      "slug": "official-notice-multilingual-translation-review",
+      "locale": "ko-KR",
+      "jurisdiction": "KR",
+      "service": "공공안내 다국어 번역·용어 일관성 검토 admission",
+      "credential_class": "none",
+      "proxy_mode": "none",
+      "side_effect_class": "draft-only",
+      "manual_handoff_gate": "공식 용어, 법적 의미, 언어별 감수와 게시·발송은 기관 담당자와 전문 감수자가 승인",
+      "source_provenance": [
+        "https://www.mois.go.kr/",
+        "https://www.korean.go.kr/"
+      ],
+      "execution_status": "fixture-verified",
+      "live_smoke": "not-run"
+    },
+    {
+      "slug": "patent-prior-art-evidence-pack",
+      "locale": "ko-KR",
+      "jurisdiction": "KR",
+      "service": "KIPRIS 공식문헌 조회·선행기술 청구항-근거표 admission",
+      "credential_class": "none",
+      "proxy_mode": "none",
+      "side_effect_class": "read-only",
+      "manual_handoff_gate": "신규성·진보성·침해·등록가능성 판단과 출원·심판 제출은 변리사 또는 담당자가 승인",
+      "source_provenance": [
+        "https://www.kipris.or.kr/",
+        "https://www.kipo.go.kr/"
+      ],
+      "execution_status": "fixture-verified",
+      "live_smoke": "not-run"
     }
   ],
   "domains": [
@@ -251,6 +386,45 @@
             "legal-kr"
           ],
           "boundary": "draft-only"
+        },
+        {
+          "name": "public-ai-impact-assessment-draft-review",
+          "title": "공공 AI 영향평가 초안 검토",
+          "capability": "public-ai-governance-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "영향 대상·목적·데이터 범위를 명시",
+            "권리·안전·차별·개인정보 영향을 근거별 분리",
+            "완화조치·이의제기·중단조건을 담당자에게 이관"
+          ]
+        },
+        {
+          "name": "public-ai-risk-management-plan-review",
+          "title": "공공 AI 위험관리계획 검토",
+          "capability": "public-ai-governance-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "책임자·로그·검증·사고대응·중단·이의제기 6항 확인",
+            "모델 출력과 기관 결정을 분리",
+            "운영 승인 전 잔여 위험을 명시"
+          ]
+        },
+        {
+          "name": "official-notice-multilingual-translation-review",
+          "title": "공공안내 다국어 번역 검토",
+          "capability": "official-notice-multilingual-translation-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "원문 의미·공식 용어·숫자·날짜·연락처 일관성 점검",
+            "기계번역을 법적·의학적 의미 보증으로 사용하지 않음",
+            "게시·발송 전 언어별 전문 감수자 승인"
+          ]
         }
       ]
     },
@@ -269,6 +443,19 @@
             "k-dart"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "local-finance-evidence-pack",
+          "title": "지방재정 근거 묶음",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "예산·결산 주장을 회계연도·기관·항목별 분리",
+            "지방재정365 공식 URL과 조회일 보존",
+            "수치 해석·정책평가는 담당자 검토로 이관"
+          ]
         }
       ]
     },
@@ -392,6 +579,19 @@
             "g2b-sanctioned-supplier"
           ],
           "boundary": "draft-only"
+        },
+        {
+          "name": "audit-finding-response-draft-review",
+          "title": "감사 지적사항 답변 초안 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "지적사항·소명·근거·조치계획을 항목별 분리",
+            "완료·예정 조치와 증빙 공백을 구분",
+            "감사 수용·불수용 판단과 제출은 담당자 승인"
+          ]
         }
       ]
     },
@@ -427,6 +627,32 @@
             "g2b-sanctioned-supplier"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "ai-product-procurement-readiness-check",
+          "title": "AI 제품 조달 준비도 점검",
+          "capability": "public-procurement-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "MAS·공고·자격·납품조건을 공식 근거에서 확인",
+            "AI 기능·데이터 처리·성능검증 요구사항을 분리",
+            "투찰·계약·인증서 사용을 수행하지 않음"
+          ]
+        },
+        {
+          "name": "procurement-specification-hwpx-review",
+          "title": "조달 규격서 HWPX 검토",
+          "capability": "public-document-hwpx",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "HWPX를 읽기 전용으로 추출",
+            "누락 항목·특정규격·검수조건 후보를 표시",
+            "원본 수정·공고·계약은 조달 담당자 승인"
+          ]
         }
       ]
     },
@@ -573,6 +799,19 @@
           "role": "primary",
           "reference_skills": [],
           "boundary": "read-only"
+        },
+        {
+          "name": "immigration-civil-complaint-triage-draft",
+          "title": "출입국 민원 분류·답변 초안",
+          "capability": "civil-complaint-triage-draft",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "체류·비자 민원 소관과 요청사항을 분리",
+            "체류자격·처분·입국 가능 여부를 자동 판단하지 않음",
+            "답변 발송은 출입국 담당자 승인"
+          ]
         }
       ]
     },
@@ -590,6 +829,19 @@
             "subway-lost-property"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "police-civil-complaint-triage-draft",
+          "title": "경찰 민원 분류·답변 초안",
+          "capability": "civil-complaint-triage-draft",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "치안 민원 소관과 긴급성 후보를 분리",
+            "수사·처분·출동 여부를 자동 결정하지 않음",
+            "긴급 신고는 공식 112 경로로 즉시 이관"
+          ]
         }
       ]
     },
@@ -646,6 +898,19 @@
             "emergency-room-beds"
           ],
           "boundary": "draft-only"
+        },
+        {
+          "name": "disaster-public-message-draft-review",
+          "title": "재난 공공안내문 초안 검토",
+          "capability": "disaster-geospatial-brief",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "발령 시각·대상 지역·기관·행동요령을 명시",
+            "조회 자료 시각과 안내문 기준 시각을 비교",
+            "실제 발송 직전 담당기관이 최신성을 승인"
+          ]
         }
       ]
     },
@@ -729,6 +994,19 @@
             "k-schoollunch-menu"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "education-administrative-document-draft-review",
+          "title": "교육행정 문서 초안 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "공문·가정통신문·회의자료 문서유형을 명시",
+            "학생·보호자·교직원 개인정보 원문 입력 금지",
+            "결재·배포·발송은 교육행정 담당자 승인"
+          ]
         }
       ]
     },
@@ -748,6 +1026,19 @@
             "korean-scholarship-search"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "welfare-civil-complaint-triage-draft",
+          "title": "복지 민원 분류·답변 초안",
+          "capability": "civil-complaint-triage-draft",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "급여·서비스·기관 문의를 분리",
+            "수급자격·금액·대상자 여부를 자동 판정하지 않음",
+            "안내 발송과 자격 판단은 담당기관 승인"
+          ]
         }
       ]
     },
@@ -767,6 +1058,19 @@
             "korean-law-search"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "labor-civil-complaint-triage-draft",
+          "title": "고용노동 민원 분류·답변 초안",
+          "capability": "civil-complaint-triage-draft",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "임금·산재·근로관계 요청사항을 분리",
+            "위법·근로자성·산재 인정 여부를 자동 판단하지 않음",
+            "법적 판단과 답변 발송은 담당기관 승인"
+          ]
         }
       ]
     },
@@ -967,6 +1271,19 @@
             "gongsijiga-search"
           ],
           "boundary": "draft-only"
+        },
+        {
+          "name": "construction-standard-bim-compliance-precheck",
+          "title": "건설기준·BIM 적합성 사전점검",
+          "capability": "construction-standard-bim-compliance-precheck",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "기준 버전·적용 범위·도면/모델 항목을 분리",
+            "KCSC 근거 URL과 조회일을 보존",
+            "공학적 적합성·안전 판단은 기술자 승인"
+          ]
         }
       ]
     },
@@ -987,6 +1304,19 @@
             "sh-notice-search"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "building-permit-document-precheck",
+          "title": "건축 인허가 서류 사전점검",
+          "capability": "building-permit-document-precheck",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "건축물·행위·지역에 따른 서류 후보를 분리",
+            "세움터 도달 여부를 실제 민원 기능 성공으로 간주하지 않음",
+            "허가요건과 실제 제출은 건축사·허가권자 확인"
+          ]
         }
       ]
     },
@@ -1091,12 +1421,17 @@
         {
           "name": "korean-patent-lookup",
           "title": "KIPRIS 특허 조회",
-          "capability": "official-source-research",
+          "capability": "patent-prior-art-evidence-pack",
           "role": "primary",
           "reference_skills": [
             "korean-patent-search"
           ],
-          "boundary": "read-only"
+          "boundary": "read-only",
+          "task_checks": [
+            "KIPRIS 검색 결과와 공개번호·공개일을 보존",
+            "청구항 요소별 관련 문헌·인용 위치를 구조화",
+            "신규성·진보성·침해 판단은 변리사 검토로 이관"
+          ]
         }
       ]
     },
@@ -1130,6 +1465,19 @@
           "role": "primary",
           "reference_skills": [],
           "boundary": "draft-only"
+        },
+        {
+          "name": "public-it-project-procedure-check",
+          "title": "공공 정보화사업 절차 점검",
+          "capability": "public-it-project-procedure-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "기획·사전검토·조달·구축·검수·운영 단계 식별",
+            "단계별 필수 산출물과 승인 주체 확인",
+            "기관별 적용 규정의 최신성을 담당자가 재확인"
+          ]
         }
       ]
     },
@@ -1239,6 +1587,19 @@
             "joseon-sillok-search"
           ],
           "boundary": "draft-only"
+        },
+        {
+          "name": "public-record-disclosure-redaction-review",
+          "title": "공공기록 공개·마스킹 검토",
+          "capability": "public-record-disclosure-redaction-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "공개·비공개·부분공개 후보를 근거별 분리",
+            "직접식별자 no-match를 완전 마스킹 증명으로 사용하지 않음",
+            "공개 결정과 원문 변경은 정보공개 담당자 승인"
+          ]
         }
       ]
     },
@@ -1337,6 +1698,19 @@
           "role": "additional",
           "reference_skills": [],
           "boundary": "draft-only"
+        },
+        {
+          "name": "local-ordinance-draft-review",
+          "title": "자치법규안 초안 검토",
+          "capability": "local-ordinance-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "상위법 위임·저촉·자치사무 범위 확인",
+            "조문·부칙·시행일·경과조치 구조 점검",
+            "법률 해석과 발의·입법예고는 법무·의회 승인"
+          ]
         }
       ]
     },
@@ -1375,6 +1749,19 @@
             "korean-law-search"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "local-council-agenda-draft-review",
+          "title": "지방의회 의안·상정안 초안 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "의안 요지·제안이유·주요내용·검토사항 분리",
+            "기존 회의록·조례 조사 Skill과 역할 분리",
+            "상정·의결·공개는 의회 담당자 승인"
+          ]
         }
       ]
     },

@@ -1,0 +1,16 @@
+{
+  "case_id": "PUBLIC-001",
+  "review_type": "disclosure-redaction-review",
+  "summary": "공공기록 공개 범위와 마스킹 후보를 검토합니다.",
+  "facts": [
+    "부분공개와 비공개 근거는 정보공개 담당자가 확정합니다."
+  ],
+  "source_refs": [
+    {
+      "url": "https://www.open.go.kr/",
+      "retrieved_on": "2026-07-25"
+    }
+  ],
+  "as_of_date": "2026-07-25",
+  "redaction_status": "redacted"
+}

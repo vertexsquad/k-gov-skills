@@ -6,6 +6,7 @@ import subprocess
 import sys
 import unittest
 from pathlib import Path
+from urllib.parse import urlsplit
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -57,6 +58,9 @@ class AdapterTest(unittest.TestCase):
             "report",
             "meeting-material",
             "press-release",
+            "audit-response",
+            "council-agenda",
+            "education-notice",
         ):
             with self.subTest(document_type=document_type):
                 result = self.adapter.review_document(
@@ -88,6 +92,9 @@ class AdapterTest(unittest.TestCase):
             ["http://www.suwon.go.kr/"],
             ["https://user:secret@example.org/"],
             ["https://example.org/?contact=user@example.org"],
+            ["https://attacker.example/"],
+            ["https://www.suwon.go.kr/?api_key=SYNTHETIC_TOKEN"],
+            ["https://www.suwon.go.kr/#internal"],
             ["not-a-url"],
         ):
             with self.subTest(source_refs=source_refs):
@@ -95,6 +102,16 @@ class AdapterTest(unittest.TestCase):
                     self.adapter.review_document(
                         dict(self.valid, source_refs=source_refs)
                     )
+
+    def test_source_host_allowlist_matches_catalog_provenance(self) -> None:
+        catalog = json.loads((REPO_ROOT / "catalog" / "domain-skills.json").read_text())
+        manifest = next(
+            capability
+            for capability in catalog["shared_capabilities"]
+            if capability["slug"] == "administrative-document-draft-review"
+        )
+        manifest_hosts = {urlsplit(url).hostname for url in manifest["source_provenance"]}
+        self.assertEqual(self.adapter.ALLOWED_SOURCE_HOSTS, manifest_hosts)
 
     def test_fixture_cli_is_deterministic(self) -> None:
         first = subprocess.run(

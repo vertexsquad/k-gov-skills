@@ -33,6 +33,7 @@ def render_domain_skill(
     )
     references = skill["reference_skills"]
     reference_line = ", ".join(f"`{item}`" for item in references) if references else "없음"
+    task_checks = skill.get("task_checks", [])
     procedure_path = f"docs/capabilities/{capability_slug}/procedure.md"
     contract_path = f"docs/capabilities/{capability_slug}/runtime-contract.md"
     command = f"python3 -m kgov_runtime.capabilities.{module_name(capability_slug)} --fixture"
@@ -57,6 +58,18 @@ def render_domain_skill(
         f"- 실행 경계: `{skill['boundary']}`",
         f"- Reference Skill: {reference_line}",
         "",
+    ]
+    if task_checks:
+        lines.extend(
+            [
+                "## 업무별 추가 체크",
+                "",
+                *(f"- {check}" for check in task_checks),
+                "",
+            ]
+        )
+    lines.extend(
+        [
         "## 절차",
         "",
         f"1. 저장소 루트에서 `{procedure_path}`와 `{contract_path}`를 먼저 읽습니다.",
@@ -71,7 +84,8 @@ def render_domain_skill(
         "- 비밀값이나 원문 개인정보를 로그·결과·fixture에 남기지 않습니다.",
         "- 내부 capability를 별도 top-level `skills/` 제품 표면으로 복제하지 않습니다.",
         "",
-    ]
+        ]
+    )
     return "\n".join(lines)
 
 

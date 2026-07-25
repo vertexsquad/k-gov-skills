@@ -1,0 +1,16 @@
+{
+  "case_id": "PATENT-001",
+  "review_type": "prior-art-evidence-pack",
+  "summary": "KIPRIS 선행기술과 청구항 요소별 근거표를 검토합니다.",
+  "facts": [
+    "신규성·진보성·침해 여부는 변리사 또는 담당자가 판단합니다."
+  ],
+  "source_refs": [
+    {
+      "url": "https://www.kipris.or.kr/",
+      "retrieved_on": "2026-07-25"
+    }
+  ],
+  "as_of_date": "2026-07-25",
+  "redaction_status": "redacted"
+}
