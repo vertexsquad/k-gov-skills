@@ -1,0 +1,16 @@
+{
+  "case_id": "BUILDING-001",
+  "review_type": "permit-document-precheck",
+  "summary": "건축 인허가 제출 전 서류 후보와 공백을 점검합니다.",
+  "facts": [
+    "세움터 URL 도달은 실제 민원 기능 성공을 의미하지 않습니다."
+  ],
+  "source_refs": [
+    {
+      "url": "https://www.law.go.kr/",
+      "retrieved_on": "2026-07-25"
+    }
+  ],
+  "as_of_date": "2026-07-25",
+  "redaction_status": "redacted"
+}

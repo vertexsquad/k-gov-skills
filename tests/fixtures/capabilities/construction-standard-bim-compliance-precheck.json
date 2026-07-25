@@ -1,0 +1,16 @@
+{
+  "case_id": "CONSTRUCTION-001",
+  "review_type": "construction-standard-precheck",
+  "summary": "건설기준과 BIM 적용 항목의 사전점검표를 검토합니다.",
+  "facts": [
+    "구조와 시공 안전성은 자격 있는 기술자가 판단합니다."
+  ],
+  "source_refs": [
+    {
+      "url": "https://www.kcsc.re.kr/",
+      "retrieved_on": "2026-07-25"
+    }
+  ],
+  "as_of_date": "2026-07-25",
+  "redaction_status": "redacted"
+}

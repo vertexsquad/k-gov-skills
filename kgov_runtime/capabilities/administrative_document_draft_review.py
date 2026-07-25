@@ -23,13 +23,34 @@ REQUIRED_FIELDS = frozenset(
     {"document_type", "title", "body", "purpose", "source_refs", "redaction_status"}
 )
 SUPPORTED_DOCUMENT_TYPES = frozenset(
-    {"official-letter", "report", "meeting-material", "press-release"}
+    {
+        "official-letter",
+        "report",
+        "meeting-material",
+        "press-release",
+        "audit-response",
+        "council-agenda",
+        "education-notice",
+    }
 )
 MAX_INPUT_FILE_BYTES = 150_000
 MAX_TITLE_CHARACTERS = 200
 MAX_BODY_CHARACTERS = 30_000
 MAX_PURPOSE_CHARACTERS = 500
 MAX_SOURCE_REFS = 20
+ALLOWED_SOURCE_HOSTS = frozenset(
+    {
+        "www.archives.go.kr",
+        "www.bai.go.kr",
+        "www.elis.go.kr",
+        "gnews.gg.go.kr",
+        "www.law.go.kr",
+        "www.moe.go.kr",
+        "www.mois.go.kr",
+        "www.open.go.kr",
+        "www.suwon.go.kr",
+    }
+)
 LEGAL_TERMS = re.compile(r"법률|법령|조례|시행령|시행규칙|고시|훈령|예규")
 NUMERIC_CLAIM = re.compile(r"\d")
 
@@ -53,10 +74,15 @@ def _validate_source_refs(value: Any) -> int:
         if (
             parsed.scheme != "https"
             or not parsed.hostname
+            or parsed.hostname.lower().rstrip(".") not in ALLOWED_SOURCE_HOSTS
             or parsed.username is not None
             or parsed.password is not None
+            or bool(parsed.query)
+            or bool(parsed.fragment)
         ):
-            raise ValueError("source_refs entries must be credential-free HTTPS URLs")
+            raise ValueError(
+                "source_refs entries must be credential-free allowlisted HTTPS URLs without query or fragment"
+            )
     return len(value)
 
 
@@ -137,7 +163,11 @@ def main() -> int:
     try:
         payload = _load_payload(FIXTURE if args.fixture else args.path)
         result = review_document(payload)
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
+    except OSError:
+        parser.exit(2, "ERROR input file cannot be read\n")
+    except json.JSONDecodeError:
+        parser.exit(2, "ERROR input must be valid JSON\n")
+    except ValueError as exc:
         parser.exit(2, f"ERROR {exc}\n")
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
     return 0

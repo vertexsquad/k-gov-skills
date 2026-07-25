@@ -9,3 +9,4 @@
 - fixture 검증: `python3 -m kgov_runtime.capabilities.public_procurement_research --fixture`
 - live 검증: 필요한 query parameter와 사용자 소유 credential을 준비한 뒤에만 실행한다.
 - 상태 표기: fixture PASS와 live smoke PASS를 서로 대체하지 않는다.
+- AI 제품 readiness는 공개 조회 결과를 담당자가 검토하는 절차 확장일 뿐 적격·인증·성능을 자동 판정하지 않는다.
