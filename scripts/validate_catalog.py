@@ -58,6 +58,9 @@ MINIMUM_THREE_DOMAINS = {
     "사법",
     "보건의료",
     "식품의약",
+    "통계",
+    "소방",
+    "과학기술",
 }
 WAVE_ONE_TASK_CHECKS = {
     "national-subsidy-project-evidence-review": (
@@ -348,6 +351,92 @@ WAVE_FOUR_SKILL_CONTRACTS = {
         },
     ),
 }
+WAVE_FIVE_SKILL_CONTRACTS = {
+    "통계": (
+        {
+            "name": "official-statistics-methodology-evidence-review",
+            "title": "공식통계 방법론 근거 검토",
+            "capability": "public-policy-evidence-pack",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "통계명·통계표 코드·작성기관·작성목적·작성주기·조사대상·모집단·표본·가중치를 분리",
+                "공식 자료로 입력된 URL·공표일·조회일·방법론 버전·개정 이력과 상충·미수집 근거를 구분",
+                "방법론 적합성·통계 품질등급·정책 적용 판단은 통계 담당자 최종 검토로 이관",
+            ),
+        },
+        {
+            "name": "statistical-release-evidence-brief",
+            "title": "통계 공표 근거 브리프",
+            "capability": "kosis-official-statistics",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "통계표 코드·지표·분류·기준기간·분모·단위·잠정 또는 확정 상태를 분리",
+                "KOSIS 통계표 코드·작성기관·수록기간·공표일·조회일·개정 상태·결측·시계열 단절을 보존",
+                "추세 해석·인과관계·정책효과·공식 입장 판단은 통계 담당자 검토로 이관",
+            ),
+        },
+    ),
+    "소방": (
+        {
+            "name": "fire-safety-standard-evidence-pack",
+            "title": "소방안전 기준 근거 팩",
+            "capability": "public-policy-evidence-pack",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "시설유형·점검대상·적용 법령·고시·안전기준·시행일을 분리",
+                "공식 자료로 입력된 URL·문서번호·공표일·조회일·개정 상태와 상충·미수집 근거를 구분",
+                "적합·부적합 판정·시정명령·과태료·현장 점검·안전조치는 소방 담당기관과 전문가에게 이관",
+            ),
+        },
+        {
+            "name": "fire-response-statistics-brief",
+            "title": "소방 대응통계 브리프",
+            "capability": "kosis-official-statistics",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "화재유형·지역·기준기간·출동 또는 진압 단계·지표·분모·단위를 분리",
+                "KOSIS 통계표 코드·작성기관·공표일·조회일·개정 상태·결측을 보존",
+                "위험도 순위·인력 또는 장비 배치·현장 대응·예방정책 우선순위는 소방 담당기관에 이관",
+            ),
+        },
+    ),
+    "과학기술": (
+        {
+            "name": "national-rd-program-evidence-brief",
+            "title": "국가 R&D 사업 근거 브리프",
+            "capability": "public-policy-evidence-pack",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "사업명·사업 또는 과제 식별자·주관기관·공고번호·기간·예산·추진상태를 분리",
+                "공식 자료로 입력된 NTIS·부처 URL·공표일·조회일·문서 버전과 상충·미수집 근거를 구분",
+                "지원자격·선정·평가·예산배분·과제 수행 판단은 연구개발 담당기관에 이관",
+            ),
+        },
+        {
+            "name": "technology-impact-evidence-pack",
+            "title": "과학기술 영향 근거 팩",
+            "capability": "public-policy-evidence-pack",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "기술·정책 주장별 기준선·지표·기간·대상·단위와 상관 또는 인과 표현을 분리",
+                "공식 자료로 입력된 URL·발행기관·공표일·조회일·방법론·문서 버전과 상충·미수집 근거를 구분",
+                "인과효과·기술성숙도·투자·규제·사업 우선순위 판단은 과학기술 담당자와 전문가 검토로 이관",
+            ),
+        },
+    ),
+}
 WAVE_TWO_CAPABILITY_CONTRACTS = {
     "public-records-lifecycle-review": {
         "service": "공공기록물 분류·보존기간·이관·폐기 검토 admission",
@@ -593,6 +682,17 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
                 errors.append(f"{domain}/{expected_name}: wave-four contract mismatch")
             elif not _skill_contract_matches(matches[0], wave_four_contract):
                 errors.append(f"{domain}/{expected_name}: wave-four contract mismatch")
+        for wave_five_contract in WAVE_FIVE_SKILL_CONTRACTS.get(domain, ()):
+            expected_name = wave_five_contract["name"]
+            matches = [
+                skill
+                for skill in skills
+                if isinstance(skill, dict) and skill.get("name") == expected_name
+            ]
+            if len(matches) != 1:
+                errors.append(f"{domain}/{expected_name}: wave-five contract mismatch")
+            elif not _skill_contract_matches(matches[0], wave_five_contract):
+                errors.append(f"{domain}/{expected_name}: wave-five contract mismatch")
         total_skills += len(skills)
         primary_count = sum(isinstance(skill, dict) and skill.get("role") == "primary" for skill in skills)
         if primary_count != 1:
@@ -660,8 +760,8 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
                     errors.append(f"{domain}: sensitive evidence requires manual-review-only")
             declared_entrypoints.add(Path("domains") / domain / "skills" / name / "SKILL.md")
 
-    if total_skills != 120:
-        errors.append(f"catalog must declare 120 domain Skills, got {total_skills}")
+    if total_skills != 126:
+        errors.append(f"catalog must declare 126 domain Skills, got {total_skills}")
     domains_root = root / "domains"
     actual_domains = {path.name for path in domains_root.iterdir() if path.is_dir()} if domains_root.is_dir() else set()
     if actual_domains != seen_domains:

@@ -7,7 +7,7 @@
 ## 요약
 
 - 전체 domain: **60개**
-- domain-owned Skill: **120개** (primary 60 / additional 60)
+- domain-owned Skill: **126개** (primary 60 / additional 66)
 - 직접 reference 확인: **35개**
 - 인접 capability 활용: **16개**
 - 신규 설계 필요: **8개**
@@ -80,6 +80,8 @@
 | 감사 | `adjacent` | `additional` | 감사 지적사항 답변 초안 검토 | `audit-finding-response-draft-review` | `administrative-document-draft-review` | — | `draft-only` |
 | 감사 | `adjacent` | `additional` | 감사 조치계획 근거 검토 | `audit-action-plan-evidence-review` | `administrative-document-draft-review` | — | `draft-only` |
 | 통계 | `direct` | `primary` | KOSIS 공식통계 조회 | `kosis-statistics-lookup` | `kosis-official-statistics` | `kosis-stats` | `read-only` |
+| 통계 | `direct` | `additional` | 공식통계 방법론 근거 검토 | `official-statistics-methodology-evidence-review` | `public-policy-evidence-pack` | — | `draft-only` |
+| 통계 | `direct` | `additional` | 통계 공표 근거 브리프 | `statistical-release-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
 | 조달 | `direct` | `primary` | 나라장터 발주·제재 조회 | `public-procurement-plan-check` | `public-procurement-research` | `g2b-order-plan-search`, `g2b-sanctioned-supplier` | `read-only` |
 | 조달 | `direct` | `additional` | AI 제품 조달 준비도 점검 | `ai-product-procurement-readiness-check` | `public-procurement-research` | — | `draft-only` |
 | 조달 | `direct` | `additional` | 조달 규격서 HWPX 검토 | `procurement-specification-hwpx-review` | `public-document-hwpx` | — | `draft-only` |
@@ -113,6 +115,8 @@
 | Domain | Evidence | Role | Skill | Slug | Capability | Reference Skill | 경계 |
 |---|---|---|---|---|---|---|---|
 | 소방 | `adjacent` | `primary` | 응급실·재난자원 브리프 | `fire-emergency-resource-brief` | `disaster-geospatial-brief` | `emergency-room-beds`, `korea-weather` | `draft-only` |
+| 소방 | `adjacent` | `additional` | 소방안전 기준 근거 팩 | `fire-safety-standard-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
+| 소방 | `adjacent` | `additional` | 소방 대응통계 브리프 | `fire-response-statistics-brief` | `kosis-official-statistics` | — | `draft-only` |
 | 재난안전 | `direct` | `primary` | 기상·수위·대기 재난브리프 | `disaster-situation-brief` | `disaster-geospatial-brief` | `korea-weather`, `fine-dust-location`, `han-river-water-level`, `emergency-room-beds` | `draft-only` |
 | 재난안전 | `direct` | `additional` | 재난 공공안내문 초안 검토 | `disaster-public-message-draft-review` | `disaster-geospatial-brief` | — | `draft-only` |
 | 재난안전 | `direct` | `additional` | 재난 대응계획 근거 검토 | `disaster-response-plan-evidence-review` | `administrative-document-draft-review` | — | `draft-only` |
@@ -178,6 +182,8 @@
 | Domain | Evidence | Role | Skill | Slug | Capability | Reference Skill | 경계 |
 |---|---|---|---|---|---|---|---|
 | 과학기술 | `adjacent` | `primary` | 과학기술 특허·동향 조사 | `science-technology-trend-search` | `official-source-research` | `korean-patent-search`, `kosis-stats` | `draft-only` |
+| 과학기술 | `adjacent` | `additional` | 국가 R&D 사업 근거 브리프 | `national-rd-program-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
+| 과학기술 | `adjacent` | `additional` | 과학기술 영향 근거 팩 | `technology-impact-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
 | 특허 | `direct` | `primary` | KIPRIS 특허 조회 | `korean-patent-lookup` | `patent-prior-art-evidence-pack` | `korean-patent-search` | `read-only` |
 | 정보통신 | `adjacent` | `primary` | WHOIS·정보통신 정책 조사 | `ict-policy-domain-research` | `official-source-research` | `kr-whois-lookup`, `korean-privacy-terms` | `read-only` |
 | 전산 | `new` | `primary` | 공공시스템 운영점검 | `public-it-operations-check` | `official-source-research` | — | `draft-only` |

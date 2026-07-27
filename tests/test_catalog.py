@@ -39,8 +39,8 @@ class CatalogContractTest(unittest.TestCase):
     def test_public_skills_are_owned_by_domains(self) -> None:
         self.assertFalse((ROOT / "skills").exists())
         entrypoints = sorted(ROOT.glob("domains/*/skills/*/SKILL.md"))
-        self.assertEqual(120, len(entrypoints))
-        self.assertEqual(120, len({path.parent.name for path in entrypoints}))
+        self.assertEqual(126, len(entrypoints))
+        self.assertEqual(126, len({path.parent.name for path in entrypoints}))
         self.assertFalse(list(ROOT.glob("domains/*/.gitkeep")))
 
     def test_evidence_distribution_matches_review(self) -> None:
@@ -74,7 +74,7 @@ class CatalogContractTest(unittest.TestCase):
         for domain in self.data["domains"]:
             self.assertEqual(1, sum(skill["role"] == "primary" for skill in domain["skills"]))
             names.extend(skill["name"] for skill in domain["skills"])
-        self.assertEqual(120, len(names))
+        self.assertEqual(126, len(names))
         self.assertEqual(len(names), len(set(names)))
 
     def test_additional_capabilities_are_domain_owned(self) -> None:
@@ -674,6 +674,159 @@ class CatalogContractTest(unittest.TestCase):
                         errors,
                     )
 
+    def test_domain_minimum_three_wave_five_contract(self) -> None:
+        expected = {
+            "통계": (
+                (
+                    "official-statistics-methodology-evidence-review",
+                    "공식통계 방법론 근거 검토",
+                    "public-policy-evidence-pack",
+                    (
+                        "통계명·통계표 코드·작성기관·작성목적·작성주기·조사대상·모집단·표본·가중치를 분리",
+                        "공식 자료로 입력된 URL·공표일·조회일·방법론 버전·개정 이력과 상충·미수집 근거를 구분",
+                        "방법론 적합성·통계 품질등급·정책 적용 판단은 통계 담당자 최종 검토로 이관",
+                    ),
+                ),
+                (
+                    "statistical-release-evidence-brief",
+                    "통계 공표 근거 브리프",
+                    "kosis-official-statistics",
+                    (
+                        "통계표 코드·지표·분류·기준기간·분모·단위·잠정 또는 확정 상태를 분리",
+                        "KOSIS 통계표 코드·작성기관·수록기간·공표일·조회일·개정 상태·결측·시계열 단절을 보존",
+                        "추세 해석·인과관계·정책효과·공식 입장 판단은 통계 담당자 검토로 이관",
+                    ),
+                ),
+            ),
+            "소방": (
+                (
+                    "fire-safety-standard-evidence-pack",
+                    "소방안전 기준 근거 팩",
+                    "public-policy-evidence-pack",
+                    (
+                        "시설유형·점검대상·적용 법령·고시·안전기준·시행일을 분리",
+                        "공식 자료로 입력된 URL·문서번호·공표일·조회일·개정 상태와 상충·미수집 근거를 구분",
+                        "적합·부적합 판정·시정명령·과태료·현장 점검·안전조치는 소방 담당기관과 전문가에게 이관",
+                    ),
+                ),
+                (
+                    "fire-response-statistics-brief",
+                    "소방 대응통계 브리프",
+                    "kosis-official-statistics",
+                    (
+                        "화재유형·지역·기준기간·출동 또는 진압 단계·지표·분모·단위를 분리",
+                        "KOSIS 통계표 코드·작성기관·공표일·조회일·개정 상태·결측을 보존",
+                        "위험도 순위·인력 또는 장비 배치·현장 대응·예방정책 우선순위는 소방 담당기관에 이관",
+                    ),
+                ),
+            ),
+            "과학기술": (
+                (
+                    "national-rd-program-evidence-brief",
+                    "국가 R&D 사업 근거 브리프",
+                    "public-policy-evidence-pack",
+                    (
+                        "사업명·사업 또는 과제 식별자·주관기관·공고번호·기간·예산·추진상태를 분리",
+                        "공식 자료로 입력된 NTIS·부처 URL·공표일·조회일·문서 버전과 상충·미수집 근거를 구분",
+                        "지원자격·선정·평가·예산배분·과제 수행 판단은 연구개발 담당기관에 이관",
+                    ),
+                ),
+                (
+                    "technology-impact-evidence-pack",
+                    "과학기술 영향 근거 팩",
+                    "public-policy-evidence-pack",
+                    (
+                        "기술·정책 주장별 기준선·지표·기간·대상·단위와 상관 또는 인과 표현을 분리",
+                        "공식 자료로 입력된 URL·발행기관·공표일·조회일·방법론·문서 버전과 상충·미수집 근거를 구분",
+                        "인과효과·기술성숙도·투자·규제·사업 우선순위 판단은 과학기술 담당자와 전문가 검토로 이관",
+                    ),
+                ),
+            ),
+        }
+        by_domain = {item["domain"]: item for item in self.data["domains"]}
+        for domain_name, contracts in expected.items():
+            with self.subTest(domain=domain_name):
+                domain = by_domain[domain_name]
+                self.assertEqual(3, len(domain["skills"]))
+                for skill_name, title, capability, task_checks in contracts:
+                    skill = next(item for item in domain["skills"] if item["name"] == skill_name)
+                    self.assertEqual(title, skill["title"])
+                    self.assertEqual(capability, skill["capability"])
+                    self.assertEqual("additional", skill["role"])
+                    self.assertEqual([], skill["reference_skills"])
+                    self.assertEqual("draft-only", skill["boundary"])
+                    self.assertEqual(task_checks, tuple(skill["task_checks"]))
+
+    def test_wave_five_contract_mutations_fail_closed(self) -> None:
+        protected = {
+            "통계": (
+                "official-statistics-methodology-evidence-review",
+                "statistical-release-evidence-brief",
+            ),
+            "소방": ("fire-safety-standard-evidence-pack", "fire-response-statistics-brief"),
+            "과학기술": ("national-rd-program-evidence-brief", "technology-impact-evidence-pack"),
+        }
+        for domain_name, skill_names in protected.items():
+            for skill_name in skill_names:
+                for mutation in (
+                    "title",
+                    "capability",
+                    "role",
+                    "references",
+                    "boundary",
+                    "task-check-replacement",
+                    "task-check-delete",
+                    "task-check-append",
+                    "task-check-reorder",
+                    "task-check-empty",
+                ):
+                    with self.subTest(domain=domain_name, skill=skill_name, mutation=mutation):
+                        changed = copy.deepcopy(self.data)
+                        by_domain = {item["domain"]: item for item in changed["domains"]}
+                        skill = next(
+                            item for item in by_domain[domain_name]["skills"] if item["name"] == skill_name
+                        )
+                        if mutation == "title":
+                            skill["title"] = "다른 제목"
+                        elif mutation == "capability":
+                            skill["capability"] = "official-source-research"
+                        elif mutation == "role":
+                            skill["role"] = "primary"
+                        elif mutation == "references":
+                            skill["reference_skills"] = ["korean-law-search"]
+                        elif mutation == "boundary":
+                            skill["boundary"] = "manual-review-only"
+                        elif mutation == "task-check-replacement":
+                            skill["task_checks"][0] = "자동 판단을 허용"
+                        elif mutation == "task-check-delete":
+                            skill["task_checks"].pop(0)
+                        elif mutation == "task-check-append":
+                            skill["task_checks"].append("자동 제출")
+                        elif mutation == "task-check-reorder":
+                            skill["task_checks"].reverse()
+                        else:
+                            skill["task_checks"] = []
+                        errors = validate(changed, ROOT)
+                        self.assertIn(f"{domain_name}/{skill_name}: wave-five contract mismatch", errors)
+
+        for domain_name, skill_names in protected.items():
+            for skill_name in skill_names:
+                with self.subTest(domain=domain_name, skill=skill_name, mutation="cross-domain"):
+                    changed = copy.deepcopy(self.data)
+                    by_domain = {item["domain"]: item for item in changed["domains"]}
+                    index = next(
+                        index
+                        for index, item in enumerate(by_domain[domain_name]["skills"])
+                        if item["name"] == skill_name
+                    )
+                    moved = by_domain[domain_name]["skills"].pop(index)
+                    by_domain["세무"]["skills"].append(moved)
+                    errors = validate(changed, ROOT)
+                    self.assertIn(
+                        f"{domain_name}: requires at least 3 Skills in minimum-three rollout, got 2",
+                        errors,
+                    )
+
     def test_unknown_capability_is_rejected(self) -> None:
         changed = copy.deepcopy(self.data)
         changed["domains"][0]["skills"][0]["capability"] = "unknown-capability"
@@ -740,11 +893,11 @@ class CatalogContractTest(unittest.TestCase):
         current = (ROOT / "docs/domain-skill-candidates.md").read_text(encoding="utf-8")
         self.assertEqual(render_catalog(self.data), current)
         self.assertIn("전체 domain: **60개**", current)
-        self.assertIn("domain-owned Skill: **120개**", current)
+        self.assertIn("domain-owned Skill: **126개**", current)
 
     def test_generated_domain_skills_match_catalog(self) -> None:
         expected = expected_domain_skills(self.data, ROOT)
-        self.assertEqual(120, len(expected))
+        self.assertEqual(126, len(expected))
         for path, content in expected.items():
             self.assertEqual(content, path.read_text(encoding="utf-8"))
 
@@ -788,7 +941,7 @@ class CatalogContractTest(unittest.TestCase):
             capture_output=True,
             text=True,
         )
-        self.assertIn("domains=60 domain_skills=120 capabilities=21 top_level_skills=0", result.stdout)
+        self.assertIn("domains=60 domain_skills=126 capabilities=21 top_level_skills=0", result.stdout)
 
 
 if __name__ == "__main__":
