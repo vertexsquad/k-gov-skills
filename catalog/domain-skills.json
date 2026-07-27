@@ -759,6 +759,32 @@
             "assembly-bill-vote-search"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "bill-comparison-impact-brief",
+          "title": "법안 비교·영향 근거 브리프",
+          "capability": "korean-law-bill-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "법안·대안·수정안별 의안번호·기준일·처리단계·조문 차이를 분리",
+            "국가법령정보·국회 공개정보의 공식 URL·조회일·문서 버전을 보존",
+            "법적 효력·정책 영향·채택 여부 판단은 입법·법무 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "committee-minutes-evidence-pack",
+          "title": "상임위원회 회의록 근거 팩",
+          "capability": "korean-law-bill-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "위원회·회기·안건·회의일·의결 결과를 문서 단위로 분리",
+            "공식 회의록·심사보고서·의안정보 URL·공개일·조회일을 보존",
+            "발언 취지·정치적 평가·의결 해석은 입법 담당자 검토로 이관"
+          ]
         }
       ]
     },
@@ -1057,6 +1083,32 @@
             "korean-scholarship-search"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "education-statistics-brief",
+          "title": "교육통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "지표명·학제·지역·학년도·분모·단위를 분리",
+            "KOSIS 통계표 코드·작성기관·수록기간·조회일·개정 상태를 보존",
+            "학교·학생 평가·정책 효과·자원배분 판단은 교육 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "school-policy-document-review",
+          "title": "학교 정책문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "정책 대상·적용기관·시행일·의무·권고·근거 문서를 분리",
+            "교육부·법령 공식 URL·조회일·문서 버전과 근거 공백을 보존",
+            "법적 해석·학교별 적용·공문 확정·발송은 교육 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -1373,6 +1425,32 @@
             "kakao-map"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "transport-policy-project-evidence-pack",
+          "title": "교통정책·사업 근거 팩",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "사업·노선·구간·단계·예산·일정 주장을 항목별로 분리",
+            "공식 1차 자료로 입력된 URL·조회일·문서 버전과 상충·미수집 근거를 구분",
+            "사업 타당성·우선순위·예산 승인·노선 결정은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "traffic-safety-statistics-brief",
+          "title": "교통안전 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "기준기간·지역·도로유형·사고유형·지표·분모·단위를 분리",
+            "KOSIS 통계표 코드·작성기관·조회일·통계 기준·개정 상태를 보존",
+            "위험도 순위·단속·시설 개선 우선순위는 교통안전 담당기관 검토로 이관"
+          ]
         }
       ]
     },

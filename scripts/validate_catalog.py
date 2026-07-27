@@ -52,6 +52,9 @@ MINIMUM_THREE_DOMAINS = {
     "전산",
     "기록관리",
     "지방의회",
+    "입법",
+    "교육",
+    "국토교통",
 }
 WAVE_ONE_TASK_CHECKS = {
     "national-subsidy-project-evidence-review": (
@@ -170,6 +173,92 @@ WAVE_TWO_SKILL_CONTRACTS = {
         ),
     },
 }
+WAVE_THREE_SKILL_CONTRACTS = {
+    "입법": (
+        {
+            "name": "bill-comparison-impact-brief",
+            "title": "법안 비교·영향 근거 브리프",
+            "capability": "korean-law-bill-research",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "법안·대안·수정안별 의안번호·기준일·처리단계·조문 차이를 분리",
+                "국가법령정보·국회 공개정보의 공식 URL·조회일·문서 버전을 보존",
+                "법적 효력·정책 영향·채택 여부 판단은 입법·법무 담당자 검토로 이관",
+            ),
+        },
+        {
+            "name": "committee-minutes-evidence-pack",
+            "title": "상임위원회 회의록 근거 팩",
+            "capability": "korean-law-bill-research",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "위원회·회기·안건·회의일·의결 결과를 문서 단위로 분리",
+                "공식 회의록·심사보고서·의안정보 URL·공개일·조회일을 보존",
+                "발언 취지·정치적 평가·의결 해석은 입법 담당자 검토로 이관",
+            ),
+        },
+    ),
+    "교육": (
+        {
+            "name": "education-statistics-brief",
+            "title": "교육통계 근거 브리프",
+            "capability": "kosis-official-statistics",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "지표명·학제·지역·학년도·분모·단위를 분리",
+                "KOSIS 통계표 코드·작성기관·수록기간·조회일·개정 상태를 보존",
+                "학교·학생 평가·정책 효과·자원배분 판단은 교육 담당기관 검토로 이관",
+            ),
+        },
+        {
+            "name": "school-policy-document-review",
+            "title": "학교 정책문서 검토",
+            "capability": "administrative-document-draft-review",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "정책 대상·적용기관·시행일·의무·권고·근거 문서를 분리",
+                "교육부·법령 공식 URL·조회일·문서 버전과 근거 공백을 보존",
+                "법적 해석·학교별 적용·공문 확정·발송은 교육 담당자 승인으로 이관",
+            ),
+        },
+    ),
+    "국토교통": (
+        {
+            "name": "transport-policy-project-evidence-pack",
+            "title": "교통정책·사업 근거 팩",
+            "capability": "public-policy-evidence-pack",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "사업·노선·구간·단계·예산·일정 주장을 항목별로 분리",
+                "공식 1차 자료로 입력된 URL·조회일·문서 버전과 상충·미수집 근거를 구분",
+                "사업 타당성·우선순위·예산 승인·노선 결정은 담당기관 검토로 이관",
+            ),
+        },
+        {
+            "name": "traffic-safety-statistics-brief",
+            "title": "교통안전 통계 근거 브리프",
+            "capability": "kosis-official-statistics",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "기준기간·지역·도로유형·사고유형·지표·분모·단위를 분리",
+                "KOSIS 통계표 코드·작성기관·조회일·통계 기준·개정 상태를 보존",
+                "위험도 순위·단속·시설 개선 우선순위는 교통안전 담당기관 검토로 이관",
+            ),
+        },
+    ),
+}
 WAVE_TWO_CAPABILITY_CONTRACTS = {
     "public-records-lifecycle-review": {
         "service": "공공기록물 분류·보존기간·이관·폐기 검토 admission",
@@ -197,6 +286,19 @@ def collect_used_capabilities(domains: list[dict[str, Any]]) -> set[str]:
             if isinstance(skill, dict) and isinstance(skill.get("capability"), str)
         )
     return used
+
+
+def _skill_contract_matches(actual: dict[str, Any], contract: dict[str, Any]) -> bool:
+    scalar_matches = all(
+        actual.get(key) == value
+        for key, value in contract.items()
+        if key not in {"reference_skills", "task_checks"}
+    )
+    return (
+        scalar_matches
+        and tuple(actual.get("reference_skills") or ()) == contract["reference_skills"]
+        and tuple(actual.get("task_checks") or ()) == contract["task_checks"]
+    )
 
 
 def _validate_instructions(root: Path, errors: list[str]) -> None:
@@ -378,20 +480,19 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
                 errors.append(f"{domain}/{expected_name}: wave-two contract mismatch")
             else:
                 actual = matches[0]
-                contract_matches = all(
-                    actual.get(key) == value
-                    for key, value in wave_two_contract.items()
-                    if key not in {"reference_skills", "task_checks"}
-                )
-                contract_matches = (
-                    contract_matches
-                    and tuple(actual.get("reference_skills") or ())
-                    == wave_two_contract["reference_skills"]
-                    and tuple(actual.get("task_checks") or ())
-                    == wave_two_contract["task_checks"]
-                )
-                if not contract_matches:
+                if not _skill_contract_matches(actual, wave_two_contract):
                     errors.append(f"{domain}/{expected_name}: wave-two contract mismatch")
+        for wave_three_contract in WAVE_THREE_SKILL_CONTRACTS.get(domain, ()):
+            expected_name = wave_three_contract["name"]
+            matches = [
+                skill
+                for skill in skills
+                if isinstance(skill, dict) and skill.get("name") == expected_name
+            ]
+            if len(matches) != 1:
+                errors.append(f"{domain}/{expected_name}: wave-three contract mismatch")
+            elif not _skill_contract_matches(matches[0], wave_three_contract):
+                errors.append(f"{domain}/{expected_name}: wave-three contract mismatch")
         total_skills += len(skills)
         primary_count = sum(isinstance(skill, dict) and skill.get("role") == "primary" for skill in skills)
         if primary_count != 1:
@@ -459,8 +560,8 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
                     errors.append(f"{domain}: sensitive evidence requires manual-review-only")
             declared_entrypoints.add(Path("domains") / domain / "skills" / name / "SKILL.md")
 
-    if total_skills != 108:
-        errors.append(f"catalog must declare 108 domain Skills, got {total_skills}")
+    if total_skills != 114:
+        errors.append(f"catalog must declare 114 domain Skills, got {total_skills}")
     domains_root = root / "domains"
     actual_domains = {path.name for path in domains_root.iterdir() if path.is_dir()} if domains_root.is_dir() else set()
     if actual_domains != seen_domains:
