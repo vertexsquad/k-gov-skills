@@ -38,6 +38,52 @@ PROXY_MODES = {"none", "optional", "required", "mixed"}
 SIDE_EFFECT_CLASSES = {"read-only", "document-read", "draft-only"}
 EXECUTION_STATUSES = {"planned", "fixture-verified", "live-verified", "blocked"}
 LIVE_SMOKE_STATUSES = {"not-run", "passed", "failed", "blocked"}
+MINIMUM_THREE_DOMAINS = {
+    "재정",
+    "감사",
+    "출입국",
+    "경찰",
+    "재난안전",
+    "교육행정",
+    "사회복지",
+}
+WAVE_ONE_TASK_CHECKS = {
+    "national-subsidy-project-evidence-review": (
+        "사업·회계연도·소관기관·지원 근거를 주장 단위로 분리",
+        "공식 법령·사업공고·재정자료 URL과 조회일을 보존",
+        "지원대상 확정·교부결정·정책평가는 담당기관 승인으로 이관",
+    ),
+    "audit-action-plan-evidence-review": (
+        "지적사항별 원인·조치·담당·기한·증빙 공백을 분리",
+        "완료·예정 상태와 근거 URL·문서유형을 구분",
+        "이행완료 판단·제출·수용 여부는 감사 담당자 승인",
+    ),
+    "immigration-statistics-policy-brief": (
+        "통계 지표의 기준기간·대상·체류자격·단위를 분리",
+        "공식 출입국·KOSIS 자료의 URL과 조회일을 보존",
+        "체류자격·입국 허가·정책 해석은 담당기관 검토로 이관",
+    ),
+    "police-crime-statistics-brief": (
+        "범죄유형·지역·기간·집계 단위를 구분",
+        "공식 통계표 코드·조회일·통계 기준을 보존",
+        "치안 수준·수사·개별 위험도 판단은 경찰 담당 검토로 이관",
+    ),
+    "disaster-response-plan-evidence-review": (
+        "재난유형·대응단계·기관역할·연락체계·행동요령을 분리",
+        "기준시각·공식 지침·공개 상황자료와 증빙 공백을 구분",
+        "경보발령·대피·출동 판단은 공식기관 승인으로 이관",
+    ),
+    "school-facility-safety-plan-review": (
+        "시설구역·위험요인·점검주기·담당·대응조치를 분리",
+        "학생·보호자 개인정보 원문을 제외하고 공개 지침 근거를 보존",
+        "시설 안전판단·긴급조치·계획 승인은 학교 담당자에게 이관",
+    ),
+    "welfare-eligibility-evidence-check": (
+        "급여·서비스별 기준일과 소득·가구·연령 조건을 비식별 상태로 분리",
+        "공식 법령·사업안내 URL과 조회일 및 상충 근거를 보존",
+        "수급자격·지급액·신청 가능 여부는 담당기관 판단으로 이관",
+    ),
+}
 SLUG = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 
@@ -204,6 +250,10 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
         if not isinstance(skills, list) or not skills:
             errors.append(f"{domain}: skills must be a non-empty list")
             continue
+        if domain in MINIMUM_THREE_DOMAINS and len(skills) < 3:
+            errors.append(
+                f"{domain}: requires at least 3 Skills in minimum-three rollout, got {len(skills)}"
+            )
         total_skills += len(skills)
         primary_count = sum(isinstance(skill, dict) and skill.get("role") == "primary" for skill in skills)
         if primary_count != 1:
@@ -259,6 +309,9 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
                 )
             ):
                 errors.append(f"{domain}/{name}: invalid task_checks")
+            expected_task_checks = WAVE_ONE_TASK_CHECKS.get(name)
+            if expected_task_checks is not None and tuple(task_checks or ()) != expected_task_checks:
+                errors.append(f"{domain}/{name}: wave-one task_checks contract mismatch")
             if role == "primary":
                 if evidence in {"direct", "adjacent"} and not references:
                     errors.append(f"{domain}: {evidence} evidence requires primary reference_skills")
@@ -268,8 +321,8 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
                     errors.append(f"{domain}: sensitive evidence requires manual-review-only")
             declared_entrypoints.add(Path("domains") / domain / "skills" / name / "SKILL.md")
 
-    if total_skills != 95:
-        errors.append(f"catalog must declare 95 domain Skills, got {total_skills}")
+    if total_skills != 102:
+        errors.append(f"catalog must declare 102 domain Skills, got {total_skills}")
     domains_root = root / "domains"
     actual_domains = {path.name for path in domains_root.iterdir() if path.is_dir()} if domains_root.is_dir() else set()
     if actual_domains != seen_domains:

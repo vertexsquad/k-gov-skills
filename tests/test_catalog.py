@@ -39,8 +39,8 @@ class CatalogContractTest(unittest.TestCase):
     def test_public_skills_are_owned_by_domains(self) -> None:
         self.assertFalse((ROOT / "skills").exists())
         entrypoints = sorted(ROOT.glob("domains/*/skills/*/SKILL.md"))
-        self.assertEqual(95, len(entrypoints))
-        self.assertEqual(95, len({path.parent.name for path in entrypoints}))
+        self.assertEqual(102, len(entrypoints))
+        self.assertEqual(102, len({path.parent.name for path in entrypoints}))
         self.assertFalse(list(ROOT.glob("domains/*/.gitkeep")))
 
     def test_evidence_distribution_matches_review(self) -> None:
@@ -74,7 +74,7 @@ class CatalogContractTest(unittest.TestCase):
         for domain in self.data["domains"]:
             self.assertEqual(1, sum(skill["role"] == "primary" for skill in domain["skills"]))
             names.extend(skill["name"] for skill in domain["skills"])
-        self.assertEqual(95, len(names))
+        self.assertEqual(102, len(names))
         self.assertEqual(len(names), len(set(names)))
 
     def test_additional_capabilities_are_domain_owned(self) -> None:
@@ -129,6 +129,102 @@ class CatalogContractTest(unittest.TestCase):
             "patent-prior-art-evidence-pack",
             by_name["korean-patent-lookup"]["capability"],
         )
+
+    def test_domain_minimum_three_wave_one_contract(self) -> None:
+        expected = {
+            "재정": (
+                "national-subsidy-project-evidence-review",
+                "public-policy-evidence-pack",
+                "지원대상 확정·교부결정·정책평가는 담당기관 승인으로 이관",
+            ),
+            "감사": (
+                "audit-action-plan-evidence-review",
+                "administrative-document-draft-review",
+                "이행완료 판단·제출·수용 여부는 감사 담당자 승인",
+            ),
+            "출입국": (
+                "immigration-statistics-policy-brief",
+                "public-policy-evidence-pack",
+                "체류자격·입국 허가·정책 해석은 담당기관 검토로 이관",
+            ),
+            "경찰": (
+                "police-crime-statistics-brief",
+                "kosis-official-statistics",
+                "치안 수준·수사·개별 위험도 판단은 경찰 담당 검토로 이관",
+            ),
+            "재난안전": (
+                "disaster-response-plan-evidence-review",
+                "administrative-document-draft-review",
+                "경보발령·대피·출동 판단은 공식기관 승인으로 이관",
+            ),
+            "교육행정": (
+                "school-facility-safety-plan-review",
+                "administrative-document-draft-review",
+                "시설 안전판단·긴급조치·계획 승인은 학교 담당자에게 이관",
+            ),
+            "사회복지": (
+                "welfare-eligibility-evidence-check",
+                "public-policy-evidence-pack",
+                "수급자격·지급액·신청 가능 여부는 담당기관 판단으로 이관",
+            ),
+        }
+        by_domain = {item["domain"]: item for item in self.data["domains"]}
+        for domain_name, (skill_name, capability, safety_handoff) in expected.items():
+            with self.subTest(domain=domain_name):
+                domain = by_domain[domain_name]
+                self.assertEqual(3, len(domain["skills"]))
+                skill = next(item for item in domain["skills"] if item["name"] == skill_name)
+                self.assertEqual("additional", skill["role"])
+                self.assertEqual(capability, skill["capability"])
+                self.assertEqual("draft-only", skill["boundary"])
+                self.assertEqual(3, len(skill["task_checks"]))
+                self.assertEqual(safety_handoff, skill["task_checks"][-1])
+
+    def test_wave_one_minimum_three_mutation_fails_closed(self) -> None:
+        protected_domains = (
+            "재정",
+            "감사",
+            "출입국",
+            "경찰",
+            "재난안전",
+            "교육행정",
+            "사회복지",
+        )
+        for domain_name in protected_domains:
+            with self.subTest(domain=domain_name):
+                changed = copy.deepcopy(self.data)
+                by_domain = {item["domain"]: item for item in changed["domains"]}
+                moved = by_domain[domain_name]["skills"].pop()
+                by_domain["세무"]["skills"].append(moved)
+                errors = validate(changed, ROOT)
+                self.assertIn(
+                    f"{domain_name}: requires at least 3 Skills in minimum-three rollout, got 2",
+                    errors,
+                )
+
+    def test_wave_one_safety_task_checks_mutation_fails_closed(self) -> None:
+        protected_skills = {
+            "재정": "national-subsidy-project-evidence-review",
+            "감사": "audit-action-plan-evidence-review",
+            "출입국": "immigration-statistics-policy-brief",
+            "경찰": "police-crime-statistics-brief",
+            "재난안전": "disaster-response-plan-evidence-review",
+            "교육행정": "school-facility-safety-plan-review",
+            "사회복지": "welfare-eligibility-evidence-check",
+        }
+        for domain_name, skill_name in protected_skills.items():
+            with self.subTest(domain=domain_name):
+                changed = copy.deepcopy(self.data)
+                by_domain = {item["domain"]: item for item in changed["domains"]}
+                skill = next(
+                    item for item in by_domain[domain_name]["skills"] if item["name"] == skill_name
+                )
+                skill["task_checks"][-1] = "고위험 판단을 자동 수행"
+                errors = validate(changed, ROOT)
+                self.assertIn(
+                    f"{domain_name}/{skill_name}: wave-one task_checks contract mismatch",
+                    errors,
+                )
 
     def test_unknown_capability_is_rejected(self) -> None:
         changed = copy.deepcopy(self.data)
@@ -196,11 +292,11 @@ class CatalogContractTest(unittest.TestCase):
         current = (ROOT / "docs/domain-skill-candidates.md").read_text(encoding="utf-8")
         self.assertEqual(render_catalog(self.data), current)
         self.assertIn("전체 domain: **60개**", current)
-        self.assertIn("domain-owned Skill: **95개**", current)
+        self.assertIn("domain-owned Skill: **102개**", current)
 
     def test_generated_domain_skills_match_catalog(self) -> None:
         expected = expected_domain_skills(self.data, ROOT)
-        self.assertEqual(95, len(expected))
+        self.assertEqual(102, len(expected))
         for path, content in expected.items():
             self.assertEqual(content, path.read_text(encoding="utf-8"))
 
@@ -244,7 +340,7 @@ class CatalogContractTest(unittest.TestCase):
             capture_output=True,
             text=True,
         )
-        self.assertIn("domains=60 domain_skills=95 capabilities=20 top_level_skills=0", result.stdout)
+        self.assertIn("domains=60 domain_skills=102 capabilities=20 top_level_skills=0", result.stdout)
 
 
 if __name__ == "__main__":
