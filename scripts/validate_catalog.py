@@ -55,6 +55,9 @@ MINIMUM_THREE_DOMAINS = {
     "입법",
     "교육",
     "국토교통",
+    "사법",
+    "보건의료",
+    "식품의약",
 }
 WAVE_ONE_TASK_CHECKS = {
     "national-subsidy-project-evidence-review": (
@@ -255,6 +258,92 @@ WAVE_THREE_SKILL_CONTRACTS = {
                 "기준기간·지역·도로유형·사고유형·지표·분모·단위를 분리",
                 "KOSIS 통계표 코드·작성기관·조회일·통계 기준·개정 상태를 보존",
                 "위험도 순위·단속·시설 개선 우선순위는 교통안전 담당기관 검토로 이관",
+            ),
+        },
+    ),
+}
+WAVE_FOUR_SKILL_CONTRACTS = {
+    "사법": (
+        {
+            "name": "judgment-citation-evidence-pack",
+            "title": "판결 인용 근거 팩",
+            "capability": "korean-legal-citation-verification",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "법원·사건번호·선고일·판례 원문 식별자와 정확한 인용 위치를 분리",
+                "국가법령정보 공식 원문 URL·조회일·적용 법령 버전과 불일치·복수 후보를 보존",
+                "법률적 효력·사안 적용·소송 제출 여부는 법무 담당자 최종 검토로 이관",
+            ),
+        },
+        {
+            "name": "court-statistics-evidence-brief",
+            "title": "법원 통계 근거 브리프",
+            "capability": "public-policy-evidence-pack",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "작성기관·통계표 또는 보고서 식별자·기준기간·분모·단위·절차 단계를 분리",
+                "공식 자료로 입력된 URL·공표일·조회일·문서 버전과 상충·미수집 근거를 구분",
+                "사건 결과 예측·법원 또는 재판부 평가·정책 판단은 사법 담당자 검토로 이관",
+            ),
+        },
+    ),
+    "보건의료": (
+        {
+            "name": "healthcare-policy-statistics-brief",
+            "title": "보건의료 정책통계 브리프",
+            "capability": "kosis-official-statistics",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "지표명·지역·기간·기관 또는 질환 범주·분모·단위·집계 기준을 분리",
+                "KOSIS 통계표 코드·작성기관·수록기간·조회일·개정 상태와 결측을 보존",
+                "진단·치료·기관 서열화·정책 효과 판단은 보건의료 담당기관 검토로 이관",
+            ),
+        },
+        {
+            "name": "medical-benefit-criteria-evidence-pack",
+            "title": "급여기준 근거 팩",
+            "capability": "public-policy-evidence-pack",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "급여기준 주장을 대상·조건·예외·시행일·적용 시점 단위로 분리",
+                "공식 자료로 입력된 URL·조회일·문서 버전·개정 상태와 상충·미수집 근거를 구분",
+                "환자별 급여 여부·진료·처방·청구 판단은 의료전문가와 담당기관 검토로 이관",
+            ),
+        },
+    ),
+    "식품의약": (
+        {
+            "name": "food-drug-recall-evidence-brief",
+            "title": "식품·의약품 회수 근거 브리프",
+            "capability": "welfare-health-safety-research",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "제품명·업체·품목 식별자·회수 등급·대상 제조번호·유통기한을 분리",
+                "식약처·공공데이터 응답의 공식 endpoint·조회일·공표일·정정 상태와 미확인 항목을 보존",
+                "복약·섭취 중단·행정처분·현장 회수 집행은 식약처·전문가·담당자 확인으로 이관",
+            ),
+        },
+        {
+            "name": "regulatory-notice-comparison-review",
+            "title": "식품의약 규제고시 비교 검토",
+            "capability": "public-policy-evidence-pack",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "고시·공고·행정예고별 발행기관·문서번호·공포일·시행일·적용 대상을 분리",
+                "공식 자료로 입력된 URL·조회일·문서 버전과 변경 전후·경과조치·상충·미수집 근거를 구분",
+                "법적 효력·개별 사안 적용·기관 대응·발송·집행은 식품의약 담당자 검토로 이관",
             ),
         },
     ),
@@ -493,6 +582,17 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
                 errors.append(f"{domain}/{expected_name}: wave-three contract mismatch")
             elif not _skill_contract_matches(matches[0], wave_three_contract):
                 errors.append(f"{domain}/{expected_name}: wave-three contract mismatch")
+        for wave_four_contract in WAVE_FOUR_SKILL_CONTRACTS.get(domain, ()):
+            expected_name = wave_four_contract["name"]
+            matches = [
+                skill
+                for skill in skills
+                if isinstance(skill, dict) and skill.get("name") == expected_name
+            ]
+            if len(matches) != 1:
+                errors.append(f"{domain}/{expected_name}: wave-four contract mismatch")
+            elif not _skill_contract_matches(matches[0], wave_four_contract):
+                errors.append(f"{domain}/{expected_name}: wave-four contract mismatch")
         total_skills += len(skills)
         primary_count = sum(isinstance(skill, dict) and skill.get("role") == "primary" for skill in skills)
         if primary_count != 1:
@@ -560,8 +660,8 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
                     errors.append(f"{domain}: sensitive evidence requires manual-review-only")
             declared_entrypoints.add(Path("domains") / domain / "skills" / name / "SKILL.md")
 
-    if total_skills != 114:
-        errors.append(f"catalog must declare 114 domain Skills, got {total_skills}")
+    if total_skills != 120:
+        errors.append(f"catalog must declare 120 domain Skills, got {total_skills}")
     domains_root = root / "domains"
     actual_domains = {path.name for path in domains_root.iterdir() if path.is_dir()} if domains_root.is_dir() else set()
     if actual_domains != seen_domains:

@@ -7,7 +7,7 @@
 ## 요약
 
 - 전체 domain: **60개**
-- domain-owned Skill: **114개** (primary 60 / additional 54)
+- domain-owned Skill: **120개** (primary 60 / additional 60)
 - 직접 reference 확인: **35개**
 - 인접 capability 활용: **16개**
 - 신규 설계 필요: **8개**
@@ -95,6 +95,8 @@
 | Domain | Evidence | Role | Skill | Slug | Capability | Reference Skill | 경계 |
 |---|---|---|---|---|---|---|---|
 | 사법 | `direct` | `primary` | 법령·법원공고·등기 조사 | `law-court-registry-research` | `korean-law-bill-research` | `korean-law-search`, `court-auction-notice-search`, `iros-registry-automation`, `court-payment-order-assistant` | `read-only` |
+| 사법 | `direct` | `additional` | 판결 인용 근거 팩 | `judgment-citation-evidence-pack` | `korean-legal-citation-verification` | — | `draft-only` |
+| 사법 | `direct` | `additional` | 법원 통계 근거 브리프 | `court-statistics-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 검찰 | `adjacent` | `primary` | 검찰업무 법적 근거 조사 | `prosecution-legal-basis-research` | `korean-law-bill-research` | `korean-law-search` | `read-only` |
 | 교정 | `new` | `primary` | 교정 관련 규정 검색 | `corrections-regulation-search` | `korean-law-bill-research` | — | `read-only` |
 | 보호관찰 | `new` | `primary` | 보호관찰 처분·준수사항 검색 | `probation-compliance-search` | `korean-law-bill-research` | — | `read-only` |
@@ -135,7 +137,11 @@
 | 고용노동 | `direct` | `additional` | 고용노동 민원 분류·답변 초안 | `labor-civil-complaint-triage-draft` | `civil-complaint-triage-draft` | — | `draft-only` |
 | 고용노동 | `direct` | `additional` | 산업재해 통계 근거 브리프 | `industrial-accident-statistics-brief` | `kosis-official-statistics` | — | `draft-only` |
 | 보건의료 | `direct` | `primary` | 응급실·검진·장기요양기관 조회 | `healthcare-facility-search` | `welfare-health-safety-research` | `emergency-room-beds`, `nhis-care-checkup-search` | `read-only` |
+| 보건의료 | `direct` | `additional` | 보건의료 정책통계 브리프 | `healthcare-policy-statistics-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 보건의료 | `direct` | `additional` | 급여기준 근거 팩 | `medical-benefit-criteria-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
 | 식품의약 | `direct` | `primary` | 식품·의약 안전정보 확인 | `food-drug-safety-check` | `welfare-health-safety-research` | `mfds-food-safety`, `mfds-drug-safety` | `read-only` |
+| 식품의약 | `direct` | `additional` | 식품·의약품 회수 근거 브리프 | `food-drug-recall-evidence-brief` | `welfare-health-safety-research` | — | `draft-only` |
+| 식품의약 | `direct` | `additional` | 식품의약 규제고시 비교 검토 | `regulatory-notice-comparison-review` | `public-policy-evidence-pack` | — | `draft-only` |
 
 ## 농림·해양·환경
 
