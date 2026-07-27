@@ -61,6 +61,9 @@ MINIMUM_THREE_DOMAINS = {
     "통계",
     "소방",
     "과학기술",
+    "선거관리",
+    "특허",
+    "사이버보안",
 }
 WAVE_ONE_TASK_CHECKS = {
     "national-subsidy-project-evidence-review": (
@@ -437,6 +440,92 @@ WAVE_FIVE_SKILL_CONTRACTS = {
         },
     ),
 }
+WAVE_SIX_SKILL_CONTRACTS = {
+    "선거관리": (
+        {
+            "name": "election-law-procedure-evidence-review",
+            "title": "선거법·절차 근거 검토",
+            "capability": "public-policy-evidence-pack",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "선거유형·선거일·절차단계·행위주체·적용 법령·조문·기준시점을 분리",
+                "공식 자료로 입력된 선관위·국가법령정보 URL·문서 식별자·조회일·시행일·개정 상태와 상충·미수집 근거를 구분",
+                "위법성·후보자격·등록수리·제재·이의처리 판단은 선거관리위원회와 법무 담당자 검토로 이관",
+            ),
+        },
+        {
+            "name": "election-result-statistics-evidence-brief",
+            "title": "선거결과 통계 근거 브리프",
+            "capability": "public-policy-evidence-pack",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "선거종류·회차·선거구·후보 또는 정당·기준일·득표수·득표율·투표율·분모·무효표를 분리",
+                "공식 자료로 입력된 선거통계 URL·공표일·조회일·정정 상태와 상충·미수집 근거를 구분",
+                "당락·재검표·선거무효·정치적 평가·인과관계 판단은 선거관리위원회와 담당자 검토로 이관",
+            ),
+        },
+    ),
+    "특허": (
+        {
+            "name": "patent-claim-citation-evidence-review",
+            "title": "특허 청구항 인용 근거 검토",
+            "capability": "patent-prior-art-evidence-pack",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "출원번호·공개번호·등록번호·청구항 버전·청구항 요소·인용 문헌번호·인용 위치를 분리",
+                "KIPRIS·특허청 공식 URL·공개일·조회일·공개 또는 등록 상태와 미확인·복수 후보를 보존",
+                "신규성·진보성·침해·유효성·출원전략 판단은 변리사와 특허 담당자 검토로 이관",
+            ),
+        },
+        {
+            "name": "ip-policy-statistics-evidence-brief",
+            "title": "지식재산 정책통계 근거 브리프",
+            "capability": "public-policy-evidence-pack",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "권리유형·정책 또는 사업·기준기간·출원인 범주·지역·건수·분모·단위를 분리",
+                "공식 자료로 입력된 특허청·KIPRIS URL·보고서 또는 통계표 식별자·공표일·조회일·개정 상태와 결측을 구분",
+                "인과관계·정책효과·산업경쟁력·지원 또는 규제 우선순위 판단은 지식재산 담당자 검토로 이관",
+            ),
+        },
+    ),
+    "사이버보안": (
+        {
+            "name": "privacy-impact-evidence-review",
+            "title": "개인정보 영향평가 근거 검토",
+            "capability": "public-policy-evidence-pack",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "시스템·처리업무·개인정보 유형·처리목적·정보주체·법적근거·처리흐름·보유기간·제3자 제공을 분리",
+                "공식 자료로 입력된 개인정보위·국가법령정보 URL·가이드 또는 법령 버전·조회일과 상충·미수집 근거를 구분",
+                "영향평가 실시대상·적합성·법적준수·승인 판단은 개인정보 보호책임자와 전문기관 검토로 이관",
+            ),
+        },
+        {
+            "name": "cyber-incident-response-plan-evidence-review",
+            "title": "사이버 침해사고 대응계획 근거 검토",
+            "capability": "public-policy-evidence-pack",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "사고유형·시스템경계·자산·담당역할·보고경로·격리·복구·로그보존 항목을 분리",
+                "공식 자료로 입력된 KISA·국가 또는 기관 보안기준 URL·문서버전·시행일·조회일과 상충·미수집 근거를 구분",
+                "사고등급·차단·격리·포렌식·외부신고·현장대응 실행은 보안책임자와 관할기관 검토로 이관",
+            ),
+        },
+    ),
+}
 WAVE_TWO_CAPABILITY_CONTRACTS = {
     "public-records-lifecycle-review": {
         "service": "공공기록물 분류·보존기간·이관·폐기 검토 admission",
@@ -693,6 +782,17 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
                 errors.append(f"{domain}/{expected_name}: wave-five contract mismatch")
             elif not _skill_contract_matches(matches[0], wave_five_contract):
                 errors.append(f"{domain}/{expected_name}: wave-five contract mismatch")
+        for wave_six_contract in WAVE_SIX_SKILL_CONTRACTS.get(domain, ()):
+            expected_name = wave_six_contract["name"]
+            matches = [
+                skill
+                for skill in skills
+                if isinstance(skill, dict) and skill.get("name") == expected_name
+            ]
+            if len(matches) != 1:
+                errors.append(f"{domain}/{expected_name}: wave-six contract mismatch")
+            elif not _skill_contract_matches(matches[0], wave_six_contract):
+                errors.append(f"{domain}/{expected_name}: wave-six contract mismatch")
         total_skills += len(skills)
         primary_count = sum(isinstance(skill, dict) and skill.get("role") == "primary" for skill in skills)
         if primary_count != 1:
@@ -760,8 +860,8 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
                     errors.append(f"{domain}: sensitive evidence requires manual-review-only")
             declared_entrypoints.add(Path("domains") / domain / "skills" / name / "SKILL.md")
 
-    if total_skills != 126:
-        errors.append(f"catalog must declare 126 domain Skills, got {total_skills}")
+    if total_skills != 132:
+        errors.append(f"catalog must declare 132 domain Skills, got {total_skills}")
     domains_root = root / "domains"
     actual_domains = {path.name for path in domains_root.iterdir() if path.is_dir()} if domains_root.is_dir() else set()
     if actual_domains != seen_domains:

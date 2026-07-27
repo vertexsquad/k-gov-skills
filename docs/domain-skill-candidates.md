@@ -7,7 +7,7 @@
 ## 요약
 
 - 전체 domain: **60개**
-- domain-owned Skill: **126개** (primary 60 / additional 66)
+- domain-owned Skill: **132개** (primary 60 / additional 72)
 - 직접 reference 확인: **35개**
 - 인접 capability 활용: **16개**
 - 신규 설계 필요: **8개**
@@ -88,6 +88,8 @@
 | 외교 | `new` | `primary` | 공식 국가·외교 브리프 | `official-country-brief` | `official-source-research` | — | `draft-only` |
 | 통일 | `new` | `primary` | 북한·통일정책 공식자료 검색 | `unification-policy-source-search` | `official-source-research` | — | `read-only` |
 | 선거관리 | `direct` | `primary` | 지방선거 후보자 조회 | `local-election-candidate-lookup` | `official-source-research` | `local-election-candidate-search` | `read-only` |
+| 선거관리 | `direct` | `additional` | 선거법·절차 근거 검토 | `election-law-procedure-evidence-review` | `public-policy-evidence-pack` | — | `draft-only` |
+| 선거관리 | `direct` | `additional` | 선거결과 통계 근거 브리프 | `election-result-statistics-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 입법 | `direct` | `primary` | 국회 의안·표결 조회 | `assembly-bill-vote-lookup` | `korean-law-bill-research` | `assembly-bill-vote-search` | `read-only` |
 | 입법 | `direct` | `additional` | 법안 비교·영향 근거 브리프 | `bill-comparison-impact-brief` | `korean-law-bill-research` | — | `draft-only` |
 | 입법 | `direct` | `additional` | 상임위원회 회의록 근거 팩 | `committee-minutes-evidence-pack` | `korean-law-bill-research` | — | `draft-only` |
@@ -185,11 +187,15 @@
 | 과학기술 | `adjacent` | `additional` | 국가 R&D 사업 근거 브리프 | `national-rd-program-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 과학기술 | `adjacent` | `additional` | 과학기술 영향 근거 팩 | `technology-impact-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
 | 특허 | `direct` | `primary` | KIPRIS 특허 조회 | `korean-patent-lookup` | `patent-prior-art-evidence-pack` | `korean-patent-search` | `read-only` |
+| 특허 | `direct` | `additional` | 특허 청구항 인용 근거 검토 | `patent-claim-citation-evidence-review` | `patent-prior-art-evidence-pack` | — | `draft-only` |
+| 특허 | `direct` | `additional` | 지식재산 정책통계 근거 브리프 | `ip-policy-statistics-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 정보통신 | `adjacent` | `primary` | WHOIS·정보통신 정책 조사 | `ict-policy-domain-research` | `official-source-research` | `kr-whois-lookup`, `korean-privacy-terms` | `read-only` |
 | 전산 | `new` | `primary` | 공공시스템 운영점검 | `public-it-operations-check` | `official-source-research` | — | `draft-only` |
 | 전산 | `new` | `additional` | 공공 정보화사업 절차 점검 | `public-it-project-procedure-check` | `public-it-project-procedure-review` | — | `draft-only` |
 | 전산 | `new` | `additional` | 공공 정보시스템 보안 체크리스트 검토 | `public-it-security-checklist-review` | `public-it-project-procedure-review` | — | `draft-only` |
 | 사이버보안 | `adjacent` | `primary` | 개인정보·보안기준 검토 | `privacy-security-baseline-review` | `official-source-research` | `korean-privacy-terms` | `draft-only` |
+| 사이버보안 | `adjacent` | `additional` | 개인정보 영향평가 근거 검토 | `privacy-impact-evidence-review` | `public-policy-evidence-pack` | — | `draft-only` |
+| 사이버보안 | `adjacent` | `additional` | 사이버 침해사고 대응계획 근거 검토 | `cyber-incident-response-plan-evidence-review` | `public-policy-evidence-pack` | — | `draft-only` |
 
 ## 문화·지식
 
