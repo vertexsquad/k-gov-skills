@@ -7,7 +7,7 @@
 ```text
 CLAUDE.md                                      # canonical 저장소 작업 계약
 AGENTS.md                                      # cross-runtime thin adapter
-catalog/domain-skills.json                     # 60 domain·95 Skill·20 capability SSOT
+catalog/domain-skills.json                     # 60 domain·108 Skill·21 capability SSOT
 domains/<한글 domain>/skills/<slug>/SKILL.md   # 공개 Skill 진입점
 kgov_runtime/capabilities/<module>.py           # domain 간 공유하는 내부 실행 구현
 docs/capabilities/<capability>/                 # 절차·runtime contract·live 증거
@@ -24,12 +24,12 @@ scripts/check.py                                # 전체 deterministic 검증 �
 공통 adapter 코드는 `kgov_runtime/capabilities/`에서 한 번만 구현하고 domain Skill이 이를 호출합니다.
 
 Catalog schema v4의 domain `skills[]`는 `primary` 하나와 선택적 `additional` Skill을 명시합니다.
-모든 `name`은 저장소 전체에서 고유합니다. 60개 domain에 primary 60개와 additional 35개,
-총 95개 domain-owned Skill 진입점이 있습니다.
+모든 `name`은 저장소 전체에서 고유합니다. 60개 domain에 primary 60개와 additional 48개,
+총 108개 domain-owned Skill 진입점이 있습니다.
 
 ## 현재 capability
 
-다음 20개 read-only/document-read/draft-only 내부 capability를 제공합니다.
+다음 21개 read-only/document-read/draft-only 내부 capability를 제공합니다.
 
 - `public-document-hwpx`
 - `korean-law-bill-research`
@@ -51,9 +51,10 @@ Catalog schema v4의 domain `skills[]`는 `primary` 하나와 선택적 `additio
 - `building-permit-document-precheck`
 - `official-notice-multilingual-translation-review`
 - `patent-prior-art-evidence-pack`
+- `public-records-lifecycle-review`
 
 Domain의 `direct`, `adjacent`, `new`, `sensitive`는 구현 완료도가 아니라 **근거 강도와 도입 경계**입니다.
-18개 capability는 `fixture-verified`이고 `official-source-research`와
+19개 capability는 `fixture-verified`이고 `official-source-research`와
 `korean-legal-citation-verification`은 `live-verified / live_smoke: passed`입니다. Domain Skill은 연결된 capability보다 강한 검증 상태를
 주장하지 않습니다.
 

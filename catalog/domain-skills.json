@@ -332,6 +332,22 @@
       ],
       "execution_status": "fixture-verified",
       "live_smoke": "not-run"
+    },
+    {
+      "slug": "public-records-lifecycle-review",
+      "locale": "ko-KR",
+      "jurisdiction": "KR",
+      "service": "공공기록물 분류·보존기간·이관·폐기 검토 admission",
+      "credential_class": "none",
+      "proxy_mode": "none",
+      "side_effect_class": "draft-only",
+      "manual_handoff_gate": "보존기간 확정·평가·이관·폐기·원본 변경은 기록물관리 담당자 승인",
+      "source_provenance": [
+        "https://www.archives.go.kr/",
+        "https://www.law.go.kr/"
+      ],
+      "execution_status": "fixture-verified",
+      "live_smoke": "not-run"
     }
   ],
   "domains": [
@@ -1162,6 +1178,19 @@
             "위법·근로자성·산재 인정 여부를 자동 판단하지 않음",
             "법적 판단과 답변 발송은 담당기관 승인"
           ]
+        },
+        {
+          "name": "industrial-accident-statistics-brief",
+          "title": "산업재해 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "산업재해 지표의 기준기간·업종·재해유형·집계단위를 분리",
+            "공식 고용노동·KOSIS 통계표 코드·조회일·통계 기준을 보존",
+            "산재 인정·사업장 위험도·제재 판단은 담당기관 검토로 이관"
+          ]
         }
       ]
     },
@@ -1375,6 +1404,19 @@
             "KCSC 근거 URL과 조회일을 보존",
             "공학적 적합성·안전 판단은 기술자 승인"
           ]
+        },
+        {
+          "name": "infrastructure-maintenance-evidence-review",
+          "title": "기반시설 유지관리 근거 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "시설·구간·점검일·손상유형·조치상태·증빙을 분리",
+            "공식 기준·점검보고서·사진·도면 참조와 증빙 공백을 구분",
+            "시설 안전등급·통제·보수 우선순위는 기술자·관리기관 승인으로 이관"
+          ]
         }
       ]
     },
@@ -1407,6 +1449,19 @@
             "건축물·행위·지역에 따른 서류 후보를 분리",
             "세움터 도달 여부를 실제 민원 기능 성공으로 간주하지 않음",
             "허가요건과 실제 제출은 건축사·허가권자 확인"
+          ]
+        },
+        {
+          "name": "building-code-citation-check",
+          "title": "건축기준 조문 인용 점검",
+          "capability": "korean-legal-citation-verification",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "용도·규모·지역·행위별 적용 법령 후보와 기준시점을 분리",
+            "국가법령정보센터의 조문·시행일·인용문과 공식 URL을 보존",
+            "설계 적합성·허가 가능 여부·법적 해석은 건축사·허가권자 검토로 이관"
           ]
         }
       ]
@@ -1569,6 +1624,19 @@
             "단계별 필수 산출물과 승인 주체 확인",
             "기관별 적용 규정의 최신성을 담당자가 재확인"
           ]
+        },
+        {
+          "name": "public-it-security-checklist-review",
+          "title": "공공 정보시스템 보안 체크리스트 검토",
+          "capability": "public-it-project-procedure-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "시스템·데이터등급·위협·통제·검증증빙을 항목별로 분리",
+            "공식 보안·개인정보·정보화 지침의 버전·URL·조회일을 보존",
+            "보안 적합성·취약점 수용·운영 승인은 보안책임자 검토로 이관"
+          ]
         }
       ]
     },
@@ -1690,6 +1758,19 @@
             "공개·비공개·부분공개 후보를 근거별 분리",
             "직접식별자 no-match를 완전 마스킹 증명으로 사용하지 않음",
             "공개 결정과 원문 변경은 정보공개 담당자 승인"
+          ]
+        },
+        {
+          "name": "records-retention-schedule-review",
+          "title": "기록물 보존기간표 검토",
+          "capability": "public-records-lifecycle-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "기록물계열·업무기능·보존기산점·보존기간 후보를 분리",
+            "공식 기록관리기준·법령 URL과 조회일 및 근거 공백을 보존",
+            "보존기간 확정·평가·이관·폐기·원본 변경은 기록물관리 담당자 승인으로 이관"
           ]
         }
       ]
@@ -1852,6 +1933,19 @@
             "의안 요지·제안이유·주요내용·검토사항 분리",
             "기존 회의록·조례 조사 Skill과 역할 분리",
             "상정·의결·공개는 의회 담당자 승인"
+          ]
+        },
+        {
+          "name": "local-council-budget-bill-comparison",
+          "title": "지방의회 예산안 비교 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "예산안·수정안·심사보고서의 회계연도·사업·금액·근거를 분리",
+            "공식 의안·회의록·예산서 URL과 조회일 및 문서 버전을 보존",
+            "증감 적정성·재정 영향·의결 판단은 지방의회 담당자 검토로 이관"
           ]
         }
       ]
