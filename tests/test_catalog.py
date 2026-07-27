@@ -39,8 +39,8 @@ class CatalogContractTest(unittest.TestCase):
     def test_public_skills_are_owned_by_domains(self) -> None:
         self.assertFalse((ROOT / "skills").exists())
         entrypoints = sorted(ROOT.glob("domains/*/skills/*/SKILL.md"))
-        self.assertEqual(108, len(entrypoints))
-        self.assertEqual(108, len({path.parent.name for path in entrypoints}))
+        self.assertEqual(114, len(entrypoints))
+        self.assertEqual(114, len({path.parent.name for path in entrypoints}))
         self.assertFalse(list(ROOT.glob("domains/*/.gitkeep")))
 
     def test_evidence_distribution_matches_review(self) -> None:
@@ -74,7 +74,7 @@ class CatalogContractTest(unittest.TestCase):
         for domain in self.data["domains"]:
             self.assertEqual(1, sum(skill["role"] == "primary" for skill in domain["skills"]))
             names.extend(skill["name"] for skill in domain["skills"])
-        self.assertEqual(108, len(names))
+        self.assertEqual(114, len(names))
         self.assertEqual(len(names), len(set(names)))
 
     def test_additional_capabilities_are_domain_owned(self) -> None:
@@ -365,6 +365,159 @@ class CatalogContractTest(unittest.TestCase):
                     errors,
                 )
 
+    def test_domain_minimum_three_wave_three_contract(self) -> None:
+        expected = {
+            "입법": (
+                (
+                    "bill-comparison-impact-brief",
+                    "법안 비교·영향 근거 브리프",
+                    "korean-law-bill-research",
+                    (
+                        "법안·대안·수정안별 의안번호·기준일·처리단계·조문 차이를 분리",
+                        "국가법령정보·국회 공개정보의 공식 URL·조회일·문서 버전을 보존",
+                        "법적 효력·정책 영향·채택 여부 판단은 입법·법무 담당자 검토로 이관",
+                    ),
+                ),
+                (
+                    "committee-minutes-evidence-pack",
+                    "상임위원회 회의록 근거 팩",
+                    "korean-law-bill-research",
+                    (
+                        "위원회·회기·안건·회의일·의결 결과를 문서 단위로 분리",
+                        "공식 회의록·심사보고서·의안정보 URL·공개일·조회일을 보존",
+                        "발언 취지·정치적 평가·의결 해석은 입법 담당자 검토로 이관",
+                    ),
+                ),
+            ),
+            "교육": (
+                (
+                    "education-statistics-brief",
+                    "교육통계 근거 브리프",
+                    "kosis-official-statistics",
+                    (
+                        "지표명·학제·지역·학년도·분모·단위를 분리",
+                        "KOSIS 통계표 코드·작성기관·수록기간·조회일·개정 상태를 보존",
+                        "학교·학생 평가·정책 효과·자원배분 판단은 교육 담당기관 검토로 이관",
+                    ),
+                ),
+                (
+                    "school-policy-document-review",
+                    "학교 정책문서 검토",
+                    "administrative-document-draft-review",
+                    (
+                        "정책 대상·적용기관·시행일·의무·권고·근거 문서를 분리",
+                        "교육부·법령 공식 URL·조회일·문서 버전과 근거 공백을 보존",
+                        "법적 해석·학교별 적용·공문 확정·발송은 교육 담당자 승인으로 이관",
+                    ),
+                ),
+            ),
+            "국토교통": (
+                (
+                    "transport-policy-project-evidence-pack",
+                    "교통정책·사업 근거 팩",
+                    "public-policy-evidence-pack",
+                    (
+                        "사업·노선·구간·단계·예산·일정 주장을 항목별로 분리",
+                        "공식 1차 자료로 입력된 URL·조회일·문서 버전과 상충·미수집 근거를 구분",
+                        "사업 타당성·우선순위·예산 승인·노선 결정은 담당기관 검토로 이관",
+                    ),
+                ),
+                (
+                    "traffic-safety-statistics-brief",
+                    "교통안전 통계 근거 브리프",
+                    "kosis-official-statistics",
+                    (
+                        "기준기간·지역·도로유형·사고유형·지표·분모·단위를 분리",
+                        "KOSIS 통계표 코드·작성기관·조회일·통계 기준·개정 상태를 보존",
+                        "위험도 순위·단속·시설 개선 우선순위는 교통안전 담당기관 검토로 이관",
+                    ),
+                ),
+            ),
+        }
+        by_domain = {item["domain"]: item for item in self.data["domains"]}
+        for domain_name, contracts in expected.items():
+            with self.subTest(domain=domain_name):
+                domain = by_domain[domain_name]
+                self.assertEqual(3, len(domain["skills"]))
+                for skill_name, title, capability, task_checks in contracts:
+                    skill = next(item for item in domain["skills"] if item["name"] == skill_name)
+                    self.assertEqual(title, skill["title"])
+                    self.assertEqual(capability, skill["capability"])
+                    self.assertEqual("additional", skill["role"])
+                    self.assertEqual([], skill["reference_skills"])
+                    self.assertEqual("draft-only", skill["boundary"])
+                    self.assertEqual(task_checks, tuple(skill["task_checks"]))
+
+    def test_wave_three_contract_mutations_fail_closed(self) -> None:
+        protected = {
+            "입법": ("bill-comparison-impact-brief", "committee-minutes-evidence-pack"),
+            "교육": ("education-statistics-brief", "school-policy-document-review"),
+            "국토교통": (
+                "transport-policy-project-evidence-pack",
+                "traffic-safety-statistics-brief",
+            ),
+        }
+        for domain_name, skill_names in protected.items():
+            for skill_name in skill_names:
+                for mutation in (
+                    "title",
+                    "capability",
+                    "role",
+                    "references",
+                    "boundary",
+                    "task-check-replacement",
+                    "task-check-delete",
+                    "task-check-append",
+                    "task-check-reorder",
+                    "task-check-empty",
+                ):
+                    with self.subTest(domain=domain_name, skill=skill_name, mutation=mutation):
+                        changed = copy.deepcopy(self.data)
+                        by_domain = {item["domain"]: item for item in changed["domains"]}
+                        skill = next(
+                            item for item in by_domain[domain_name]["skills"] if item["name"] == skill_name
+                        )
+                        if mutation == "title":
+                            skill["title"] = "다른 제목"
+                        elif mutation == "capability":
+                            skill["capability"] = "official-source-research"
+                        elif mutation == "role":
+                            skill["role"] = "primary"
+                        elif mutation == "references":
+                            skill["reference_skills"] = ["korean-law-search"]
+                        elif mutation == "boundary":
+                            skill["boundary"] = "manual-review-only"
+                        elif mutation == "task-check-replacement":
+                            skill["task_checks"][0] = "자동 판단을 허용"
+                        elif mutation == "task-check-delete":
+                            skill["task_checks"].pop(0)
+                        elif mutation == "task-check-append":
+                            skill["task_checks"].append("자동 제출")
+                        elif mutation == "task-check-reorder":
+                            skill["task_checks"].reverse()
+                        else:
+                            skill["task_checks"] = []
+                        errors = validate(changed, ROOT)
+                        self.assertIn(f"{domain_name}/{skill_name}: wave-three contract mismatch", errors)
+
+        for domain_name, skill_names in protected.items():
+            for skill_name in skill_names:
+                with self.subTest(domain=domain_name, skill=skill_name, mutation="cross-domain"):
+                    changed = copy.deepcopy(self.data)
+                    by_domain = {item["domain"]: item for item in changed["domains"]}
+                    index = next(
+                        index
+                        for index, item in enumerate(by_domain[domain_name]["skills"])
+                        if item["name"] == skill_name
+                    )
+                    moved = by_domain[domain_name]["skills"].pop(index)
+                    by_domain["세무"]["skills"].append(moved)
+                    errors = validate(changed, ROOT)
+                    self.assertIn(
+                        f"{domain_name}: requires at least 3 Skills in minimum-three rollout, got 2",
+                        errors,
+                    )
+
     def test_unknown_capability_is_rejected(self) -> None:
         changed = copy.deepcopy(self.data)
         changed["domains"][0]["skills"][0]["capability"] = "unknown-capability"
@@ -431,11 +584,11 @@ class CatalogContractTest(unittest.TestCase):
         current = (ROOT / "docs/domain-skill-candidates.md").read_text(encoding="utf-8")
         self.assertEqual(render_catalog(self.data), current)
         self.assertIn("전체 domain: **60개**", current)
-        self.assertIn("domain-owned Skill: **108개**", current)
+        self.assertIn("domain-owned Skill: **114개**", current)
 
     def test_generated_domain_skills_match_catalog(self) -> None:
         expected = expected_domain_skills(self.data, ROOT)
-        self.assertEqual(108, len(expected))
+        self.assertEqual(114, len(expected))
         for path, content in expected.items():
             self.assertEqual(content, path.read_text(encoding="utf-8"))
 
@@ -479,7 +632,7 @@ class CatalogContractTest(unittest.TestCase):
             capture_output=True,
             text=True,
         )
-        self.assertIn("domains=60 domain_skills=108 capabilities=21 top_level_skills=0", result.stdout)
+        self.assertIn("domains=60 domain_skills=114 capabilities=21 top_level_skills=0", result.stdout)
 
 
 if __name__ == "__main__":

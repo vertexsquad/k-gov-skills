@@ -7,7 +7,7 @@
 ## 요약
 
 - 전체 domain: **60개**
-- domain-owned Skill: **108개** (primary 60 / additional 48)
+- domain-owned Skill: **114개** (primary 60 / additional 54)
 - 직접 reference 확인: **35개**
 - 인접 capability 활용: **16개**
 - 신규 설계 필요: **8개**
@@ -87,6 +87,8 @@
 | 통일 | `new` | `primary` | 북한·통일정책 공식자료 검색 | `unification-policy-source-search` | `official-source-research` | — | `read-only` |
 | 선거관리 | `direct` | `primary` | 지방선거 후보자 조회 | `local-election-candidate-lookup` | `official-source-research` | `local-election-candidate-search` | `read-only` |
 | 입법 | `direct` | `primary` | 국회 의안·표결 조회 | `assembly-bill-vote-lookup` | `korean-law-bill-research` | `assembly-bill-vote-search` | `read-only` |
+| 입법 | `direct` | `additional` | 법안 비교·영향 근거 브리프 | `bill-comparison-impact-brief` | `korean-law-bill-research` | — | `draft-only` |
+| 입법 | `direct` | `additional` | 상임위원회 회의록 근거 팩 | `committee-minutes-evidence-pack` | `korean-law-bill-research` | — | `draft-only` |
 
 ## 법무·치안
 
@@ -121,6 +123,8 @@
 | Domain | Evidence | Role | Skill | Slug | Capability | Reference Skill | 경계 |
 |---|---|---|---|---|---|---|---|
 | 교육 | `direct` | `primary` | 교육 공공데이터·장학 조회 | `education-public-data-search` | `official-source-research` | `k-schoollunch-menu`, `korean-scholarship-search` | `read-only` |
+| 교육 | `direct` | `additional` | 교육통계 근거 브리프 | `education-statistics-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 교육 | `direct` | `additional` | 학교 정책문서 검토 | `school-policy-document-review` | `administrative-document-draft-review` | — | `draft-only` |
 | 교육행정 | `direct` | `primary` | 학교장터 공고·학교정보 조회 | `education-procurement-notice-search` | `public-procurement-research` | `s2b-notice-search`, `k-schoollunch-menu` | `read-only` |
 | 교육행정 | `direct` | `additional` | 교육행정 문서 초안 검토 | `education-administrative-document-draft-review` | `administrative-document-draft-review` | — | `draft-only` |
 | 교육행정 | `direct` | `additional` | 학교시설 안전계획 검토 | `school-facility-safety-plan-review` | `administrative-document-draft-review` | — | `draft-only` |
@@ -150,6 +154,8 @@
 | Domain | Evidence | Role | Skill | Slug | Capability | Reference Skill | 경계 |
 |---|---|---|---|---|---|---|---|
 | 국토교통 | `direct` | `primary` | 대중교통·지도 경로 조사 | `public-transit-map-research` | `land-housing-geospatial-research` | `korean-transit-route`, `kakao-map` | `read-only` |
+| 국토교통 | `direct` | `additional` | 교통정책·사업 근거 팩 | `transport-policy-project-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
+| 국토교통 | `direct` | `additional` | 교통안전 통계 근거 브리프 | `traffic-safety-statistics-brief` | `kosis-official-statistics` | — | `draft-only` |
 | 토목시설 | `adjacent` | `primary` | 공사·시설점검 자료 조사 | `civil-facility-project-review` | `land-housing-geospatial-research` | `kakao-map`, `gongsijiga-search` | `draft-only` |
 | 토목시설 | `adjacent` | `additional` | 건설기준·BIM 적합성 사전점검 | `construction-standard-bim-compliance-precheck` | `construction-standard-bim-compliance-precheck` | — | `draft-only` |
 | 토목시설 | `adjacent` | `additional` | 기반시설 유지관리 근거 검토 | `infrastructure-maintenance-evidence-review` | `administrative-document-draft-review` | — | `draft-only` |
