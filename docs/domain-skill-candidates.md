@@ -7,7 +7,7 @@
 ## 요약
 
 - 전체 domain: **60개**
-- domain-owned Skill: **95개** (primary 60 / additional 35)
+- domain-owned Skill: **102개** (primary 60 / additional 42)
 - 직접 reference 확인: **35개**
 - 인접 capability 활용: **16개**
 - 신규 설계 필요: **8개**
@@ -63,6 +63,7 @@
 | 행정 | `direct` | `additional` | 공공안내 다국어 번역 검토 | `official-notice-multilingual-translation-review` | `official-notice-multilingual-translation-review` | — | `draft-only` |
 | 재정 | `adjacent` | `primary` | 예산·결산 비교 | `budget-settlement-comparison` | `kosis-official-statistics` | `kosis-stats`, `k-dart` | `read-only` |
 | 재정 | `adjacent` | `additional` | 지방재정 근거 묶음 | `local-finance-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
+| 재정 | `adjacent` | `additional` | 국고보조사업 근거 검토 | `national-subsidy-project-evidence-review` | `public-policy-evidence-pack` | — | `draft-only` |
 | 세무 | `direct` | `primary` | 사업자·체납 상태조회 | `business-tax-status-lookup` | `official-source-research` | `nts-business-registration`, `nts-tax-delinquency` | `read-only` |
 | 세무 | `direct` | `additional` | 세법령·개정 의안 조사 | `tax-law-bill-research` | `korean-law-bill-research` | — | `read-only` |
 | 세무 | `direct` | `additional` | 국세통계 조회 | `national-tax-statistics-lookup` | `kosis-official-statistics` | — | `read-only` |
@@ -76,6 +77,7 @@
 | 관세 | `new` | `primary` | HS 품목·관세율 조사 | `tariff-hs-code-research` | `official-source-research` | — | `read-only` |
 | 감사 | `adjacent` | `primary` | 감사 증빙 교차검증 | `audit-evidence-cross-check` | `official-source-research` | `biz-health-check`, `g2b-sanctioned-supplier` | `draft-only` |
 | 감사 | `adjacent` | `additional` | 감사 지적사항 답변 초안 검토 | `audit-finding-response-draft-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 감사 | `adjacent` | `additional` | 감사 조치계획 근거 검토 | `audit-action-plan-evidence-review` | `administrative-document-draft-review` | — | `draft-only` |
 | 통계 | `direct` | `primary` | KOSIS 공식통계 조회 | `kosis-statistics-lookup` | `kosis-official-statistics` | `kosis-stats` | `read-only` |
 | 조달 | `direct` | `primary` | 나라장터 발주·제재 조회 | `public-procurement-plan-check` | `public-procurement-research` | `g2b-order-plan-search`, `g2b-sanctioned-supplier` | `read-only` |
 | 조달 | `direct` | `additional` | AI 제품 조달 준비도 점검 | `ai-product-procurement-readiness-check` | `public-procurement-research` | — | `draft-only` |
@@ -95,8 +97,10 @@
 | 보호관찰 | `new` | `primary` | 보호관찰 처분·준수사항 검색 | `probation-compliance-search` | `korean-law-bill-research` | — | `read-only` |
 | 출입국 | `new` | `primary` | 체류·비자 절차 검색 | `immigration-procedure-search` | `official-source-research` | — | `read-only` |
 | 출입국 | `new` | `additional` | 출입국 민원 분류·답변 초안 | `immigration-civil-complaint-triage-draft` | `civil-complaint-triage-draft` | — | `draft-only` |
+| 출입국 | `new` | `additional` | 출입국 통계·정책 근거 브리프 | `immigration-statistics-policy-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 경찰 | `direct` | `primary` | LOST112 유실물 조회 | `police-lost-property-lookup` | `official-source-research` | `subway-lost-property` | `read-only` |
 | 경찰 | `direct` | `additional` | 경찰 민원 분류·답변 초안 | `police-civil-complaint-triage-draft` | `civil-complaint-triage-draft` | — | `draft-only` |
+| 경찰 | `direct` | `additional` | 경찰 범죄통계 브리프 | `police-crime-statistics-brief` | `kosis-official-statistics` | — | `draft-only` |
 | 해양경찰 | `adjacent` | `primary` | 해양기상·안전상황 브리프 | `maritime-safety-brief` | `disaster-geospatial-brief` | `korea-weather`, `han-river-water-level` | `draft-only` |
 
 ## 안전·국방
@@ -106,6 +110,7 @@
 | 소방 | `adjacent` | `primary` | 응급실·재난자원 브리프 | `fire-emergency-resource-brief` | `disaster-geospatial-brief` | `emergency-room-beds`, `korea-weather` | `draft-only` |
 | 재난안전 | `direct` | `primary` | 기상·수위·대기 재난브리프 | `disaster-situation-brief` | `disaster-geospatial-brief` | `korea-weather`, `fine-dust-location`, `han-river-water-level`, `emergency-room-beds` | `draft-only` |
 | 재난안전 | `direct` | `additional` | 재난 공공안내문 초안 검토 | `disaster-public-message-draft-review` | `disaster-geospatial-brief` | — | `draft-only` |
+| 재난안전 | `direct` | `additional` | 재난 대응계획 근거 검토 | `disaster-response-plan-evidence-review` | `administrative-document-draft-review` | — | `draft-only` |
 | 국방 | `direct` | `primary` | 국방조달 공개공고 조회 | `defense-procurement-notice-search` | `public-procurement-research` | `d2b-notice-search` | `read-only` |
 | 군무 | `new` | `primary` | 군무 관련 규정 검색 | `civilian-military-regulation-search` | `official-source-research` | — | `read-only` |
 | 경호 | `sensitive` | `primary` | 공개행사 안전점검 | `public-event-security-review` | `official-source-research` | — | `manual-review-only` |
@@ -117,8 +122,10 @@
 | 교육 | `direct` | `primary` | 교육 공공데이터·장학 조회 | `education-public-data-search` | `official-source-research` | `k-schoollunch-menu`, `korean-scholarship-search` | `read-only` |
 | 교육행정 | `direct` | `primary` | 학교장터 공고·학교정보 조회 | `education-procurement-notice-search` | `public-procurement-research` | `s2b-notice-search`, `k-schoollunch-menu` | `read-only` |
 | 교육행정 | `direct` | `additional` | 교육행정 문서 초안 검토 | `education-administrative-document-draft-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 교육행정 | `direct` | `additional` | 학교시설 안전계획 검토 | `school-facility-safety-plan-review` | `administrative-document-draft-review` | — | `draft-only` |
 | 사회복지 | `direct` | `primary` | 복지·연금·지원정보 조회 | `welfare-pension-support-search` | `welfare-health-safety-research` | `national-pension-workplace`, `donation-place-search`, `korean-scholarship-search` | `read-only` |
 | 사회복지 | `direct` | `additional` | 복지 민원 분류·답변 초안 | `welfare-civil-complaint-triage-draft` | `civil-complaint-triage-draft` | — | `draft-only` |
+| 사회복지 | `direct` | `additional` | 복지 자격요건 근거 사전점검 | `welfare-eligibility-evidence-check` | `public-policy-evidence-pack` | — | `draft-only` |
 | 고용노동 | `direct` | `primary` | 채용공고·노동법 조사 | `labor-job-law-research` | `official-source-research` | `job-posting-match`, `daangn-jobs-search`, `korean-law-search` | `read-only` |
 | 고용노동 | `direct` | `additional` | 고용노동 민원 분류·답변 초안 | `labor-civil-complaint-triage-draft` | `civil-complaint-triage-draft` | — | `draft-only` |
 | 보건의료 | `direct` | `primary` | 응급실·검진·장기요양기관 조회 | `healthcare-facility-search` | `welfare-health-safety-research` | `emergency-room-beds`, `nhis-care-checkup-search` | `read-only` |
