@@ -39,8 +39,8 @@ class CatalogContractTest(unittest.TestCase):
     def test_public_skills_are_owned_by_domains(self) -> None:
         self.assertFalse((ROOT / "skills").exists())
         entrypoints = sorted(ROOT.glob("domains/*/skills/*/SKILL.md"))
-        self.assertEqual(102, len(entrypoints))
-        self.assertEqual(102, len({path.parent.name for path in entrypoints}))
+        self.assertEqual(108, len(entrypoints))
+        self.assertEqual(108, len({path.parent.name for path in entrypoints}))
         self.assertFalse(list(ROOT.glob("domains/*/.gitkeep")))
 
     def test_evidence_distribution_matches_review(self) -> None:
@@ -50,7 +50,7 @@ class CatalogContractTest(unittest.TestCase):
     def test_capability_runtime_manifest_is_complete(self) -> None:
         self.assertEqual(4, self.data["schema_version"])
         capabilities = self.data["shared_capabilities"]
-        self.assertEqual(20, len(capabilities))
+        self.assertEqual(21, len(capabilities))
         required = {
             "slug",
             "locale",
@@ -74,7 +74,7 @@ class CatalogContractTest(unittest.TestCase):
         for domain in self.data["domains"]:
             self.assertEqual(1, sum(skill["role"] == "primary" for skill in domain["skills"]))
             names.extend(skill["name"] for skill in domain["skills"])
-        self.assertEqual(102, len(names))
+        self.assertEqual(108, len(names))
         self.assertEqual(len(names), len(set(names)))
 
     def test_additional_capabilities_are_domain_owned(self) -> None:
@@ -226,6 +226,145 @@ class CatalogContractTest(unittest.TestCase):
                     errors,
                 )
 
+    def test_domain_minimum_three_wave_two_contract(self) -> None:
+        expected = {
+            "고용노동": (
+                "industrial-accident-statistics-brief",
+                "산업재해 통계 근거 브리프",
+                "kosis-official-statistics",
+                (
+                    "산업재해 지표의 기준기간·업종·재해유형·집계단위를 분리",
+                    "공식 고용노동·KOSIS 통계표 코드·조회일·통계 기준을 보존",
+                    "산재 인정·사업장 위험도·제재 판단은 담당기관 검토로 이관",
+                ),
+            ),
+            "토목시설": (
+                "infrastructure-maintenance-evidence-review",
+                "기반시설 유지관리 근거 검토",
+                "administrative-document-draft-review",
+                (
+                    "시설·구간·점검일·손상유형·조치상태·증빙을 분리",
+                    "공식 기준·점검보고서·사진·도면 참조와 증빙 공백을 구분",
+                    "시설 안전등급·통제·보수 우선순위는 기술자·관리기관 승인으로 이관",
+                ),
+            ),
+            "건축": (
+                "building-code-citation-check",
+                "건축기준 조문 인용 점검",
+                "korean-legal-citation-verification",
+                (
+                    "용도·규모·지역·행위별 적용 법령 후보와 기준시점을 분리",
+                    "국가법령정보센터의 조문·시행일·인용문과 공식 URL을 보존",
+                    "설계 적합성·허가 가능 여부·법적 해석은 건축사·허가권자 검토로 이관",
+                ),
+            ),
+            "전산": (
+                "public-it-security-checklist-review",
+                "공공 정보시스템 보안 체크리스트 검토",
+                "public-it-project-procedure-review",
+                (
+                    "시스템·데이터등급·위협·통제·검증증빙을 항목별로 분리",
+                    "공식 보안·개인정보·정보화 지침의 버전·URL·조회일을 보존",
+                    "보안 적합성·취약점 수용·운영 승인은 보안책임자 검토로 이관",
+                ),
+            ),
+            "기록관리": (
+                "records-retention-schedule-review",
+                "기록물 보존기간표 검토",
+                "public-records-lifecycle-review",
+                (
+                    "기록물계열·업무기능·보존기산점·보존기간 후보를 분리",
+                    "공식 기록관리기준·법령 URL과 조회일 및 근거 공백을 보존",
+                    "보존기간 확정·평가·이관·폐기·원본 변경은 기록물관리 담당자 승인으로 이관",
+                ),
+            ),
+            "지방의회": (
+                "local-council-budget-bill-comparison",
+                "지방의회 예산안 비교 브리프",
+                "public-policy-evidence-pack",
+                (
+                    "예산안·수정안·심사보고서의 회계연도·사업·금액·근거를 분리",
+                    "공식 의안·회의록·예산서 URL과 조회일 및 문서 버전을 보존",
+                    "증감 적정성·재정 영향·의결 판단은 지방의회 담당자 검토로 이관",
+                ),
+            ),
+        }
+        by_domain = {item["domain"]: item for item in self.data["domains"]}
+        for domain_name, (skill_name, title, capability, task_checks) in expected.items():
+            with self.subTest(domain=domain_name):
+                domain = by_domain[domain_name]
+                self.assertEqual(3, len(domain["skills"]))
+                skill = next(item for item in domain["skills"] if item["name"] == skill_name)
+                self.assertEqual(title, skill["title"])
+                self.assertEqual(capability, skill["capability"])
+                self.assertEqual("additional", skill["role"])
+                self.assertEqual("draft-only", skill["boundary"])
+                self.assertEqual(task_checks, tuple(skill["task_checks"]))
+
+    def test_wave_two_minimum_three_mutation_fails_closed(self) -> None:
+        for domain_name in ("고용노동", "토목시설", "건축", "전산", "기록관리", "지방의회"):
+            with self.subTest(domain=domain_name):
+                changed = copy.deepcopy(self.data)
+                by_domain = {item["domain"]: item for item in changed["domains"]}
+                moved = by_domain[domain_name]["skills"].pop()
+                by_domain["세무"]["skills"].append(moved)
+                errors = validate(changed, ROOT)
+                self.assertIn(
+                    f"{domain_name}: requires at least 3 Skills in minimum-three rollout, got 2",
+                    errors,
+                )
+
+    def test_wave_two_contract_mutations_fail_closed(self) -> None:
+        protected = {
+            "고용노동": "industrial-accident-statistics-brief",
+            "토목시설": "infrastructure-maintenance-evidence-review",
+            "건축": "building-code-citation-check",
+            "전산": "public-it-security-checklist-review",
+            "기록관리": "records-retention-schedule-review",
+            "지방의회": "local-council-budget-bill-comparison",
+        }
+        for domain_name, skill_name in protected.items():
+            for mutation, field, value in (
+                ("title", "title", "다른 제목"),
+                ("capability", "capability", "official-source-research"),
+                ("role", "role", "primary"),
+                ("references", "reference_skills", ["korean-law-search"]),
+                ("boundary", "boundary", "manual-review-only"),
+                ("unsafe-handoff", "task_checks", ["고위험 판단을 자동 수행"]),
+                ("reordered-checks", "task_checks", None),
+            ):
+                with self.subTest(domain=domain_name, mutation=mutation):
+                    changed = copy.deepcopy(self.data)
+                    by_domain = {item["domain"]: item for item in changed["domains"]}
+                    skill = next(
+                        item for item in by_domain[domain_name]["skills"] if item["name"] == skill_name
+                    )
+                    skill[field] = list(reversed(skill[field])) if value is None else value
+                    errors = validate(changed, ROOT)
+                    self.assertIn(f"{domain_name}/{skill_name}: wave-two contract mismatch", errors)
+
+    def test_wave_two_capability_contract_mutations_fail_closed(self) -> None:
+        for mutation, field, value in (
+            ("service", "service", "일반 기록물 검색"),
+            ("side-effect", "side_effect_class", "read-only"),
+            ("handoff", "manual_handoff_gate", "자동 폐기 가능"),
+            ("provenance-order", "source_provenance", None),
+            ("execution-status", "execution_status", "blocked"),
+        ):
+            with self.subTest(mutation=mutation):
+                changed = copy.deepcopy(self.data)
+                capability = next(
+                    item
+                    for item in changed["shared_capabilities"]
+                    if item["slug"] == "public-records-lifecycle-review"
+                )
+                capability[field] = list(reversed(capability[field])) if value is None else value
+                errors = validate(changed, ROOT)
+                self.assertIn(
+                    "public-records-lifecycle-review: wave-two capability contract mismatch",
+                    errors,
+                )
+
     def test_unknown_capability_is_rejected(self) -> None:
         changed = copy.deepcopy(self.data)
         changed["domains"][0]["skills"][0]["capability"] = "unknown-capability"
@@ -292,11 +431,11 @@ class CatalogContractTest(unittest.TestCase):
         current = (ROOT / "docs/domain-skill-candidates.md").read_text(encoding="utf-8")
         self.assertEqual(render_catalog(self.data), current)
         self.assertIn("전체 domain: **60개**", current)
-        self.assertIn("domain-owned Skill: **102개**", current)
+        self.assertIn("domain-owned Skill: **108개**", current)
 
     def test_generated_domain_skills_match_catalog(self) -> None:
         expected = expected_domain_skills(self.data, ROOT)
-        self.assertEqual(102, len(expected))
+        self.assertEqual(108, len(expected))
         for path, content in expected.items():
             self.assertEqual(content, path.read_text(encoding="utf-8"))
 
@@ -340,7 +479,7 @@ class CatalogContractTest(unittest.TestCase):
             capture_output=True,
             text=True,
         )
-        self.assertIn("domains=60 domain_skills=102 capabilities=20 top_level_skills=0", result.stdout)
+        self.assertIn("domains=60 domain_skills=108 capabilities=21 top_level_skills=0", result.stdout)
 
 
 if __name__ == "__main__":

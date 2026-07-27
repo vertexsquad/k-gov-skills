@@ -1,0 +1,16 @@
+{
+  "case_id": "RECORDS-001",
+  "review_type": "retention-schedule-review",
+  "summary": "비식별 기록물계열의 보존기간표 후보를 검토합니다.",
+  "facts": [
+    "보존기간 확정과 이관·폐기 결정은 기록물관리 담당자가 수행합니다."
+  ],
+  "source_refs": [
+    {
+      "url": "https://www.archives.go.kr/",
+      "retrieved_on": "2026-07-25"
+    }
+  ],
+  "as_of_date": "2026-07-25",
+  "redaction_status": "redacted"
+}

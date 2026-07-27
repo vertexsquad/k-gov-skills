@@ -7,12 +7,12 @@
 ## 요약
 
 - 전체 domain: **60개**
-- domain-owned Skill: **102개** (primary 60 / additional 42)
+- domain-owned Skill: **108개** (primary 60 / additional 48)
 - 직접 reference 확인: **35개**
 - 인접 capability 활용: **16개**
 - 신규 설계 필요: **8개**
 - 민감업무 제한: **1개**
-- 내부 공통 capability: **20개**
+- 내부 공통 capability: **21개**
 - Domain Skill의 live 검증 상태는 연결된 capability manifest보다 강하게 주장하지 않습니다.
 
 ## Evidence 등급
@@ -48,6 +48,7 @@
 | `building-permit-document-precheck` | `none` | `none` | `draft-only` | `fixture-verified` | `blocked` |
 | `official-notice-multilingual-translation-review` | `none` | `none` | `draft-only` | `fixture-verified` | `not-run` |
 | `patent-prior-art-evidence-pack` | `none` | `none` | `read-only` | `fixture-verified` | `not-run` |
+| `public-records-lifecycle-review` | `none` | `none` | `draft-only` | `fixture-verified` | `not-run` |
 
 ## 국가운영
 
@@ -128,6 +129,7 @@
 | 사회복지 | `direct` | `additional` | 복지 자격요건 근거 사전점검 | `welfare-eligibility-evidence-check` | `public-policy-evidence-pack` | — | `draft-only` |
 | 고용노동 | `direct` | `primary` | 채용공고·노동법 조사 | `labor-job-law-research` | `official-source-research` | `job-posting-match`, `daangn-jobs-search`, `korean-law-search` | `read-only` |
 | 고용노동 | `direct` | `additional` | 고용노동 민원 분류·답변 초안 | `labor-civil-complaint-triage-draft` | `civil-complaint-triage-draft` | — | `draft-only` |
+| 고용노동 | `direct` | `additional` | 산업재해 통계 근거 브리프 | `industrial-accident-statistics-brief` | `kosis-official-statistics` | — | `draft-only` |
 | 보건의료 | `direct` | `primary` | 응급실·검진·장기요양기관 조회 | `healthcare-facility-search` | `welfare-health-safety-research` | `emergency-room-beds`, `nhis-care-checkup-search` | `read-only` |
 | 식품의약 | `direct` | `primary` | 식품·의약 안전정보 확인 | `food-drug-safety-check` | `welfare-health-safety-research` | `mfds-food-safety`, `mfds-drug-safety` | `read-only` |
 
@@ -150,8 +152,10 @@
 | 국토교통 | `direct` | `primary` | 대중교통·지도 경로 조사 | `public-transit-map-research` | `land-housing-geospatial-research` | `korean-transit-route`, `kakao-map` | `read-only` |
 | 토목시설 | `adjacent` | `primary` | 공사·시설점검 자료 조사 | `civil-facility-project-review` | `land-housing-geospatial-research` | `kakao-map`, `gongsijiga-search` | `draft-only` |
 | 토목시설 | `adjacent` | `additional` | 건설기준·BIM 적합성 사전점검 | `construction-standard-bim-compliance-precheck` | `construction-standard-bim-compliance-precheck` | — | `draft-only` |
+| 토목시설 | `adjacent` | `additional` | 기반시설 유지관리 근거 검토 | `infrastructure-maintenance-evidence-review` | `administrative-document-draft-review` | — | `draft-only` |
 | 건축 | `direct` | `primary` | 토지·등기·공공주택 조사 | `land-building-housing-research` | `land-housing-geospatial-research` | `gongsijiga-search`, `iros-registry-automation`, `lh-notice-search`, `sh-notice-search` | `read-only` |
 | 건축 | `direct` | `additional` | 건축 인허가 서류 사전점검 | `building-permit-document-precheck` | `building-permit-document-precheck` | — | `draft-only` |
+| 건축 | `direct` | `additional` | 건축기준 조문 인용 점검 | `building-code-citation-check` | `korean-legal-citation-verification` | — | `draft-only` |
 | 도시계획 | `direct` | `primary` | 혼잡도·토지·주택 조사 | `urban-planning-density-land` | `land-housing-geospatial-research` | `seoul-density`, `gongsijiga-search`, `lh-notice-search`, `sh-notice-search` | `read-only` |
 | 산업 | `direct` | `primary` | 기업공시·산업정보 조회 | `corporate-industry-information` | `official-source-research` | `k-dart`, `fsc-corporate-info` | `read-only` |
 | 에너지 | `direct` | `primary` | 유가·에너지통계 조회 | `fuel-energy-statistics` | `kosis-official-statistics` | `cheap-gas-nearby`, `kosis-stats` | `read-only` |
@@ -166,6 +170,7 @@
 | 정보통신 | `adjacent` | `primary` | WHOIS·정보통신 정책 조사 | `ict-policy-domain-research` | `official-source-research` | `kr-whois-lookup`, `korean-privacy-terms` | `read-only` |
 | 전산 | `new` | `primary` | 공공시스템 운영점검 | `public-it-operations-check` | `official-source-research` | — | `draft-only` |
 | 전산 | `new` | `additional` | 공공 정보화사업 절차 점검 | `public-it-project-procedure-check` | `public-it-project-procedure-review` | — | `draft-only` |
+| 전산 | `new` | `additional` | 공공 정보시스템 보안 체크리스트 검토 | `public-it-security-checklist-review` | `public-it-project-procedure-review` | — | `draft-only` |
 | 사이버보안 | `adjacent` | `primary` | 개인정보·보안기준 검토 | `privacy-security-baseline-review` | `official-source-research` | `korean-privacy-terms` | `draft-only` |
 
 ## 문화·지식
@@ -178,6 +183,7 @@
 | 문화유산 | `direct` | `primary` | 문화유산 공식자료 검색 | `cultural-heritage-source-search` | `official-source-research` | `joseon-sillok-search` | `read-only` |
 | 기록관리 | `adjacent` | `primary` | 기록물분류·HWPX 검토 | `records-classification-hwpx` | `public-document-hwpx` | `hwp`, `rhwp-edit`, `joseon-sillok-search` | `draft-only` |
 | 기록관리 | `adjacent` | `additional` | 공공기록 공개·마스킹 검토 | `public-record-disclosure-redaction-review` | `public-record-disclosure-redaction-review` | — | `draft-only` |
+| 기록관리 | `adjacent` | `additional` | 기록물 보존기간표 검토 | `records-retention-schedule-review` | `public-records-lifecycle-review` | — | `draft-only` |
 | 도서관 | `direct` | `primary` | 공공도서관 소장자료 조회 | `public-library-holdings-search` | `official-source-research` | `library-book-search` | `read-only` |
 | 학예연구 | `adjacent` | `primary` | 유물·자료 출처 조사 | `museum-object-provenance-research` | `official-source-research` | `joseon-sillok-search`, `library-book-search` | `draft-only` |
 | 연구 | `direct` | `primary` | 공식출처 연구 브리프 | `official-research-brief` | `official-source-research` | `kosis-stats`, `k-dart`, `naver-news-search`, `daishin-report-search` | `draft-only` |
@@ -194,6 +200,7 @@
 | 지역개발 | `direct` | `primary` | 주택·토지·혼잡도 개발정보 조회 | `regional-development-housing-land` | `land-housing-geospatial-research` | `lh-notice-search`, `sh-notice-search`, `gongsijiga-search`, `seoul-density` | `read-only` |
 | 지방의회 | `adjacent` | `primary` | 회의록·조례안 조사 | `local-council-minutes-ordinance` | `korean-law-bill-research` | `assembly-bill-vote-search`, `korean-law-search` | `read-only` |
 | 지방의회 | `adjacent` | `additional` | 지방의회 의안·상정안 초안 검토 | `local-council-agenda-draft-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 지방의회 | `adjacent` | `additional` | 지방의회 예산안 비교 브리프 | `local-council-budget-bill-comparison` | `public-policy-evidence-pack` | — | `draft-only` |
 | 우정 | `direct` | `primary` | 우편번호·배송조회 | `postal-code-delivery-tracking` | `official-source-research` | `delivery-tracking`, `zipcode-search` | `read-only` |
 
 ## 근거와 경계

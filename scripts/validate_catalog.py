@@ -46,6 +46,12 @@ MINIMUM_THREE_DOMAINS = {
     "재난안전",
     "교육행정",
     "사회복지",
+    "고용노동",
+    "토목시설",
+    "건축",
+    "전산",
+    "기록관리",
+    "지방의회",
 }
 WAVE_ONE_TASK_CHECKS = {
     "national-subsidy-project-evidence-review": (
@@ -83,6 +89,98 @@ WAVE_ONE_TASK_CHECKS = {
         "공식 법령·사업안내 URL과 조회일 및 상충 근거를 보존",
         "수급자격·지급액·신청 가능 여부는 담당기관 판단으로 이관",
     ),
+}
+WAVE_TWO_SKILL_CONTRACTS = {
+    "고용노동": {
+        "name": "industrial-accident-statistics-brief",
+        "title": "산업재해 통계 근거 브리프",
+        "capability": "kosis-official-statistics",
+        "role": "additional",
+        "reference_skills": (),
+        "boundary": "draft-only",
+        "task_checks": (
+            "산업재해 지표의 기준기간·업종·재해유형·집계단위를 분리",
+            "공식 고용노동·KOSIS 통계표 코드·조회일·통계 기준을 보존",
+            "산재 인정·사업장 위험도·제재 판단은 담당기관 검토로 이관",
+        ),
+    },
+    "토목시설": {
+        "name": "infrastructure-maintenance-evidence-review",
+        "title": "기반시설 유지관리 근거 검토",
+        "capability": "administrative-document-draft-review",
+        "role": "additional",
+        "reference_skills": (),
+        "boundary": "draft-only",
+        "task_checks": (
+            "시설·구간·점검일·손상유형·조치상태·증빙을 분리",
+            "공식 기준·점검보고서·사진·도면 참조와 증빙 공백을 구분",
+            "시설 안전등급·통제·보수 우선순위는 기술자·관리기관 승인으로 이관",
+        ),
+    },
+    "건축": {
+        "name": "building-code-citation-check",
+        "title": "건축기준 조문 인용 점검",
+        "capability": "korean-legal-citation-verification",
+        "role": "additional",
+        "reference_skills": (),
+        "boundary": "draft-only",
+        "task_checks": (
+            "용도·규모·지역·행위별 적용 법령 후보와 기준시점을 분리",
+            "국가법령정보센터의 조문·시행일·인용문과 공식 URL을 보존",
+            "설계 적합성·허가 가능 여부·법적 해석은 건축사·허가권자 검토로 이관",
+        ),
+    },
+    "전산": {
+        "name": "public-it-security-checklist-review",
+        "title": "공공 정보시스템 보안 체크리스트 검토",
+        "capability": "public-it-project-procedure-review",
+        "role": "additional",
+        "reference_skills": (),
+        "boundary": "draft-only",
+        "task_checks": (
+            "시스템·데이터등급·위협·통제·검증증빙을 항목별로 분리",
+            "공식 보안·개인정보·정보화 지침의 버전·URL·조회일을 보존",
+            "보안 적합성·취약점 수용·운영 승인은 보안책임자 검토로 이관",
+        ),
+    },
+    "기록관리": {
+        "name": "records-retention-schedule-review",
+        "title": "기록물 보존기간표 검토",
+        "capability": "public-records-lifecycle-review",
+        "role": "additional",
+        "reference_skills": (),
+        "boundary": "draft-only",
+        "task_checks": (
+            "기록물계열·업무기능·보존기산점·보존기간 후보를 분리",
+            "공식 기록관리기준·법령 URL과 조회일 및 근거 공백을 보존",
+            "보존기간 확정·평가·이관·폐기·원본 변경은 기록물관리 담당자 승인으로 이관",
+        ),
+    },
+    "지방의회": {
+        "name": "local-council-budget-bill-comparison",
+        "title": "지방의회 예산안 비교 브리프",
+        "capability": "public-policy-evidence-pack",
+        "role": "additional",
+        "reference_skills": (),
+        "boundary": "draft-only",
+        "task_checks": (
+            "예산안·수정안·심사보고서의 회계연도·사업·금액·근거를 분리",
+            "공식 의안·회의록·예산서 URL과 조회일 및 문서 버전을 보존",
+            "증감 적정성·재정 영향·의결 판단은 지방의회 담당자 검토로 이관",
+        ),
+    },
+}
+WAVE_TWO_CAPABILITY_CONTRACTS = {
+    "public-records-lifecycle-review": {
+        "service": "공공기록물 분류·보존기간·이관·폐기 검토 admission",
+        "credential_class": "none",
+        "proxy_mode": "none",
+        "side_effect_class": "draft-only",
+        "manual_handoff_gate": "보존기간 확정·평가·이관·폐기·원본 변경은 기록물관리 담당자 승인",
+        "source_provenance": ("https://www.archives.go.kr/", "https://www.law.go.kr/"),
+        "execution_status": "fixture-verified",
+        "live_smoke": "not-run",
+    }
 }
 SLUG = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
@@ -148,8 +246,8 @@ def _validate_capabilities(
     if not isinstance(raw_capabilities, list):
         errors.append("shared_capabilities must be a list")
         return set(), {}
-    if len(raw_capabilities) != 20:
-        errors.append(f"catalog must contain 20 shared capabilities, got {len(raw_capabilities)}")
+    if len(raw_capabilities) != 21:
+        errors.append(f"catalog must contain 21 shared capabilities, got {len(raw_capabilities)}")
     slugs: set[str] = set()
     by_slug: dict[str, dict[str, Any]] = {}
     for index, capability in enumerate(raw_capabilities):
@@ -184,6 +282,20 @@ def _validate_capabilities(
             errors.append(f"{slug}: live-verified requires live_smoke=passed")
         if capability["live_smoke"] == "passed" and capability["execution_status"] != "live-verified":
             errors.append(f"{slug}: live_smoke=passed requires live-verified")
+        wave_two_capability = WAVE_TWO_CAPABILITY_CONTRACTS.get(slug)
+        if wave_two_capability is not None:
+            contract_matches = all(
+                capability.get(key) == value
+                for key, value in wave_two_capability.items()
+                if key != "source_provenance"
+            )
+            contract_matches = (
+                contract_matches
+                and tuple(capability.get("source_provenance") or ())
+                == wave_two_capability["source_provenance"]
+            )
+            if not contract_matches:
+                errors.append(f"{slug}: wave-two capability contract mismatch")
         provenance = capability["source_provenance"]
         if not isinstance(provenance, list) or not provenance or not all(
             isinstance(url, str) and url.startswith("https://") for url in provenance
@@ -254,6 +366,32 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
             errors.append(
                 f"{domain}: requires at least 3 Skills in minimum-three rollout, got {len(skills)}"
             )
+        wave_two_contract = WAVE_TWO_SKILL_CONTRACTS.get(domain)
+        if wave_two_contract is not None:
+            expected_name = wave_two_contract["name"]
+            matches = [
+                skill
+                for skill in skills
+                if isinstance(skill, dict) and skill.get("name") == expected_name
+            ]
+            if len(matches) != 1:
+                errors.append(f"{domain}/{expected_name}: wave-two contract mismatch")
+            else:
+                actual = matches[0]
+                contract_matches = all(
+                    actual.get(key) == value
+                    for key, value in wave_two_contract.items()
+                    if key not in {"reference_skills", "task_checks"}
+                )
+                contract_matches = (
+                    contract_matches
+                    and tuple(actual.get("reference_skills") or ())
+                    == wave_two_contract["reference_skills"]
+                    and tuple(actual.get("task_checks") or ())
+                    == wave_two_contract["task_checks"]
+                )
+                if not contract_matches:
+                    errors.append(f"{domain}/{expected_name}: wave-two contract mismatch")
         total_skills += len(skills)
         primary_count = sum(isinstance(skill, dict) and skill.get("role") == "primary" for skill in skills)
         if primary_count != 1:
@@ -321,8 +459,8 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
                     errors.append(f"{domain}: sensitive evidence requires manual-review-only")
             declared_entrypoints.add(Path("domains") / domain / "skills" / name / "SKILL.md")
 
-    if total_skills != 102:
-        errors.append(f"catalog must declare 102 domain Skills, got {total_skills}")
+    if total_skills != 108:
+        errors.append(f"catalog must declare 108 domain Skills, got {total_skills}")
     domains_root = root / "domains"
     actual_domains = {path.name for path in domains_root.iterdir() if path.is_dir()} if domains_root.is_dir() else set()
     if actual_domains != seen_domains:
