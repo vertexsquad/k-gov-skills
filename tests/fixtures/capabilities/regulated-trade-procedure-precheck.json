@@ -1,0 +1,16 @@
+{
+  "case_id": "CUSTOMS-001",
+  "review_type": "customs-origin-document-precheck",
+  "summary": "원산지 증빙서류의 항목과 공식 근거를 비식별 상태로 사전점검합니다.",
+  "facts": [
+    "원산지 판정과 실제 신고·제출·통관은 관세사와 세관 담당자가 수행합니다."
+  ],
+  "source_refs": [
+    {
+      "url": "https://www.customs.go.kr/ftaportalkor/main.do",
+      "retrieved_on": "2026-07-25"
+    }
+  ],
+  "as_of_date": "2026-07-25",
+  "redaction_status": "redacted"
+}

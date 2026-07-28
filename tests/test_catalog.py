@@ -39,8 +39,8 @@ class CatalogContractTest(unittest.TestCase):
     def test_public_skills_are_owned_by_domains(self) -> None:
         self.assertFalse((ROOT / "skills").exists())
         entrypoints = sorted(ROOT.glob("domains/*/skills/*/SKILL.md"))
-        self.assertEqual(132, len(entrypoints))
-        self.assertEqual(132, len({path.parent.name for path in entrypoints}))
+        self.assertEqual(138, len(entrypoints))
+        self.assertEqual(138, len({path.parent.name for path in entrypoints}))
         self.assertFalse(list(ROOT.glob("domains/*/.gitkeep")))
 
     def test_evidence_distribution_matches_review(self) -> None:
@@ -50,7 +50,7 @@ class CatalogContractTest(unittest.TestCase):
     def test_capability_runtime_manifest_is_complete(self) -> None:
         self.assertEqual(4, self.data["schema_version"])
         capabilities = self.data["shared_capabilities"]
-        self.assertEqual(21, len(capabilities))
+        self.assertEqual(22, len(capabilities))
         required = {
             "slug",
             "locale",
@@ -74,7 +74,7 @@ class CatalogContractTest(unittest.TestCase):
         for domain in self.data["domains"]:
             self.assertEqual(1, sum(skill["role"] == "primary" for skill in domain["skills"]))
             names.extend(skill["name"] for skill in domain["skills"])
-        self.assertEqual(132, len(names))
+        self.assertEqual(138, len(names))
         self.assertEqual(len(names), len(set(names)))
 
     def test_additional_capabilities_are_domain_owned(self) -> None:
@@ -990,6 +990,203 @@ class CatalogContractTest(unittest.TestCase):
                     )
         self.assertEqual(66, mutation_count)
 
+    def test_domain_minimum_three_wave_seven_contract(self) -> None:
+        expected = {
+            "관세": (
+                (
+                    "customs-origin-document-precheck",
+                    "원산지 증빙서류 사전점검",
+                    "regulated-trade-procedure-precheck",
+                    (
+                        "거래·품목·HS 코드·협정·원산지 기준·증빙서류·기준시점을 분리",
+                        "관세청·UNI-PASS·FTA 포털 공식 URL·문서 식별자·발급 또는 조회일·유효기간과 누락·상충 근거를 구분",
+                        "원산지 판정·특혜관세 적용·신고·제출·통관·제재 판단은 관세사와 세관 담당자 검토로 이관",
+                    ),
+                ),
+                (
+                    "customs-trade-statistics-brief",
+                    "관세 무역통계 브리프",
+                    "public-policy-evidence-pack",
+                    (
+                        "기준기간·수출입 구분·상대국·HS 코드·수량·금액·단위·정정 상태를 분리",
+                        "관세청 무역통계 공식 URL·통계표 또는 품목 식별자·공표일·조회일·잠정 또는 확정 상태와 결측·개정을 구분",
+                        "추세·인과관계·정책효과·세율 또는 통관 판단은 관세 통계 담당자 검토로 이관",
+                    ),
+                ),
+            ),
+            "외교": (
+                (
+                    "treaty-diplomatic-document-source-check",
+                    "조약·외교문서 출처 점검",
+                    "public-policy-evidence-pack",
+                    (
+                        "조약명·조약번호·당사국·서명일·비준일·발효일·언어·문서 버전을 분리",
+                        "외교부 조약정보 안내(https://www.mofa.go.kr/www/wpge/m_24251/contents.do)와 조약정보시스템(https://treatyweb.mofa.go.kr/) 공식 URL·문서 식별자·공표일·조회일·개정 또는 종료 상태와 상충·미수집 근거를 구분",
+                        "조약의 효력·법적 해석·외교적 입장·국제법 판단은 외교부와 법무 담당자 검토로 이관",
+                    ),
+                ),
+                (
+                    "overseas-safety-country-brief",
+                    "해외안전 국가 브리프",
+                    "public-policy-evidence-pack",
+                    (
+                        "국가·지역·여행경보 단계·안전공지 유형·기준일·긴급 연락처를 분리",
+                        "외교부 해외안전여행 공식 URL·공표일·조회일·갱신 상태와 상충·미수집 근거를 구분",
+                        "여행·철수·대피·영사조력·현장 긴급대응 판단은 외교부와 관할 공관으로 이관",
+                    ),
+                ),
+            ),
+            "통일": (
+                (
+                    "inter-korean-policy-timeline-evidence-pack",
+                    "남북관계 정책연표 근거 팩",
+                    "public-policy-evidence-pack",
+                    (
+                        "사건·정책·행위주체·공식문서·발생일·공표일·진행 상태를 연표 항목별 분리",
+                        "통일부 공식 URL·문서 식별자·공표일·조회일·문서 버전과 상충·미수집 근거를 구분",
+                        "정부 공식입장·법적 또는 정치적 평가·관계 전망 판단은 통일부와 담당 연구자 검토로 이관",
+                    ),
+                ),
+                (
+                    "dmz-policy-source-brief",
+                    "DMZ 정책 출처 브리프",
+                    "public-policy-evidence-pack",
+                    (
+                        "지역·시설·사업·적용 규정·출입 조건·기준일·운영 상태를 분리",
+                        "통일부와 관계기관 공식 URL·문서 식별자·공표일·조회일·개정 상태와 근거 공백을 구분",
+                        "출입 승인·군사보안·현장 운영·환경 또는 법적 판단은 관할 기관과 담당자 검토로 이관",
+                    ),
+                ),
+            ),
+        }
+        by_domain = {item["domain"]: item for item in self.data["domains"]}
+        for domain_name, contracts in expected.items():
+            with self.subTest(domain=domain_name):
+                domain = by_domain[domain_name]
+                self.assertEqual(3, len(domain["skills"]))
+                for skill_name, title, capability, task_checks in contracts:
+                    skill = next(item for item in domain["skills"] if item["name"] == skill_name)
+                    self.assertEqual(title, skill["title"])
+                    self.assertEqual(capability, skill["capability"])
+                    self.assertEqual("additional", skill["role"])
+                    self.assertEqual([], skill["reference_skills"])
+                    self.assertEqual("draft-only", skill["boundary"])
+                    self.assertEqual(task_checks, tuple(skill["task_checks"]))
+
+    def test_wave_seven_contract_mutations_fail_closed(self) -> None:
+        protected = {
+            "관세": (
+                "customs-origin-document-precheck",
+                "customs-trade-statistics-brief",
+            ),
+            "외교": (
+                "treaty-diplomatic-document-source-check",
+                "overseas-safety-country-brief",
+            ),
+            "통일": (
+                "inter-korean-policy-timeline-evidence-pack",
+                "dmz-policy-source-brief",
+            ),
+        }
+        mutation_count = 0
+        for domain_name, skill_names in protected.items():
+            for skill_name in skill_names:
+                for mutation in (
+                    "title",
+                    "capability",
+                    "role",
+                    "references",
+                    "boundary",
+                    "task-check-replacement",
+                    "task-check-delete",
+                    "task-check-append",
+                    "task-check-reorder",
+                    "task-check-empty",
+                ):
+                    mutation_count += 1
+                    with self.subTest(domain=domain_name, skill=skill_name, mutation=mutation):
+                        changed = copy.deepcopy(self.data)
+                        by_domain = {item["domain"]: item for item in changed["domains"]}
+                        skill = next(
+                            item for item in by_domain[domain_name]["skills"] if item["name"] == skill_name
+                        )
+                        if mutation == "title":
+                            skill["title"] = "다른 제목"
+                        elif mutation == "capability":
+                            skill["capability"] = "official-source-research"
+                        elif mutation == "role":
+                            skill["role"] = "primary"
+                        elif mutation == "references":
+                            skill["reference_skills"] = ["korean-law-search"]
+                        elif mutation == "boundary":
+                            skill["boundary"] = "manual-review-only"
+                        elif mutation == "task-check-replacement":
+                            skill["task_checks"][0] = "자동 판단을 허용"
+                        elif mutation == "task-check-delete":
+                            skill["task_checks"].pop(0)
+                        elif mutation == "task-check-append":
+                            skill["task_checks"].append("자동 제출")
+                        elif mutation == "task-check-reorder":
+                            skill["task_checks"].reverse()
+                        else:
+                            skill["task_checks"] = []
+                        errors = validate(changed, ROOT)
+                        self.assertIn(f"{domain_name}/{skill_name}: wave-seven contract mismatch", errors)
+
+        for domain_name, skill_names in protected.items():
+            for skill_name in skill_names:
+                mutation_count += 1
+                with self.subTest(domain=domain_name, skill=skill_name, mutation="cross-domain"):
+                    changed = copy.deepcopy(self.data)
+                    by_domain = {item["domain"]: item for item in changed["domains"]}
+                    index = next(
+                        index
+                        for index, item in enumerate(by_domain[domain_name]["skills"])
+                        if item["name"] == skill_name
+                    )
+                    moved = by_domain[domain_name]["skills"].pop(index)
+                    by_domain["세무"]["skills"].append(moved)
+                    errors = validate(changed, ROOT)
+                    self.assertIn(
+                        f"{domain_name}: requires at least 3 Skills in minimum-three rollout, got 2",
+                        errors,
+                    )
+        for mutation in (
+            "service",
+            "credential_class",
+            "proxy_mode",
+            "side_effect_class",
+            "manual_handoff_gate",
+            "source_provenance",
+            "execution_status",
+            "live_smoke",
+        ):
+            mutation_count += 1
+            with self.subTest(capability="regulated-trade-procedure-precheck", mutation=mutation):
+                changed = copy.deepcopy(self.data)
+                capability = next(
+                    item
+                    for item in changed["shared_capabilities"]
+                    if item["slug"] == "regulated-trade-procedure-precheck"
+                )
+                replacements = {
+                    "service": "다른 서비스",
+                    "credential_class": "operator-held",
+                    "proxy_mode": "required",
+                    "side_effect_class": "read-only",
+                    "manual_handoff_gate": "자동 승인",
+                    "source_provenance": ["https://example.org/"],
+                    "execution_status": "planned",
+                    "live_smoke": "blocked",
+                }
+                capability[mutation] = replacements[mutation]
+                errors = validate(changed, ROOT)
+                self.assertIn(
+                    "regulated-trade-procedure-precheck: wave-seven capability contract mismatch",
+                    errors,
+                )
+        self.assertEqual(74, mutation_count)
+
     def test_unknown_capability_is_rejected(self) -> None:
         changed = copy.deepcopy(self.data)
         changed["domains"][0]["skills"][0]["capability"] = "unknown-capability"
@@ -1056,11 +1253,11 @@ class CatalogContractTest(unittest.TestCase):
         current = (ROOT / "docs/domain-skill-candidates.md").read_text(encoding="utf-8")
         self.assertEqual(render_catalog(self.data), current)
         self.assertIn("전체 domain: **60개**", current)
-        self.assertIn("domain-owned Skill: **132개**", current)
+        self.assertIn("domain-owned Skill: **138개**", current)
 
     def test_generated_domain_skills_match_catalog(self) -> None:
         expected = expected_domain_skills(self.data, ROOT)
-        self.assertEqual(132, len(expected))
+        self.assertEqual(138, len(expected))
         for path, content in expected.items():
             self.assertEqual(content, path.read_text(encoding="utf-8"))
 
@@ -1104,7 +1301,7 @@ class CatalogContractTest(unittest.TestCase):
             capture_output=True,
             text=True,
         )
-        self.assertIn("domains=60 domain_skills=132 capabilities=21 top_level_skills=0", result.stdout)
+        self.assertIn("domains=60 domain_skills=138 capabilities=22 top_level_skills=0", result.stdout)
 
 
 if __name__ == "__main__":

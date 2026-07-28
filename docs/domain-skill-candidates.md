@@ -7,12 +7,12 @@
 ## 요약
 
 - 전체 domain: **60개**
-- domain-owned Skill: **132개** (primary 60 / additional 72)
+- domain-owned Skill: **138개** (primary 60 / additional 78)
 - 직접 reference 확인: **35개**
 - 인접 capability 활용: **16개**
 - 신규 설계 필요: **8개**
 - 민감업무 제한: **1개**
-- 내부 공통 capability: **21개**
+- 내부 공통 capability: **22개**
 - Domain Skill의 live 검증 상태는 연결된 capability manifest보다 강하게 주장하지 않습니다.
 
 ## Evidence 등급
@@ -49,6 +49,7 @@
 | `official-notice-multilingual-translation-review` | `none` | `none` | `draft-only` | `fixture-verified` | `not-run` |
 | `patent-prior-art-evidence-pack` | `none` | `none` | `read-only` | `fixture-verified` | `not-run` |
 | `public-records-lifecycle-review` | `none` | `none` | `draft-only` | `fixture-verified` | `not-run` |
+| `regulated-trade-procedure-precheck` | `none` | `none` | `draft-only` | `fixture-verified` | `not-run` |
 
 ## 국가운영
 
@@ -76,6 +77,8 @@
 | 세무 | `direct` | `additional` | 세정 정책 근거 묶음 | `tax-policy-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
 | 세무 | `direct` | `additional` | 세무 공문서 HWPX 검토 | `tax-document-hwpx-review` | `public-document-hwpx` | — | `draft-only` |
 | 관세 | `new` | `primary` | HS 품목·관세율 조사 | `tariff-hs-code-research` | `official-source-research` | — | `read-only` |
+| 관세 | `new` | `additional` | 원산지 증빙서류 사전점검 | `customs-origin-document-precheck` | `regulated-trade-procedure-precheck` | — | `draft-only` |
+| 관세 | `new` | `additional` | 관세 무역통계 브리프 | `customs-trade-statistics-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 감사 | `adjacent` | `primary` | 감사 증빙 교차검증 | `audit-evidence-cross-check` | `official-source-research` | `biz-health-check`, `g2b-sanctioned-supplier` | `draft-only` |
 | 감사 | `adjacent` | `additional` | 감사 지적사항 답변 초안 검토 | `audit-finding-response-draft-review` | `administrative-document-draft-review` | — | `draft-only` |
 | 감사 | `adjacent` | `additional` | 감사 조치계획 근거 검토 | `audit-action-plan-evidence-review` | `administrative-document-draft-review` | — | `draft-only` |
@@ -86,7 +89,11 @@
 | 조달 | `direct` | `additional` | AI 제품 조달 준비도 점검 | `ai-product-procurement-readiness-check` | `public-procurement-research` | — | `draft-only` |
 | 조달 | `direct` | `additional` | 조달 규격서 HWPX 검토 | `procurement-specification-hwpx-review` | `public-document-hwpx` | — | `draft-only` |
 | 외교 | `new` | `primary` | 공식 국가·외교 브리프 | `official-country-brief` | `official-source-research` | — | `draft-only` |
+| 외교 | `new` | `additional` | 조약·외교문서 출처 점검 | `treaty-diplomatic-document-source-check` | `public-policy-evidence-pack` | — | `draft-only` |
+| 외교 | `new` | `additional` | 해외안전 국가 브리프 | `overseas-safety-country-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 통일 | `new` | `primary` | 북한·통일정책 공식자료 검색 | `unification-policy-source-search` | `official-source-research` | — | `read-only` |
+| 통일 | `new` | `additional` | 남북관계 정책연표 근거 팩 | `inter-korean-policy-timeline-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
+| 통일 | `new` | `additional` | DMZ 정책 출처 브리프 | `dmz-policy-source-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 선거관리 | `direct` | `primary` | 지방선거 후보자 조회 | `local-election-candidate-lookup` | `official-source-research` | `local-election-candidate-search` | `read-only` |
 | 선거관리 | `direct` | `additional` | 선거법·절차 근거 검토 | `election-law-procedure-evidence-review` | `public-policy-evidence-pack` | — | `draft-only` |
 | 선거관리 | `direct` | `additional` | 선거결과 통계 근거 브리프 | `election-result-statistics-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |

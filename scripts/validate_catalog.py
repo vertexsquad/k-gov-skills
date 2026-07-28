@@ -64,6 +64,9 @@ MINIMUM_THREE_DOMAINS = {
     "선거관리",
     "특허",
     "사이버보안",
+    "관세",
+    "외교",
+    "통일",
 }
 WAVE_ONE_TASK_CHECKS = {
     "national-subsidy-project-evidence-review": (
@@ -526,6 +529,92 @@ WAVE_SIX_SKILL_CONTRACTS = {
         },
     ),
 }
+WAVE_SEVEN_SKILL_CONTRACTS = {
+    "관세": (
+        {
+            "name": "customs-origin-document-precheck",
+            "title": "원산지 증빙서류 사전점검",
+            "capability": "regulated-trade-procedure-precheck",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "거래·품목·HS 코드·협정·원산지 기준·증빙서류·기준시점을 분리",
+                "관세청·UNI-PASS·FTA 포털 공식 URL·문서 식별자·발급 또는 조회일·유효기간과 누락·상충 근거를 구분",
+                "원산지 판정·특혜관세 적용·신고·제출·통관·제재 판단은 관세사와 세관 담당자 검토로 이관",
+            ),
+        },
+        {
+            "name": "customs-trade-statistics-brief",
+            "title": "관세 무역통계 브리프",
+            "capability": "public-policy-evidence-pack",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "기준기간·수출입 구분·상대국·HS 코드·수량·금액·단위·정정 상태를 분리",
+                "관세청 무역통계 공식 URL·통계표 또는 품목 식별자·공표일·조회일·잠정 또는 확정 상태와 결측·개정을 구분",
+                "추세·인과관계·정책효과·세율 또는 통관 판단은 관세 통계 담당자 검토로 이관",
+            ),
+        },
+    ),
+    "외교": (
+        {
+            "name": "treaty-diplomatic-document-source-check",
+            "title": "조약·외교문서 출처 점검",
+            "capability": "public-policy-evidence-pack",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "조약명·조약번호·당사국·서명일·비준일·발효일·언어·문서 버전을 분리",
+                "외교부 조약정보 안내(https://www.mofa.go.kr/www/wpge/m_24251/contents.do)와 조약정보시스템(https://treatyweb.mofa.go.kr/) 공식 URL·문서 식별자·공표일·조회일·개정 또는 종료 상태와 상충·미수집 근거를 구분",
+                "조약의 효력·법적 해석·외교적 입장·국제법 판단은 외교부와 법무 담당자 검토로 이관",
+            ),
+        },
+        {
+            "name": "overseas-safety-country-brief",
+            "title": "해외안전 국가 브리프",
+            "capability": "public-policy-evidence-pack",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "국가·지역·여행경보 단계·안전공지 유형·기준일·긴급 연락처를 분리",
+                "외교부 해외안전여행 공식 URL·공표일·조회일·갱신 상태와 상충·미수집 근거를 구분",
+                "여행·철수·대피·영사조력·현장 긴급대응 판단은 외교부와 관할 공관으로 이관",
+            ),
+        },
+    ),
+    "통일": (
+        {
+            "name": "inter-korean-policy-timeline-evidence-pack",
+            "title": "남북관계 정책연표 근거 팩",
+            "capability": "public-policy-evidence-pack",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "사건·정책·행위주체·공식문서·발생일·공표일·진행 상태를 연표 항목별 분리",
+                "통일부 공식 URL·문서 식별자·공표일·조회일·문서 버전과 상충·미수집 근거를 구분",
+                "정부 공식입장·법적 또는 정치적 평가·관계 전망 판단은 통일부와 담당 연구자 검토로 이관",
+            ),
+        },
+        {
+            "name": "dmz-policy-source-brief",
+            "title": "DMZ 정책 출처 브리프",
+            "capability": "public-policy-evidence-pack",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "지역·시설·사업·적용 규정·출입 조건·기준일·운영 상태를 분리",
+                "통일부와 관계기관 공식 URL·문서 식별자·공표일·조회일·개정 상태와 근거 공백을 구분",
+                "출입 승인·군사보안·현장 운영·환경 또는 법적 판단은 관할 기관과 담당자 검토로 이관",
+            ),
+        },
+    ),
+}
 WAVE_TWO_CAPABILITY_CONTRACTS = {
     "public-records-lifecycle-review": {
         "service": "공공기록물 분류·보존기간·이관·폐기 검토 admission",
@@ -534,6 +623,21 @@ WAVE_TWO_CAPABILITY_CONTRACTS = {
         "side_effect_class": "draft-only",
         "manual_handoff_gate": "보존기간 확정·평가·이관·폐기·원본 변경은 기록물관리 담당자 승인",
         "source_provenance": ("https://www.archives.go.kr/", "https://www.law.go.kr/"),
+        "execution_status": "fixture-verified",
+        "live_smoke": "not-run",
+    }
+}
+WAVE_SEVEN_CAPABILITY_CONTRACTS = {
+    "regulated-trade-procedure-precheck": {
+        "service": "관세 원산지·통관 증빙서류 사전점검 admission",
+        "credential_class": "none",
+        "proxy_mode": "none",
+        "side_effect_class": "draft-only",
+        "manual_handoff_gate": "원산지 판정·특혜관세 적용·신고·제출·통관·제재 판단은 관세사와 세관 담당자가 승인",
+        "source_provenance": (
+            "https://www.customs.go.kr/ftaportalkor/main.do",
+            "https://unipass.customs.go.kr/csp/index.do",
+        ),
         "execution_status": "fixture-verified",
         "live_smoke": "not-run",
     }
@@ -615,8 +719,8 @@ def _validate_capabilities(
     if not isinstance(raw_capabilities, list):
         errors.append("shared_capabilities must be a list")
         return set(), {}
-    if len(raw_capabilities) != 21:
-        errors.append(f"catalog must contain 21 shared capabilities, got {len(raw_capabilities)}")
+    if len(raw_capabilities) != 22:
+        errors.append(f"catalog must contain 22 shared capabilities, got {len(raw_capabilities)}")
     slugs: set[str] = set()
     by_slug: dict[str, dict[str, Any]] = {}
     for index, capability in enumerate(raw_capabilities):
@@ -651,20 +755,24 @@ def _validate_capabilities(
             errors.append(f"{slug}: live-verified requires live_smoke=passed")
         if capability["live_smoke"] == "passed" and capability["execution_status"] != "live-verified":
             errors.append(f"{slug}: live_smoke=passed requires live-verified")
-        wave_two_capability = WAVE_TWO_CAPABILITY_CONTRACTS.get(slug)
-        if wave_two_capability is not None:
+        for contract, label in (
+            (WAVE_TWO_CAPABILITY_CONTRACTS.get(slug), "wave-two"),
+            (WAVE_SEVEN_CAPABILITY_CONTRACTS.get(slug), "wave-seven"),
+        ):
+            if contract is None:
+                continue
             contract_matches = all(
                 capability.get(key) == value
-                for key, value in wave_two_capability.items()
+                for key, value in contract.items()
                 if key != "source_provenance"
             )
             contract_matches = (
                 contract_matches
                 and tuple(capability.get("source_provenance") or ())
-                == wave_two_capability["source_provenance"]
+                == contract["source_provenance"]
             )
             if not contract_matches:
-                errors.append(f"{slug}: wave-two capability contract mismatch")
+                errors.append(f"{slug}: {label} capability contract mismatch")
         provenance = capability["source_provenance"]
         if not isinstance(provenance, list) or not provenance or not all(
             isinstance(url, str) and url.startswith("https://") for url in provenance
@@ -793,6 +901,17 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
                 errors.append(f"{domain}/{expected_name}: wave-six contract mismatch")
             elif not _skill_contract_matches(matches[0], wave_six_contract):
                 errors.append(f"{domain}/{expected_name}: wave-six contract mismatch")
+        for wave_seven_contract in WAVE_SEVEN_SKILL_CONTRACTS.get(domain, ()):
+            expected_name = wave_seven_contract["name"]
+            matches = [
+                skill
+                for skill in skills
+                if isinstance(skill, dict) and skill.get("name") == expected_name
+            ]
+            if len(matches) != 1:
+                errors.append(f"{domain}/{expected_name}: wave-seven contract mismatch")
+            elif not _skill_contract_matches(matches[0], wave_seven_contract):
+                errors.append(f"{domain}/{expected_name}: wave-seven contract mismatch")
         total_skills += len(skills)
         primary_count = sum(isinstance(skill, dict) and skill.get("role") == "primary" for skill in skills)
         if primary_count != 1:
@@ -860,8 +979,8 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
                     errors.append(f"{domain}: sensitive evidence requires manual-review-only")
             declared_entrypoints.add(Path("domains") / domain / "skills" / name / "SKILL.md")
 
-    if total_skills != 132:
-        errors.append(f"catalog must declare 132 domain Skills, got {total_skills}")
+    if total_skills != 138:
+        errors.append(f"catalog must declare 138 domain Skills, got {total_skills}")
     domains_root = root / "domains"
     actual_domains = {path.name for path in domains_root.iterdir() if path.is_dir()} if domains_root.is_dir() else set()
     if actual_domains != seen_domains:
