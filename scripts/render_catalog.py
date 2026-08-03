@@ -34,6 +34,8 @@ def load_catalog(path: Path) -> dict[str, Any]:
 
 def render_catalog(data: dict[str, Any]) -> str:
     domains = data["domains"]
+    target = data["target_skills_per_domain"]
+    enforced_minimums = data["enforced_minimum_skills_by_domain"]
     counts = Counter(item["evidence"] for item in domains)
     skills = [skill for domain in domains for skill in domain["skills"]]
     role_counts = Counter(skill["role"] for skill in skills)
@@ -48,6 +50,10 @@ def render_catalog(data: dict[str, Any]) -> str:
         "",
         f"- 전체 domain: **{len(domains)}개**",
         f"- domain-owned Skill: **{len(skills)}개** (primary {role_counts['primary']} / additional {role_counts['additional']})",
+        f"- domain별 목표 Skill: **최소 {target}개**",
+        f"- 목표 충족 domain: **{sum(len(item['skills']) >= target for item in domains)}/{len(domains)}개**",
+        "- 단계적 enforcement는 catalog의 `enforced_minimum_skills_by_domain`을 따릅니다.",
+        f"- 현재 enforcement 합계: **{sum(enforced_minimums.values())}개**",
         f"- 직접 reference 확인: **{counts['direct']}개**",
         f"- 인접 capability 활용: **{counts['adjacent']}개**",
         f"- 신규 설계 필요: **{counts['new']}개**",

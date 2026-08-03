@@ -38,36 +38,127 @@ PROXY_MODES = {"none", "optional", "required", "mixed"}
 SIDE_EFFECT_CLASSES = {"read-only", "document-read", "draft-only"}
 EXECUTION_STATUSES = {"planned", "fixture-verified", "live-verified", "blocked"}
 LIVE_SMOKE_STATUSES = {"not-run", "passed", "failed", "blocked"}
-MINIMUM_THREE_DOMAINS = {
-    "재정",
-    "감사",
-    "출입국",
-    "경찰",
-    "재난안전",
-    "교육행정",
-    "사회복지",
-    "고용노동",
-    "토목시설",
-    "건축",
-    "전산",
-    "기록관리",
-    "지방의회",
-    "입법",
-    "교육",
-    "국토교통",
-    "사법",
-    "보건의료",
-    "식품의약",
-    "통계",
-    "소방",
-    "과학기술",
-    "선거관리",
-    "특허",
-    "사이버보안",
-    "관세",
-    "외교",
-    "통일",
-}
+TARGET_SKILLS_PER_DOMAIN = 5
+SOCIAL_SERVICE_MINIMUM_FIVE_SKILLS = {'교육': {'education-civil-complaint-triage-draft': {'name': 'education-civil-complaint-triage-draft',
+                                                   'title': '교육 민원 분류·답변 초안',
+                                                   'capability': 'civil-complaint-triage-draft',
+                                                   'role': 'additional',
+                                                   'reference_skills': (),
+                                                   'boundary': 'draft-only',
+                                                   'task_checks': ('민원 목적·대상기관·학교급·요청사항·처리기한을 비식별 상태로 분리',
+                                                                   '교육부·교육청·국가법령정보 공식 URL·조회일·문서 버전과 근거 공백을 보존',
+                                                                   '소관 확정·학생 또는 학교 판단·처분·답변 발송은 교육 담당자 승인으로 이관')},
+        'education-policy-evidence-pack': {'name': 'education-policy-evidence-pack',
+                                           'title': '교육정책 근거 팩',
+                                           'capability': 'public-policy-evidence-pack',
+                                           'role': 'additional',
+                                           'reference_skills': (),
+                                           'boundary': 'draft-only',
+                                           'task_checks': ('정책 대상·적용기관·시행시점·주장·평가지표를 분리',
+                                                           '교육부·교육청·법령·KOSIS 공식 URL·조회일·문서 버전과 상충·미수집 근거를 구분',
+                                                           '정책 효과·학교별 적용·자원배분·문서 결재와 발송은 교육 담당자 승인으로 이관')}},
+ '교육행정': {'education-records-disclosure-redaction-review': {'name': 'education-records-disclosure-redaction-review',
+                                                            'title': '교육기록 정보공개·마스킹 검토',
+                                                            'capability': 'public-record-disclosure-redaction-review',
+                                                            'role': 'additional',
+                                                            'reference_skills': (),
+                                                            'boundary': 'draft-only',
+                                                            'task_checks': ('학생·보호자·교직원 기록의 문서유형·정보항목·청구범위·부분공개 후보를 '
+                                                                            '분리',
+                                                                            '개인정보 원문을 저장하지 않고 공식 정보공개·기록관리 법령 '
+                                                                            'URL·조회일·버전과 마스킹 근거를 보존',
+                                                                            '비공개 사유·공개 범위·원문 마스킹·공개 결정은 정보공개 담당자 승인으로 '
+                                                                            '이관')},
+          'education-records-lifecycle-review': {'name': 'education-records-lifecycle-review',
+                                                 'title': '교육기록 생애주기 검토',
+                                                 'capability': 'public-records-lifecycle-review',
+                                                 'role': 'additional',
+                                                 'reference_skills': (),
+                                                 'boundary': 'draft-only',
+                                                 'task_checks': ('교육기록의 유형·업무기능·보존기산점·보존기간·이관 또는 폐기 후보를 분리',
+                                                                 '국가기록원·교육부·법령 공식 URL·조회일·기준 버전과 근거 공백을 보존',
+                                                                 '보존기간 확정·평가·이관·폐기·원본 변경은 기록물관리 담당자 승인으로 이관')}},
+ '사회복지': {'welfare-policy-statistics-brief': {'name': 'welfare-policy-statistics-brief',
+                                              'title': '복지정책 통계 근거 브리프',
+                                              'capability': 'kosis-official-statistics',
+                                              'role': 'additional',
+                                              'reference_skills': (),
+                                              'boundary': 'draft-only',
+                                              'task_checks': ('복지 지표의 급여·서비스·지역·기간·대상 집단·분모·단위를 분리',
+                                                              'KOSIS 통계표 코드·작성기관·수록기간·조회일·개정 상태와 결측을 보존',
+                                                              '수급자격·지급액·정책효과·자원배분 판단은 복지 담당기관 검토로 이관')},
+          'welfare-administrative-document-draft-review': {'name': 'welfare-administrative-document-draft-review',
+                                                           'title': '복지행정 문서 초안 검토',
+                                                           'capability': 'administrative-document-draft-review',
+                                                           'role': 'additional',
+                                                           'reference_skills': (),
+                                                           'boundary': 'draft-only',
+                                                           'task_checks': ('복지사업 안내·검토보고·회의자료별 목적·대상·근거·미확정 항목을 분리',
+                                                                           '신청인 개인정보 원문을 제외하고 공식 법령·사업안내 URL·조회일·문서 '
+                                                                           '버전을 보존',
+                                                                           '수급자격·지급액·기관 서식 확정·결재·발송은 복지 담당자 승인으로 '
+                                                                           '이관')}},
+ '고용노동': {'labor-law-citation-evidence-review': {'name': 'labor-law-citation-evidence-review',
+                                                 'title': '노동법 인용 근거 검토',
+                                                 'capability': 'korean-legal-citation-verification',
+                                                 'role': 'additional',
+                                                 'reference_skills': (),
+                                                 'boundary': 'draft-only',
+                                                 'task_checks': ('법령·조문·시행일·사건 또는 행정해석 후보·기준시점을 분리',
+                                                                 '국가법령정보 공식 URL·조문·시행일·인용문과 조회일을 보존',
+                                                                 '근로자성·위법성·산재 인정·법률 해석·최종 인용은 노동·법무 담당자 승인으로 이관')},
+          'workplace-safety-policy-evidence-pack': {'name': 'workplace-safety-policy-evidence-pack',
+                                                    'title': '사업장 안전정책 근거 팩',
+                                                    'capability': 'public-policy-evidence-pack',
+                                                    'role': 'additional',
+                                                    'reference_skills': (),
+                                                    'boundary': 'draft-only',
+                                                    'task_checks': ('업종·작업·위험요인·통제조치·교육·점검·증빙 공백을 분리',
+                                                                    '고용노동부·안전보건공단·법령 공식 URL·조회일·문서 버전과 상충 근거를 구분',
+                                                                    '사업장 위험도·작업중지·산재 인정·제재·계획 승인은 안전보건 담당자 검토로 이관')}},
+ '보건의료': {'healthcare-civil-complaint-triage-draft': {'name': 'healthcare-civil-complaint-triage-draft',
+                                                      'title': '보건의료 민원 분류·답변 초안',
+                                                      'capability': 'civil-complaint-triage-draft',
+                                                      'role': 'additional',
+                                                      'reference_skills': (),
+                                                      'boundary': 'draft-only',
+                                                      'task_checks': ('시설·급여·예방·민원 유형과 요청사항·소관 후보를 비식별 상태로 분리',
+                                                                      '환자 개인정보·증상 원문을 저장하지 않고 복지부·질병청·건보공단 공식 '
+                                                                      'URL·조회일·버전을 보존',
+                                                                      '진단·치료·급여·응급도·소관 확정·답변 발송은 의료전문가와 담당기관 승인으로 '
+                                                                      '이관')},
+          'healthcare-public-notice-multilingual-review': {'name': 'healthcare-public-notice-multilingual-review',
+                                                           'title': '보건의료 공지 다국어 검토',
+                                                           'capability': 'official-notice-multilingual-translation-review',
+                                                           'role': 'additional',
+                                                           'reference_skills': (),
+                                                           'boundary': 'draft-only',
+                                                           'task_checks': ('공지 대상·언어·시행일·의료 또는 행정 용어·행동요령을 문장 단위로 분리',
+                                                                           '공식 원문 URL·공표일·조회일·문서 버전과 번역상 미확정 용어를 보존',
+                                                                           '의학적 의미·공식 용어·언어별 감수·게시·발송은 보건의료 담당자와 전문 '
+                                                                           '감수자 승인으로 이관')}},
+ '식품의약': {'food-drug-labeling-guidance-evidence-review': {'name': 'food-drug-labeling-guidance-evidence-review',
+                                                          'title': '식품·의약 표시기준 근거 검토',
+                                                          'capability': 'public-policy-evidence-pack',
+                                                          'role': 'additional',
+                                                          'reference_skills': (),
+                                                          'boundary': 'draft-only',
+                                                          'task_checks': ('제품유형·원재료·알레르기·표시항목·적용기준·시행일을 주장 단위로 분리',
+                                                                          '식약처·국가법령정보 공식 URL·조회일·고시 또는 안내서 버전과 상충·미수집 '
+                                                                          '근거를 구분',
+                                                                          '표시 적합성·위반·회수·행정처분·법적 적용 판단은 식품의약 담당자 검토로 '
+                                                                          '이관')},
+          'food-drug-public-notice-multilingual-review': {'name': 'food-drug-public-notice-multilingual-review',
+                                                          'title': '식품·의약 공지 다국어 검토',
+                                                          'capability': 'official-notice-multilingual-translation-review',
+                                                          'role': 'additional',
+                                                          'reference_skills': (),
+                                                          'boundary': 'draft-only',
+                                                          'task_checks': ('공지 대상·제품 또는 품목·언어·시행일·주의사항·행동요령을 문장 단위로 분리',
+                                                                          '식약처 공식 원문 URL·공표일·조회일·문서 버전과 번역상 미확정 용어를 '
+                                                                          '보존',
+                                                                          '안전성·법적 의미·공식 용어·언어별 감수·게시·발송은 식품의약 담당자와 전문 '
+                                                                          '감수자 승인으로 이관')}}}
 WAVE_ONE_TASK_CHECKS = {
     "national-subsidy-project-evidence-review": (
         "사업·회계연도·소관기관·지원 근거를 주장 단위로 분리",
@@ -680,6 +771,8 @@ def _validate_instructions(root: Path, errors: list[str]) -> None:
                 "domains/<domain>/skills/<unique-slug>/SKILL.md",
                 "top-level `skills/`",
                 "catalog/domain-skills.json",
+                "target_skills_per_domain",
+                "enforced_minimum_skills_by_domain",
                 "python3 scripts/check.py",
                 "비밀값",
                 "명시적 승인",
@@ -691,6 +784,7 @@ def _validate_instructions(root: Path, errors: list[str]) -> None:
                 "CLAUDE.md",
                 "domains/<domain>/skills/",
                 "top-level `skills/`",
+                "target_skills_per_domain",
                 "python3 scripts/check.py",
             ),
         },
@@ -801,8 +895,15 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
     errors: list[str] = []
     if not isinstance(data, dict):
         return ["catalog root must be a JSON object"]
-    if data.get("schema_version") != 4:
-        errors.append("schema_version must be 4")
+    if data.get("schema_version") != 5:
+        errors.append("schema_version must be 5")
+    target_skills = data.get("target_skills_per_domain")
+    if type(target_skills) is not int or target_skills != TARGET_SKILLS_PER_DOMAIN:
+        errors.append("target_skills_per_domain must be integer 5")
+    enforced_minimums = data.get("enforced_minimum_skills_by_domain")
+    if not isinstance(enforced_minimums, dict):
+        errors.append("enforced_minimum_skills_by_domain must be an object")
+        enforced_minimums = {}
     domains = data.get("domains")
     if not isinstance(domains, list):
         return errors + ["domains must be a list"]
@@ -839,9 +940,16 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
         if not isinstance(skills, list) or not skills:
             errors.append(f"{domain}: skills must be a non-empty list")
             continue
-        if domain in MINIMUM_THREE_DOMAINS and len(skills) < 3:
+        enforced_minimum = enforced_minimums.get(domain)
+        if (
+            type(enforced_minimum) is not int
+            or not 1 <= enforced_minimum <= TARGET_SKILLS_PER_DOMAIN
+        ):
+            errors.append(f"{domain}: invalid enforced minimum {enforced_minimum!r}")
+        elif len(skills) < enforced_minimum:
             errors.append(
-                f"{domain}: requires at least 3 Skills in minimum-three rollout, got {len(skills)}"
+                f"{domain}: requires at least {enforced_minimum} Skills in minimum-five rollout, "
+                f"got {len(skills)}"
             )
         wave_two_contract = WAVE_TWO_SKILL_CONTRACTS.get(domain)
         if wave_two_contract is not None:
@@ -912,6 +1020,15 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
                 errors.append(f"{domain}/{expected_name}: wave-seven contract mismatch")
             elif not _skill_contract_matches(matches[0], wave_seven_contract):
                 errors.append(f"{domain}/{expected_name}: wave-seven contract mismatch")
+        expected_social_skills = SOCIAL_SERVICE_MINIMUM_FIVE_SKILLS.get(domain, {})
+        for expected_name, expected_contract in expected_social_skills.items():
+            matches = [
+                skill
+                for skill in skills
+                if isinstance(skill, dict) and skill.get("name") == expected_name
+            ]
+            if len(matches) != 1 or not _skill_contract_matches(matches[0], expected_contract):
+                errors.append(f"{domain}/{expected_name}: social-services minimum-five contract mismatch")
         total_skills += len(skills)
         primary_count = sum(isinstance(skill, dict) and skill.get("role") == "primary" for skill in skills)
         if primary_count != 1:
@@ -979,8 +1096,12 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
                     errors.append(f"{domain}: sensitive evidence requires manual-review-only")
             declared_entrypoints.add(Path("domains") / domain / "skills" / name / "SKILL.md")
 
-    if total_skills != 138:
-        errors.append(f"catalog must declare 138 domain Skills, got {total_skills}")
+    minimum_domains = set(enforced_minimums)
+    if minimum_domains != seen_domains:
+        errors.append(
+            "minimum Skill map/domain mismatch "
+            f"missing={sorted(seen_domains - minimum_domains)} extra={sorted(minimum_domains - seen_domains)}"
+        )
     domains_root = root / "domains"
     actual_domains = {path.name for path in domains_root.iterdir() if path.is_dir()} if domains_root.is_dir() else set()
     if actual_domains != seen_domains:

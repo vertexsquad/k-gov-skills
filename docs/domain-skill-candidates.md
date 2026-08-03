@@ -7,7 +7,11 @@
 ## 요약
 
 - 전체 domain: **60개**
-- domain-owned Skill: **138개** (primary 60 / additional 78)
+- domain-owned Skill: **150개** (primary 60 / additional 90)
+- domain별 목표 Skill: **최소 5개**
+- 목표 충족 domain: **9/60개**
+- 단계적 enforcement는 catalog의 `enforced_minimum_skills_by_domain`을 따릅니다.
+- 현재 enforcement 합계: **142개**
 - 직접 reference 확인: **35개**
 - 인접 capability 활용: **16개**
 - 신규 설계 필요: **8개**
@@ -140,21 +144,33 @@
 | 교육 | `direct` | `primary` | 교육 공공데이터·장학 조회 | `education-public-data-search` | `official-source-research` | `k-schoollunch-menu`, `korean-scholarship-search` | `read-only` |
 | 교육 | `direct` | `additional` | 교육통계 근거 브리프 | `education-statistics-brief` | `kosis-official-statistics` | — | `draft-only` |
 | 교육 | `direct` | `additional` | 학교 정책문서 검토 | `school-policy-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 교육 | `direct` | `additional` | 교육 민원 분류·답변 초안 | `education-civil-complaint-triage-draft` | `civil-complaint-triage-draft` | — | `draft-only` |
+| 교육 | `direct` | `additional` | 교육정책 근거 팩 | `education-policy-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
 | 교육행정 | `direct` | `primary` | 학교장터 공고·학교정보 조회 | `education-procurement-notice-search` | `public-procurement-research` | `s2b-notice-search`, `k-schoollunch-menu` | `read-only` |
 | 교육행정 | `direct` | `additional` | 교육행정 문서 초안 검토 | `education-administrative-document-draft-review` | `administrative-document-draft-review` | — | `draft-only` |
 | 교육행정 | `direct` | `additional` | 학교시설 안전계획 검토 | `school-facility-safety-plan-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 교육행정 | `direct` | `additional` | 교육기록 정보공개·마스킹 검토 | `education-records-disclosure-redaction-review` | `public-record-disclosure-redaction-review` | — | `draft-only` |
+| 교육행정 | `direct` | `additional` | 교육기록 생애주기 검토 | `education-records-lifecycle-review` | `public-records-lifecycle-review` | — | `draft-only` |
 | 사회복지 | `direct` | `primary` | 복지·연금·지원정보 조회 | `welfare-pension-support-search` | `welfare-health-safety-research` | `national-pension-workplace`, `donation-place-search`, `korean-scholarship-search` | `read-only` |
 | 사회복지 | `direct` | `additional` | 복지 민원 분류·답변 초안 | `welfare-civil-complaint-triage-draft` | `civil-complaint-triage-draft` | — | `draft-only` |
 | 사회복지 | `direct` | `additional` | 복지 자격요건 근거 사전점검 | `welfare-eligibility-evidence-check` | `public-policy-evidence-pack` | — | `draft-only` |
+| 사회복지 | `direct` | `additional` | 복지정책 통계 근거 브리프 | `welfare-policy-statistics-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 사회복지 | `direct` | `additional` | 복지행정 문서 초안 검토 | `welfare-administrative-document-draft-review` | `administrative-document-draft-review` | — | `draft-only` |
 | 고용노동 | `direct` | `primary` | 채용공고·노동법 조사 | `labor-job-law-research` | `official-source-research` | `job-posting-match`, `daangn-jobs-search`, `korean-law-search` | `read-only` |
 | 고용노동 | `direct` | `additional` | 고용노동 민원 분류·답변 초안 | `labor-civil-complaint-triage-draft` | `civil-complaint-triage-draft` | — | `draft-only` |
 | 고용노동 | `direct` | `additional` | 산업재해 통계 근거 브리프 | `industrial-accident-statistics-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 고용노동 | `direct` | `additional` | 노동법 인용 근거 검토 | `labor-law-citation-evidence-review` | `korean-legal-citation-verification` | — | `draft-only` |
+| 고용노동 | `direct` | `additional` | 사업장 안전정책 근거 팩 | `workplace-safety-policy-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
 | 보건의료 | `direct` | `primary` | 응급실·검진·장기요양기관 조회 | `healthcare-facility-search` | `welfare-health-safety-research` | `emergency-room-beds`, `nhis-care-checkup-search` | `read-only` |
 | 보건의료 | `direct` | `additional` | 보건의료 정책통계 브리프 | `healthcare-policy-statistics-brief` | `kosis-official-statistics` | — | `draft-only` |
 | 보건의료 | `direct` | `additional` | 급여기준 근거 팩 | `medical-benefit-criteria-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
+| 보건의료 | `direct` | `additional` | 보건의료 민원 분류·답변 초안 | `healthcare-civil-complaint-triage-draft` | `civil-complaint-triage-draft` | — | `draft-only` |
+| 보건의료 | `direct` | `additional` | 보건의료 공지 다국어 검토 | `healthcare-public-notice-multilingual-review` | `official-notice-multilingual-translation-review` | — | `draft-only` |
 | 식품의약 | `direct` | `primary` | 식품·의약 안전정보 확인 | `food-drug-safety-check` | `welfare-health-safety-research` | `mfds-food-safety`, `mfds-drug-safety` | `read-only` |
 | 식품의약 | `direct` | `additional` | 식품·의약품 회수 근거 브리프 | `food-drug-recall-evidence-brief` | `welfare-health-safety-research` | — | `draft-only` |
 | 식품의약 | `direct` | `additional` | 식품의약 규제고시 비교 검토 | `regulatory-notice-comparison-review` | `public-policy-evidence-pack` | — | `draft-only` |
+| 식품의약 | `direct` | `additional` | 식품·의약 표시기준 근거 검토 | `food-drug-labeling-guidance-evidence-review` | `public-policy-evidence-pack` | — | `draft-only` |
+| 식품의약 | `direct` | `additional` | 식품·의약 공지 다국어 검토 | `food-drug-public-notice-multilingual-review` | `official-notice-multilingual-translation-review` | — | `draft-only` |
 
 ## 농림·해양·환경
 

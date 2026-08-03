@@ -9,6 +9,8 @@
 - 내부 공통 구현: `kgov_runtime/capabilities/`
 - Capability 문서 root: `docs/capabilities/`
 - 전체 검증 entrypoint: `python3 scripts/check.py`
+- Domain별 목표: catalog `target_skills_per_domain`(5개)
+- 단계적 최소값: catalog `enforced_minimum_skills_by_domain`
 
 ## Domain 소유 규칙
 
@@ -17,6 +19,7 @@
 3. 공통 실행 코드는 내부 runtime에서 한 번만 구현하고 domain마다 adapter 코드를 복제하지 않습니다.
 4. 모든 Skill frontmatter `name`은 저장소 전체에서 고유해야 합니다.
 5. `domains/*/.gitkeep` 같은 빈 domain placeholder를 두지 않습니다.
+6. 각 domain은 `enforced_minimum_skills_by_domain` 이상을 유지하고 최종적으로 목표 5개를 충족합니다.
 
 ## 변경 절차
 
