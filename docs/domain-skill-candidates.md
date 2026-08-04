@@ -7,11 +7,11 @@
 ## 요약
 
 - 전체 domain: **60개**
-- domain-owned Skill: **150개** (primary 60 / additional 90)
+- domain-owned Skill: **168개** (primary 60 / additional 108)
 - domain별 목표 Skill: **최소 5개**
-- 목표 충족 domain: **9/60개**
+- 목표 충족 domain: **18/60개**
 - 단계적 enforcement는 catalog의 `enforced_minimum_skills_by_domain`을 따릅니다.
-- 현재 enforcement 합계: **142개**
+- 현재 enforcement 합계: **160개**
 - 직접 reference 확인: **35개**
 - 인접 capability 활용: **16개**
 - 신규 설계 필요: **8개**
@@ -70,6 +70,8 @@
 | 재정 | `adjacent` | `primary` | 예산·결산 비교 | `budget-settlement-comparison` | `kosis-official-statistics` | `kosis-stats`, `k-dart` | `read-only` |
 | 재정 | `adjacent` | `additional` | 지방재정 근거 묶음 | `local-finance-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
 | 재정 | `adjacent` | `additional` | 국고보조사업 근거 검토 | `national-subsidy-project-evidence-review` | `public-policy-evidence-pack` | — | `draft-only` |
+| 재정 | `adjacent` | `additional` | 재정법령 인용 근거 검토 | `fiscal-law-citation-evidence-review` | `korean-legal-citation-verification` | — | `draft-only` |
+| 재정 | `adjacent` | `additional` | 재정 집행 근거 팩 | `fiscal-budget-execution-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
 | 세무 | `direct` | `primary` | 사업자·체납 상태조회 | `business-tax-status-lookup` | `official-source-research` | `nts-business-registration`, `nts-tax-delinquency` | `read-only` |
 | 세무 | `direct` | `additional` | 세법령·개정 의안 조사 | `tax-law-bill-research` | `korean-law-bill-research` | — | `read-only` |
 | 세무 | `direct` | `additional` | 국세통계 조회 | `national-tax-statistics-lookup` | `kosis-official-statistics` | — | `read-only` |
@@ -83,27 +85,43 @@
 | 관세 | `new` | `primary` | HS 품목·관세율 조사 | `tariff-hs-code-research` | `official-source-research` | — | `read-only` |
 | 관세 | `new` | `additional` | 원산지 증빙서류 사전점검 | `customs-origin-document-precheck` | `regulated-trade-procedure-precheck` | — | `draft-only` |
 | 관세 | `new` | `additional` | 관세 무역통계 브리프 | `customs-trade-statistics-brief` | `public-policy-evidence-pack` | — | `draft-only` |
+| 관세 | `new` | `additional` | 관세법령 인용 근거 검토 | `customs-law-citation-evidence-review` | `korean-legal-citation-verification` | — | `draft-only` |
+| 관세 | `new` | `additional` | 관세 민원 분류·답변 초안 | `customs-civil-complaint-triage-draft` | `civil-complaint-triage-draft` | — | `draft-only` |
 | 감사 | `adjacent` | `primary` | 감사 증빙 교차검증 | `audit-evidence-cross-check` | `official-source-research` | `biz-health-check`, `g2b-sanctioned-supplier` | `draft-only` |
 | 감사 | `adjacent` | `additional` | 감사 지적사항 답변 초안 검토 | `audit-finding-response-draft-review` | `administrative-document-draft-review` | — | `draft-only` |
 | 감사 | `adjacent` | `additional` | 감사 조치계획 근거 검토 | `audit-action-plan-evidence-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 감사 | `adjacent` | `additional` | 감사 법적근거 인용 검토 | `audit-legal-basis-citation-review` | `korean-legal-citation-verification` | — | `draft-only` |
+| 감사 | `adjacent` | `additional` | 감사기록 정보공개·마스킹 검토 | `audit-records-disclosure-redaction-review` | `public-record-disclosure-redaction-review` | — | `draft-only` |
 | 통계 | `direct` | `primary` | KOSIS 공식통계 조회 | `kosis-statistics-lookup` | `kosis-official-statistics` | `kosis-stats` | `read-only` |
 | 통계 | `direct` | `additional` | 공식통계 방법론 근거 검토 | `official-statistics-methodology-evidence-review` | `public-policy-evidence-pack` | — | `draft-only` |
 | 통계 | `direct` | `additional` | 통계 공표 근거 브리프 | `statistical-release-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 통계 | `direct` | `additional` | 국가통계 민원 분류·답변 초안 | `statistics-civil-complaint-triage-draft` | `civil-complaint-triage-draft` | — | `draft-only` |
+| 통계 | `direct` | `additional` | 국가통계 품질 근거 팩 | `statistics-quality-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
 | 조달 | `direct` | `primary` | 나라장터 발주·제재 조회 | `public-procurement-plan-check` | `public-procurement-research` | `g2b-order-plan-search`, `g2b-sanctioned-supplier` | `read-only` |
 | 조달 | `direct` | `additional` | AI 제품 조달 준비도 점검 | `ai-product-procurement-readiness-check` | `public-procurement-research` | — | `draft-only` |
 | 조달 | `direct` | `additional` | 조달 규격서 HWPX 검토 | `procurement-specification-hwpx-review` | `public-document-hwpx` | — | `draft-only` |
+| 조달 | `direct` | `additional` | 조달법령 인용 근거 검토 | `procurement-law-citation-evidence-review` | `korean-legal-citation-verification` | — | `draft-only` |
+| 조달 | `direct` | `additional` | 조달기록 정보공개·마스킹 검토 | `procurement-records-disclosure-redaction-review` | `public-record-disclosure-redaction-review` | — | `draft-only` |
 | 외교 | `new` | `primary` | 공식 국가·외교 브리프 | `official-country-brief` | `official-source-research` | — | `draft-only` |
 | 외교 | `new` | `additional` | 조약·외교문서 출처 점검 | `treaty-diplomatic-document-source-check` | `public-policy-evidence-pack` | — | `draft-only` |
 | 외교 | `new` | `additional` | 해외안전 국가 브리프 | `overseas-safety-country-brief` | `public-policy-evidence-pack` | — | `draft-only` |
+| 외교 | `new` | `additional` | 외교정책 근거 팩 | `diplomatic-policy-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
+| 외교 | `new` | `additional` | 외교·조약 법령 인용 검토 | `diplomatic-treaty-law-citation-review` | `korean-legal-citation-verification` | — | `draft-only` |
 | 통일 | `new` | `primary` | 북한·통일정책 공식자료 검색 | `unification-policy-source-search` | `official-source-research` | — | `read-only` |
 | 통일 | `new` | `additional` | 남북관계 정책연표 근거 팩 | `inter-korean-policy-timeline-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
 | 통일 | `new` | `additional` | DMZ 정책 출처 브리프 | `dmz-policy-source-brief` | `public-policy-evidence-pack` | — | `draft-only` |
+| 통일 | `new` | `additional` | 통일정책 법령 인용 근거 검토 | `unification-law-citation-evidence-review` | `korean-legal-citation-verification` | — | `draft-only` |
+| 통일 | `new` | `additional` | 통일정책 통계 근거 브리프 | `unification-policy-statistics-brief` | `kosis-official-statistics` | — | `draft-only` |
 | 선거관리 | `direct` | `primary` | 지방선거 후보자 조회 | `local-election-candidate-lookup` | `official-source-research` | `local-election-candidate-search` | `read-only` |
 | 선거관리 | `direct` | `additional` | 선거법·절차 근거 검토 | `election-law-procedure-evidence-review` | `public-policy-evidence-pack` | — | `draft-only` |
 | 선거관리 | `direct` | `additional` | 선거결과 통계 근거 브리프 | `election-result-statistics-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
+| 선거관리 | `direct` | `additional` | 선거법령 인용 검증 | `election-law-citation-verification` | `korean-legal-citation-verification` | — | `draft-only` |
+| 선거관리 | `direct` | `additional` | 선거기록 정보공개·마스킹 검토 | `election-records-disclosure-redaction-review` | `public-record-disclosure-redaction-review` | — | `draft-only` |
 | 입법 | `direct` | `primary` | 국회 의안·표결 조회 | `assembly-bill-vote-lookup` | `korean-law-bill-research` | `assembly-bill-vote-search` | `read-only` |
 | 입법 | `direct` | `additional` | 법안 비교·영향 근거 브리프 | `bill-comparison-impact-brief` | `korean-law-bill-research` | — | `draft-only` |
 | 입법 | `direct` | `additional` | 상임위원회 회의록 근거 팩 | `committee-minutes-evidence-pack` | `korean-law-bill-research` | — | `draft-only` |
+| 입법 | `direct` | `additional` | 입법기록 정보공개·마스킹 검토 | `legislative-records-disclosure-redaction-review` | `public-record-disclosure-redaction-review` | — | `draft-only` |
+| 입법 | `direct` | `additional` | 제·개정 법령 인용 검토 | `legislative-enacted-law-citation-review` | `korean-legal-citation-verification` | — | `draft-only` |
 
 ## 법무·치안
 
