@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import shutil
 import subprocess
@@ -39,8 +40,8 @@ class CatalogContractTest(unittest.TestCase):
     def test_public_skills_are_owned_by_domains(self) -> None:
         self.assertFalse((ROOT / "skills").exists())
         entrypoints = sorted(ROOT.glob("domains/*/skills/*/SKILL.md"))
-        self.assertEqual(150, len(entrypoints))
-        self.assertEqual(150, len({path.parent.name for path in entrypoints}))
+        self.assertEqual(168, len(entrypoints))
+        self.assertEqual(168, len({path.parent.name for path in entrypoints}))
         self.assertFalse(list(ROOT.glob("domains/*/.gitkeep")))
 
     def test_evidence_distribution_matches_review(self) -> None:
@@ -74,7 +75,7 @@ class CatalogContractTest(unittest.TestCase):
         for domain in self.data["domains"]:
             self.assertEqual(1, sum(skill["role"] == "primary" for skill in domain["skills"]))
             names.extend(skill["name"] for skill in domain["skills"])
-        self.assertEqual(150, len(names))
+        self.assertEqual(168, len(names))
         self.assertEqual(len(names), len(set(names)))
 
     def test_additional_capabilities_are_domain_owned(self) -> None:
@@ -139,7 +140,23 @@ class CatalogContractTest(unittest.TestCase):
         self.assertTrue(all(isinstance(value, int) and 1 <= value <= target for value in minimums.values()))
         for domain in self.data["domains"]:
             self.assertGreaterEqual(len(domain["skills"]), minimums[domain["domain"]])
-        for domain_name in ("교육", "교육행정", "사회복지", "고용노동", "보건의료", "식품의약"):
+        for domain_name in (
+            "재정",
+            "관세",
+            "감사",
+            "통계",
+            "조달",
+            "외교",
+            "통일",
+            "선거관리",
+            "입법",
+            "교육",
+            "교육행정",
+            "사회복지",
+            "고용노동",
+            "보건의료",
+            "식품의약",
+        ):
             self.assertEqual(5, minimums[domain_name])
 
     def test_minimum_skill_rollout_mutations_fail_closed(self) -> None:
@@ -268,6 +285,124 @@ class CatalogContractTest(unittest.TestCase):
                             errors,
                         )
 
+    def test_national_operations_minimum_five_contract(self) -> None:
+        expected = {
+            "재정": {
+                "fiscal-law-citation-evidence-review": "korean-legal-citation-verification",
+                "fiscal-budget-execution-evidence-pack": "public-policy-evidence-pack",
+            },
+            "관세": {
+                "customs-law-citation-evidence-review": "korean-legal-citation-verification",
+                "customs-civil-complaint-triage-draft": "civil-complaint-triage-draft",
+            },
+            "감사": {
+                "audit-legal-basis-citation-review": "korean-legal-citation-verification",
+                "audit-records-disclosure-redaction-review": "public-record-disclosure-redaction-review",
+            },
+            "통계": {
+                "statistics-civil-complaint-triage-draft": "civil-complaint-triage-draft",
+                "statistics-quality-evidence-pack": "public-policy-evidence-pack",
+            },
+            "조달": {
+                "procurement-law-citation-evidence-review": "korean-legal-citation-verification",
+                "procurement-records-disclosure-redaction-review": "public-record-disclosure-redaction-review",
+            },
+            "외교": {
+                "diplomatic-policy-evidence-pack": "public-policy-evidence-pack",
+                "diplomatic-treaty-law-citation-review": "korean-legal-citation-verification",
+            },
+            "통일": {
+                "unification-law-citation-evidence-review": "korean-legal-citation-verification",
+                "unification-policy-statistics-brief": "kosis-official-statistics",
+            },
+            "선거관리": {
+                "election-law-citation-verification": "korean-legal-citation-verification",
+                "election-records-disclosure-redaction-review": "public-record-disclosure-redaction-review",
+            },
+            "입법": {
+                "legislative-records-disclosure-redaction-review": "public-record-disclosure-redaction-review",
+                "legislative-enacted-law-citation-review": "korean-legal-citation-verification",
+            },
+        }
+        for domain_name, expected_skills in expected.items():
+            domain = next(item for item in self.data["domains"] if item["domain"] == domain_name)
+            self.assertEqual(5, len(domain["skills"]))
+            by_name = {skill["name"]: skill for skill in domain["skills"]}
+            for name, capability in expected_skills.items():
+                skill = by_name[name]
+                self.assertEqual(capability, skill["capability"])
+                self.assertEqual("additional", skill["role"])
+                self.assertEqual([], skill["reference_skills"])
+                self.assertEqual("draft-only", skill["boundary"])
+                self.assertEqual(3, len(skill["task_checks"]))
+                combined = " ".join(skill["task_checks"])
+                self.assertTrue(any(marker in combined for marker in ("개인정보", "비식별", "원문")))
+                self.assertTrue(any(marker in combined for marker in ("승인", "검토", "이관")))
+
+        snapshot = {
+            domain_name: {name: by_name[name] for name in expected_skills}
+            for domain_name, expected_skills in expected.items()
+            for by_name in (
+                {
+                    skill["name"]: skill
+                    for skill in next(
+                        item for item in self.data["domains"] if item["domain"] == domain_name
+                    )["skills"]
+                },
+            )
+        }
+        canonical = json.dumps(
+            snapshot,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode()
+        self.assertEqual(
+            "336e6d27c40f7c343c5185b21564b6fbac8b63c8a9f63492c76a30cdd1060d87",
+            hashlib.sha256(canonical).hexdigest(),
+        )
+
+    def test_national_operations_minimum_five_contract_mutations_fail_closed(self) -> None:
+        protected = {
+            "재정": ("fiscal-law-citation-evidence-review", "fiscal-budget-execution-evidence-pack"),
+            "관세": ("customs-law-citation-evidence-review", "customs-civil-complaint-triage-draft"),
+            "감사": ("audit-legal-basis-citation-review", "audit-records-disclosure-redaction-review"),
+            "통계": ("statistics-civil-complaint-triage-draft", "statistics-quality-evidence-pack"),
+            "조달": ("procurement-law-citation-evidence-review", "procurement-records-disclosure-redaction-review"),
+            "외교": ("diplomatic-policy-evidence-pack", "diplomatic-treaty-law-citation-review"),
+            "통일": ("unification-law-citation-evidence-review", "unification-policy-statistics-brief"),
+            "선거관리": ("election-law-citation-verification", "election-records-disclosure-redaction-review"),
+            "입법": ("legislative-records-disclosure-redaction-review", "legislative-enacted-law-citation-review"),
+        }
+        mutations = {
+            "title": lambda skill: skill.__setitem__("title", "자동 결정 Skill"),
+            "capability": lambda skill: skill.__setitem__("capability", "official-source-research"),
+            "role": lambda skill: skill.__setitem__("role", "primary"),
+            "reference_skills": lambda skill: skill.__setitem__("reference_skills", ["rogue-reference"]),
+            "boundary": lambda skill: skill.__setitem__("boundary", "manual-review-only"),
+            "task_checks": lambda skill: skill.__setitem__("task_checks", skill["task_checks"][:2]),
+            "task_checks_semantic": lambda skill: skill.__setitem__(
+                "task_checks",
+                [
+                    "민원인 개인정보 원문을 저장",
+                    "법적·정책적 결론을 자동 결정",
+                    "담당자 승인 없이 제출·게시·발송",
+                ],
+            ),
+        }
+        for domain_name, skill_names in protected.items():
+            for skill_name in skill_names:
+                for mutation_name, mutate in mutations.items():
+                    with self.subTest(domain=domain_name, skill=skill_name, mutation=mutation_name):
+                        changed = copy.deepcopy(self.data)
+                        domain = next(item for item in changed["domains"] if item["domain"] == domain_name)
+                        skill = next(item for item in domain["skills"] if item["name"] == skill_name)
+                        mutate(skill)
+                        self.assertIn(
+                            f"{domain_name}/{skill_name}: national-operations minimum-five contract mismatch",
+                            validate(changed, ROOT),
+                        )
+
     def test_domain_minimum_three_wave_one_contract(self) -> None:
         expected = {
             "재정": (
@@ -336,7 +471,7 @@ class CatalogContractTest(unittest.TestCase):
                 by_domain["세무"]["skills"].append(moved)
                 errors = validate(changed, ROOT)
                 self.assertIn(
-                    f"{domain_name}: requires at least {self.data['enforced_minimum_skills_by_domain'][domain_name]} Skills in minimum-five rollout, got {len(by_domain[domain_name]['skills'])}",
+                    f"{domain_name}: requires at least {self.data['enforced_minimum_skills_by_domain'][domain_name]} Skills (target 5), got {len(by_domain[domain_name]['skills'])}",
                     errors,
                 )
 
@@ -448,7 +583,7 @@ class CatalogContractTest(unittest.TestCase):
                 by_domain["세무"]["skills"].append(moved)
                 errors = validate(changed, ROOT)
                 self.assertIn(
-                    f"{domain_name}: requires at least {self.data['enforced_minimum_skills_by_domain'][domain_name]} Skills in minimum-five rollout, got {len(by_domain[domain_name]['skills'])}",
+                    f"{domain_name}: requires at least {self.data['enforced_minimum_skills_by_domain'][domain_name]} Skills (target 5), got {len(by_domain[domain_name]['skills'])}",
                     errors,
                 )
 
@@ -652,7 +787,7 @@ class CatalogContractTest(unittest.TestCase):
                     by_domain["세무"]["skills"].append(moved)
                     errors = validate(changed, ROOT)
                     self.assertIn(
-                        f"{domain_name}: requires at least {self.data['enforced_minimum_skills_by_domain'][domain_name]} Skills in minimum-five rollout, got {len(by_domain[domain_name]['skills'])}",
+                        f"{domain_name}: requires at least {self.data['enforced_minimum_skills_by_domain'][domain_name]} Skills (target 5), got {len(by_domain[domain_name]['skills'])}",
                         errors,
                     )
 
@@ -808,7 +943,7 @@ class CatalogContractTest(unittest.TestCase):
                     by_domain["세무"]["skills"].append(moved)
                     errors = validate(changed, ROOT)
                     self.assertIn(
-                        f"{domain_name}: requires at least {self.data['enforced_minimum_skills_by_domain'][domain_name]} Skills in minimum-five rollout, got {len(by_domain[domain_name]['skills'])}",
+                        f"{domain_name}: requires at least {self.data['enforced_minimum_skills_by_domain'][domain_name]} Skills (target 5), got {len(by_domain[domain_name]['skills'])}",
                         errors,
                     )
 
@@ -961,7 +1096,7 @@ class CatalogContractTest(unittest.TestCase):
                     by_domain["세무"]["skills"].append(moved)
                     errors = validate(changed, ROOT)
                     self.assertIn(
-                        f"{domain_name}: requires at least {self.data['enforced_minimum_skills_by_domain'][domain_name]} Skills in minimum-five rollout, got {len(by_domain[domain_name]['skills'])}",
+                        f"{domain_name}: requires at least {self.data['enforced_minimum_skills_by_domain'][domain_name]} Skills (target 5), got {len(by_domain[domain_name]['skills'])}",
                         errors,
                     )
 
@@ -1123,7 +1258,7 @@ class CatalogContractTest(unittest.TestCase):
                     by_domain["세무"]["skills"].append(moved)
                     errors = validate(changed, ROOT)
                     self.assertIn(
-                        f"{domain_name}: requires at least {self.data['enforced_minimum_skills_by_domain'][domain_name]} Skills in minimum-five rollout, got {len(by_domain[domain_name]['skills'])}",
+                        f"{domain_name}: requires at least {self.data['enforced_minimum_skills_by_domain'][domain_name]} Skills (target 5), got {len(by_domain[domain_name]['skills'])}",
                         errors,
                     )
         self.assertEqual(66, mutation_count)
@@ -1286,7 +1421,7 @@ class CatalogContractTest(unittest.TestCase):
                     by_domain["세무"]["skills"].append(moved)
                     errors = validate(changed, ROOT)
                     self.assertIn(
-                        f"{domain_name}: requires at least {self.data['enforced_minimum_skills_by_domain'][domain_name]} Skills in minimum-five rollout, got {len(by_domain[domain_name]['skills'])}",
+                        f"{domain_name}: requires at least {self.data['enforced_minimum_skills_by_domain'][domain_name]} Skills (target 5), got {len(by_domain[domain_name]['skills'])}",
                         errors,
                     )
         for mutation in (
@@ -1391,13 +1526,13 @@ class CatalogContractTest(unittest.TestCase):
         current = (ROOT / "docs/domain-skill-candidates.md").read_text(encoding="utf-8")
         self.assertEqual(render_catalog(self.data), current)
         self.assertIn("전체 domain: **60개**", current)
-        self.assertIn("domain-owned Skill: **150개**", current)
+        self.assertIn("domain-owned Skill: **168개**", current)
         self.assertIn("domain별 목표 Skill: **최소 5개**", current)
-        self.assertIn("목표 충족 domain: **9/60개**", current)
+        self.assertIn("목표 충족 domain: **18/60개**", current)
 
     def test_generated_domain_skills_match_catalog(self) -> None:
         expected = expected_domain_skills(self.data, ROOT)
-        self.assertEqual(150, len(expected))
+        self.assertEqual(168, len(expected))
         for path, content in expected.items():
             self.assertEqual(content, path.read_text(encoding="utf-8"))
 
@@ -1441,7 +1576,7 @@ class CatalogContractTest(unittest.TestCase):
             capture_output=True,
             text=True,
         )
-        self.assertIn("domains=60 domain_skills=150 capabilities=22 top_level_skills=0", result.stdout)
+        self.assertIn("domains=60 domain_skills=168 capabilities=22 top_level_skills=0", result.stdout)
 
 
 if __name__ == "__main__":

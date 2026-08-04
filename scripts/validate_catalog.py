@@ -159,6 +159,186 @@ SOCIAL_SERVICE_MINIMUM_FIVE_SKILLS = {'교육': {'education-civil-complaint-tria
                                                                           '보존',
                                                                           '안전성·법적 의미·공식 용어·언어별 감수·게시·발송은 식품의약 담당자와 전문 '
                                                                           '감수자 승인으로 이관')}}}
+NATIONAL_OPERATIONS_MINIMUM_FIVE_SKILLS = {'재정': {'fiscal-law-citation-evidence-review': {'name': 'fiscal-law-citation-evidence-review',
+                                                'title': '재정법령 인용 근거 검토',
+                                                'capability': 'korean-legal-citation-verification',
+                                                'role': 'additional',
+                                                'reference_skills': (),
+                                                'boundary': 'draft-only',
+                                                'task_checks': ('재정사업·세목·회계연도·행위별 적용 법령 후보와 기준시점을 분리',
+                                                                '국가법령정보센터의 조문·시행일·공식 URL·조회일을 보존하고 원문 개인정보를 포함하지 않음',
+                                                                '법적 해석·예산 집행 적법성·지급 판단은 재정 담당자 검토로 이관')},
+        'fiscal-budget-execution-evidence-pack': {'name': 'fiscal-budget-execution-evidence-pack',
+                                                  'title': '재정 집행 근거 팩',
+                                                  'capability': 'public-policy-evidence-pack',
+                                                  'role': 'additional',
+                                                  'reference_skills': (),
+                                                  'boundary': 'draft-only',
+                                                  'task_checks': ('사업·회계연도·세목·집행행위·금액·근거 주장을 분리',
+                                                                  '공식 예산서·법령·지침 URL·조회일·문서 버전을 보존하고 원문 개인정보·비밀값을 제외',
+                                                                  '예산 집행 적법성·지급·교부·정책 평가는 재정 담당자 승인으로 이관')}},
+ '관세': {'customs-law-citation-evidence-review': {'name': 'customs-law-citation-evidence-review',
+                                                 'title': '관세법령 인용 근거 검토',
+                                                 'capability': 'korean-legal-citation-verification',
+                                                 'role': 'additional',
+                                                 'reference_skills': (),
+                                                 'boundary': 'draft-only',
+                                                 'task_checks': ('품목·신고유형·통관단계·행위별 적용 법령 후보와 기준시점을 분리',
+                                                                 '국가법령정보센터의 조문·시행일·공식 URL·조회일을 보존하고 신고인 개인정보 원문을 포함하지 '
+                                                                 '않음',
+                                                                 '품목분류·세액·통관 가능 여부·법적 해석은 관세 담당자 검토로 이관')},
+        'customs-civil-complaint-triage-draft': {'name': 'customs-civil-complaint-triage-draft',
+                                                 'title': '관세 민원 분류·답변 초안',
+                                                 'capability': 'civil-complaint-triage-draft',
+                                                 'role': 'additional',
+                                                 'reference_skills': (),
+                                                 'boundary': 'draft-only',
+                                                 'task_checks': ('민원유형·수출입단계·품목·요청사항·처리기한을 비식별 상태로 분리',
+                                                                 '신고인·수취인 개인정보와 신고서 원문을 저장하지 않고 관세청 공식 URL·조회일을 보존',
+                                                                 '세액·통관·법률 해석·소관 확정·답변 발송은 관세 담당자 승인으로 이관')}},
+ '감사': {'audit-legal-basis-citation-review': {'name': 'audit-legal-basis-citation-review',
+                                              'title': '감사 법적근거 인용 검토',
+                                              'capability': 'korean-legal-citation-verification',
+                                              'role': 'additional',
+                                              'reference_skills': (),
+                                              'boundary': 'draft-only',
+                                              'task_checks': ('감사유형·대상기관·지적사항·처분 후보별 적용 법령과 기준시점을 분리',
+                                                              '국가법령정보센터의 조문·시행일·공식 URL·조회일을 보존하고 제보자 개인정보 원문을 포함하지 않음',
+                                                              '위법성·지적 확정·처분 요구·법적 해석은 감사 담당자 검토로 이관')},
+        'audit-records-disclosure-redaction-review': {'name': 'audit-records-disclosure-redaction-review',
+                                                      'title': '감사기록 정보공개·마스킹 검토',
+                                                      'capability': 'public-record-disclosure-redaction-review',
+                                                      'role': 'additional',
+                                                      'reference_skills': (),
+                                                      'boundary': 'draft-only',
+                                                      'task_checks': ('청구범위·감사단계·문서유형·정보항목·부분공개 후보를 분리',
+                                                                      '제보자·피감사자 개인정보 원문과 비공개 감사정보를 저장하지 않고 '
+                                                                      '정보공개포털·국가기록원 공식 URL·조회일·문서 버전과 마스킹 근거를 보존',
+                                                                      '비공개 사유·공개 범위·원문 마스킹·공개 결정은 감사 정보공개 담당자 승인으로 '
+                                                                      '이관')}},
+ '통계': {'statistics-civil-complaint-triage-draft': {'name': 'statistics-civil-complaint-triage-draft',
+                                                    'title': '국가통계 민원 분류·답변 초안',
+                                                    'capability': 'civil-complaint-triage-draft',
+                                                    'role': 'additional',
+                                                    'reference_skills': (),
+                                                    'boundary': 'draft-only',
+                                                    'task_checks': ('통계표·지표·기간·단위·요청사항·오류 주장·처리기한을 비식별 상태로 분리',
+                                                                    '민원인 개인정보 원문을 저장하지 않고 KOSIS·작성기관 공식 '
+                                                                    'URL·조회일·메타데이터를 보존',
+                                                                    '통계 오류 확정·수정·공표·개별 답변 발송은 통계 담당기관 승인으로 이관')},
+        'statistics-quality-evidence-pack': {'name': 'statistics-quality-evidence-pack',
+                                             'title': '국가통계 품질 근거 팩',
+                                             'capability': 'public-policy-evidence-pack',
+                                             'role': 'additional',
+                                             'reference_skills': (),
+                                             'boundary': 'draft-only',
+                                             'task_checks': ('통계표·작성주기·기준기간·모집단·방법론·품질 주장을 분리',
+                                                             'KOSIS·작성기관 공식 자료 URL·조회일·문서 버전을 보존하고 조사대상자 개인정보 원문을 제외',
+                                                             '통계 오류·품질 수준·수정·공표 판단은 통계 담당기관 승인으로 이관')}},
+ '조달': {'procurement-law-citation-evidence-review': {'name': 'procurement-law-citation-evidence-review',
+                                                     'title': '조달법령 인용 근거 검토',
+                                                     'capability': 'korean-legal-citation-verification',
+                                                     'role': 'additional',
+                                                     'reference_skills': (),
+                                                     'boundary': 'draft-only',
+                                                     'task_checks': ('계약유형·계약방법·금액기준·절차단계별 적용 법령 후보와 기준시점을 분리',
+                                                                     '국가법령정보센터의 조문·시행일·공식 URL·조회일을 보존하고 업체 개인정보 원문을 '
+                                                                     '포함하지 않음',
+                                                                     '입찰자격·계약 적법성·제재·법적 해석은 조달 담당자 검토로 이관')},
+        'procurement-records-disclosure-redaction-review': {'name': 'procurement-records-disclosure-redaction-review',
+                                                            'title': '조달기록 정보공개·마스킹 검토',
+                                                            'capability': 'public-record-disclosure-redaction-review',
+                                                            'role': 'additional',
+                                                            'reference_skills': (),
+                                                            'boundary': 'draft-only',
+                                                            'task_checks': ('청구범위·계약단계·문서유형·정보항목·부분공개 후보를 분리',
+                                                                            '개인정보 원문·업체 영업비밀·평가 중 비공개 정보를 저장하지 않고 '
+                                                                            '정보공개포털·국가기록원 공식 URL·조회일·문서 버전과 마스킹 근거를 '
+                                                                            '보존',
+                                                                            '비공개 사유·공개 범위·원문 마스킹·공개 결정은 조달 정보공개 담당자 '
+                                                                            '승인으로 이관')}},
+ '외교': {'diplomatic-policy-evidence-pack': {'name': 'diplomatic-policy-evidence-pack',
+                                            'title': '외교정책 근거 팩',
+                                            'capability': 'public-policy-evidence-pack',
+                                            'role': 'additional',
+                                            'reference_skills': (),
+                                            'boundary': 'draft-only',
+                                            'task_checks': ('대상국·외교사안·기준시점·정책 주장·근거·상충 여부를 분리',
+                                                            '외교부·정부·조약 관련 공식 URL·조회일·문서 버전을 보존하고 영사사건 개인정보 원문·비공개 '
+                                                            '외교정보를 제외',
+                                                            '외교적 의미·정책 입장·대외 발표·문서 결재는 외교 담당자 승인으로 이관')},
+        'diplomatic-treaty-law-citation-review': {'name': 'diplomatic-treaty-law-citation-review',
+                                                  'title': '외교·조약 법령 인용 검토',
+                                                  'capability': 'korean-legal-citation-verification',
+                                                  'role': 'additional',
+                                                  'reference_skills': (),
+                                                  'boundary': 'draft-only',
+                                                  'task_checks': ('조약·법령·비준절차·외교행위별 적용 근거와 기준시점을 분리',
+                                                                  '국가법령정보센터의 조문·시행일·공식 URL·조회일을 보존하고 영사사건 개인정보 원문을 '
+                                                                  '포함하지 않음',
+                                                                  '조약 해석·국내법적 효력·비준·외교적 판단은 외교·법무 담당자 검토로 이관')}},
+ '통일': {'unification-law-citation-evidence-review': {'name': 'unification-law-citation-evidence-review',
+                                                     'title': '통일정책 법령 인용 근거 검토',
+                                                     'capability': 'korean-legal-citation-verification',
+                                                     'role': 'additional',
+                                                     'reference_skills': (),
+                                                     'boundary': 'draft-only',
+                                                     'task_checks': ('통일사업·지원유형·행위·대상별 적용 법령 후보와 기준시점을 분리',
+                                                                     '국가법령정보센터의 조문·시행일·공식 URL·조회일을 보존하고 북한이탈주민 개인정보 '
+                                                                     '원문을 포함하지 않음',
+                                                                     '지원자격·법적 의미·정책 적용 판단은 통일 담당기관 검토로 이관')},
+        'unification-policy-statistics-brief': {'name': 'unification-policy-statistics-brief',
+                                                'title': '통일정책 통계 근거 브리프',
+                                                'capability': 'kosis-official-statistics',
+                                                'role': 'additional',
+                                                'reference_skills': (),
+                                                'boundary': 'draft-only',
+                                                'task_checks': ('지표·기간·지역·대상집단·분모·단위와 남북관계 기준시점을 분리',
+                                                                'KOSIS·통일부 공식 통계표 코드·작성기관·조회일을 보존하고 개인 원문정보를 제외',
+                                                                '북한·남북관계 현황 해석·정책 효과·지원 판단은 통일 담당기관 검토로 이관')}},
+ '선거관리': {'election-law-citation-verification': {'name': 'election-law-citation-verification',
+                                                 'title': '선거법령 인용 검증',
+                                                 'capability': 'korean-legal-citation-verification',
+                                                 'role': 'additional',
+                                                 'reference_skills': (),
+                                                 'boundary': 'draft-only',
+                                                 'task_checks': ('선거유형·선거구·행위주체·행위·기준일별 적용 법령 후보를 분리',
+                                                                 '국가법령정보센터의 조문·시행일·공식 URL·조회일을 보존하고 유권자·후보자 개인정보 원문을 '
+                                                                 '포함하지 않음',
+                                                                 '피선거권·위법성·제재·법적 해석은 선거관리위원회 담당자 검토로 이관')},
+          'election-records-disclosure-redaction-review': {'name': 'election-records-disclosure-redaction-review',
+                                                           'title': '선거기록 정보공개·마스킹 검토',
+                                                           'capability': 'public-record-disclosure-redaction-review',
+                                                           'role': 'additional',
+                                                           'reference_skills': (),
+                                                           'boundary': 'draft-only',
+                                                           'task_checks': ('청구범위·선거유형·선거구·문서유형·정보항목·부분공개 후보를 분리',
+                                                                           '정보공개포털·국가기록원 공식 URL·조회일·문서 버전을 보존하고 '
+                                                                           '유권자·후보자 개인정보 원문과 비공개 선거정보를 제외',
+                                                                           '비공개 사유·공개 범위·원문 마스킹·공개 결정은 선거관리 정보공개 담당자 '
+                                                                           '승인으로 이관')}},
+ '입법': {'legislative-records-disclosure-redaction-review': {'name': 'legislative-records-disclosure-redaction-review',
+                                                            'title': '입법기록 정보공개·마스킹 검토',
+                                                            'capability': 'public-record-disclosure-redaction-review',
+                                                            'role': 'additional',
+                                                            'reference_skills': (),
+                                                            'boundary': 'draft-only',
+                                                            'task_checks': ('청구범위·의안·위원회·회기·문서유형·정보항목·부분공개 후보를 분리',
+                                                                            '개인정보 원문·비공개 협의정보·제3자 비밀을 저장하지 않고 '
+                                                                            '정보공개포털·국가기록원 공식 URL·조회일·문서 버전과 마스킹 근거를 '
+                                                                            '보존',
+                                                                            '비공개 사유·공개 범위·원문 마스킹·공개 결정은 입법기관 정보공개 담당자 '
+                                                                            '승인으로 이관')},
+        'legislative-enacted-law-citation-review': {'name': 'legislative-enacted-law-citation-review',
+                                                    'title': '제·개정 법령 인용 검토',
+                                                    'capability': 'korean-legal-citation-verification',
+                                                    'role': 'additional',
+                                                    'reference_skills': (),
+                                                    'boundary': 'draft-only',
+                                                    'task_checks': ('법률안·공포법률·조문·시행일·개정연혁·기준시점을 분리',
+                                                                    '국가법령정보센터의 조문·시행일·개정연혁·공식 URL·조회일을 보존하고 원문 개인정보를 '
+                                                                    '포함하지 않음',
+                                                                    '법적 효력·법률안 처리상태·입법 판단은 입법·법무 담당자 검토로 이관')}}}
 WAVE_ONE_TASK_CHECKS = {
     "national-subsidy-project-evidence-review": (
         "사업·회계연도·소관기관·지원 근거를 주장 단위로 분리",
@@ -914,7 +1094,6 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
     seen_domains: set[str] = set()
     seen_names: set[str] = set()
     declared_entrypoints: set[Path] = set()
-    total_skills = 0
 
     for index, item in enumerate(domains):
         if not isinstance(item, dict):
@@ -948,8 +1127,8 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
             errors.append(f"{domain}: invalid enforced minimum {enforced_minimum!r}")
         elif len(skills) < enforced_minimum:
             errors.append(
-                f"{domain}: requires at least {enforced_minimum} Skills in minimum-five rollout, "
-                f"got {len(skills)}"
+                f"{domain}: requires at least {enforced_minimum} Skills "
+                f"(target {TARGET_SKILLS_PER_DOMAIN}), got {len(skills)}"
             )
         wave_two_contract = WAVE_TWO_SKILL_CONTRACTS.get(domain)
         if wave_two_contract is not None:
@@ -1029,7 +1208,15 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
             ]
             if len(matches) != 1 or not _skill_contract_matches(matches[0], expected_contract):
                 errors.append(f"{domain}/{expected_name}: social-services minimum-five contract mismatch")
-        total_skills += len(skills)
+        expected_national_skills = NATIONAL_OPERATIONS_MINIMUM_FIVE_SKILLS.get(domain, {})
+        for expected_name, expected_contract in expected_national_skills.items():
+            matches = [
+                skill
+                for skill in skills
+                if isinstance(skill, dict) and skill.get("name") == expected_name
+            ]
+            if len(matches) != 1 or not _skill_contract_matches(matches[0], expected_contract):
+                errors.append(f"{domain}/{expected_name}: national-operations minimum-five contract mismatch")
         primary_count = sum(isinstance(skill, dict) and skill.get("role") == "primary" for skill in skills)
         if primary_count != 1:
             errors.append(f"{domain}: requires exactly one primary Skill, got {primary_count}")
