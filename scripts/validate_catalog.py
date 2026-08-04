@@ -339,6 +339,148 @@ NATIONAL_OPERATIONS_MINIMUM_FIVE_SKILLS = {'재정': {'fiscal-law-citation-evide
                                                                     '국가법령정보센터의 조문·시행일·개정연혁·공식 URL·조회일을 보존하고 원문 개인정보를 '
                                                                     '포함하지 않음',
                                                                     '법적 효력·법률안 처리상태·입법 판단은 입법·법무 담당자 검토로 이관')}}}
+LAW_SAFETY_WAVE_A_SKILL_CONTRACTS = {
+    "사법": {
+        "judicial-records-disclosure-redaction-review": {
+            "name": "judicial-records-disclosure-redaction-review",
+            "title": "사법 기록공개·비식별 검토",
+            "capability": "public-record-disclosure-redaction-review",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "사건기록·판결문·등기 또는 행정기록의 공개대상·보유기관·식별자를 분리하고 원문 개인정보를 입력하지 않음",
+                "정보공개포털(www.open.go.kr)·국가기록원(www.archives.go.kr) 공식 URL·문서번호·조회일·공개 또는 비공개 사유와 상충·미수집 근거를 보존",
+                "공개 여부·비공개 범위·제공 결정·법적 효력은 사법 담당자와 정보공개 담당자 최종 검토로 이관",
+            ),
+        },
+        "judicial-records-lifecycle-review": {
+            "name": "judicial-records-lifecycle-review",
+            "title": "사법 기록물 생애주기 검토",
+            "capability": "public-records-lifecycle-review",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "사건기록·보존기간·이관·폐기 대상과 기록관리 기준일을 분리",
+                "국가기록원(www.archives.go.kr)·기관 공식 기록관리 기준 URL·문서번호·조회일·개정 상태와 상충·미수집 근거를 구분하고 원문 개인정보를 포함하지 않음",
+                "보존기간 책정·이관·폐기·열람 승인과 원문 기록 처리는 기록관리 담당자 승인으로 이관",
+            ),
+        },
+    },
+    "출입국": {
+        "immigration-law-citation-evidence-review": {
+            "name": "immigration-law-citation-evidence-review",
+            "title": "출입국 법령 인용 근거 검토",
+            "capability": "korean-legal-citation-verification",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "체류·출입국·비자 법령·조문·행정규칙·판례 식별자와 적용 시점·인용 위치를 분리",
+                "국가법령정보(law.go.kr) 공식 원문 URL·공포일·시행일·조회일·개정 상태와 상충·미수집 근거를 보존하고 원문 개인정보를 포함하지 않음",
+                "법률적 효력·체류자격·입국 허가·처분 여부는 출입국 담당기관과 법무 담당자 최종 검토로 이관",
+            ),
+        },
+        "immigration-records-disclosure-redaction-review": {
+            "name": "immigration-records-disclosure-redaction-review",
+            "title": "출입국 기록공개·비식별 검토",
+            "capability": "public-record-disclosure-redaction-review",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "출입국·체류 기록의 공개대상·보유기관·식별자를 분리하고 원문 개인정보를 입력하지 않음",
+                "정보공개포털(www.open.go.kr)·국가기록원(www.archives.go.kr) 공식 URL·문서번호·조회일·공개 또는 비공개 사유와 상충·미수집 근거를 보존",
+                "공개 여부·비공개 범위·제공 결정·체류 또는 처분 정보 해석은 출입국 담당기관 검토로 이관",
+            ),
+        },
+    },
+    "경찰": {
+        "police-law-citation-evidence-review": {
+            "name": "police-law-citation-evidence-review",
+            "title": "경찰 법령 인용 근거 검토",
+            "capability": "korean-legal-citation-verification",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "치안·수사·신고·경찰 법령·조문·행정규칙·판례 식별자와 적용 시점·인용 위치를 분리",
+                "국가법령정보(law.go.kr) 공식 원문 URL·공포일·시행일·조회일·개정 상태와 상충·미수집 근거를 보존하고 원문 개인정보를 포함하지 않음",
+                "법률적 효력·수사·처분·출동·신고 접수 여부는 경찰 담당기관과 법무 담당자 최종 검토로 이관",
+            ),
+        },
+        "police-records-disclosure-redaction-review": {
+            "name": "police-records-disclosure-redaction-review",
+            "title": "경찰 기록공개·비식별 검토",
+            "capability": "public-record-disclosure-redaction-review",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "112 신고·수사·보호 기록의 공개대상·보유기관·식별자를 분리하고 원문 개인정보를 입력하지 않음",
+                "정보공개포털(www.open.go.kr)·국가기록원(www.archives.go.kr) 공식 URL·문서번호·조회일·공개 또는 비공개 사유와 상충·미수집 근거를 보존",
+                "공개 여부·비공개 범위·제공 결정·수사 또는 신고 정보 해석은 경찰 담당기관 검토로 이관",
+            ),
+        },
+    },
+    "소방": {
+        "fire-law-citation-evidence-review": {
+            "name": "fire-law-citation-evidence-review",
+            "title": "소방 법령 인용 근거 검토",
+            "capability": "korean-legal-citation-verification",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "소방·화재·구조·구급 법령·조문·행정규칙·판례 식별자와 적용 시점·인용 위치를 분리",
+                "국가법령정보(law.go.kr) 공식 원문 URL·공포일·시행일·조회일·개정 상태와 상충·미수집 근거를 보존하고 원문 개인정보를 포함하지 않음",
+                "법률적 효력·적합성·현장 점검·출동·안전조치 여부는 소방 담당기관과 전문가 최종 검토로 이관",
+            ),
+        },
+        "fire-records-disclosure-redaction-review": {
+            "name": "fire-records-disclosure-redaction-review",
+            "title": "소방 기록공개·비식별 검토",
+            "capability": "public-record-disclosure-redaction-review",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "화재·구조·구급 출동 기록의 공개대상·보유기관·식별자를 분리하고 원문 개인정보를 입력하지 않음",
+                "정보공개포털(www.open.go.kr)·국가기록원(www.archives.go.kr) 공식 URL·문서번호·조회일·공개 또는 비공개 사유와 상충·미수집 근거를 보존",
+                "공개 여부·비공개 범위·제공 결정·현장 대응 또는 안전 정보 해석은 소방 담당기관 검토로 이관",
+            ),
+        },
+    },
+    "재난안전": {
+        "disaster-law-citation-evidence-review": {
+            "name": "disaster-law-citation-evidence-review",
+            "title": "재난안전 법령 인용 근거 검토",
+            "capability": "korean-legal-citation-verification",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "재난·안전·대피·재해 법령·조문·행정규칙·판례 식별자와 적용 시점·인용 위치를 분리",
+                "국가법령정보(law.go.kr) 공식 원문 URL·공포일·시행일·조회일·개정 상태와 상충·미수집 근거를 보존하고 원문 개인정보를 포함하지 않음",
+                "법률적 효력·경보발령·대피·출동·재난 대응 여부는 재난안전 담당기관과 법무 담당자 최종 검토로 이관",
+            ),
+        },
+        "disaster-records-disclosure-redaction-review": {
+            "name": "disaster-records-disclosure-redaction-review",
+            "title": "재난안전 기록공개·비식별 검토",
+            "capability": "public-record-disclosure-redaction-review",
+            "role": "additional",
+            "reference_skills": (),
+            "boundary": "draft-only",
+            "task_checks": (
+                "재난상황·대응·피해 기록의 공개대상·보유기관·식별자를 분리하고 원문 개인정보를 입력하지 않음",
+                "정보공개포털(www.open.go.kr)·국가기록원(www.archives.go.kr) 공식 URL·문서번호·조회일·공개 또는 비공개 사유와 상충·미수집 근거를 보존",
+                "공개 여부·비공개 범위·제공 결정·피해 규모 또는 대응 우선순위 해석은 재난안전 담당기관 검토로 이관",
+            ),
+        },
+    },
+}
 WAVE_ONE_TASK_CHECKS = {
     "national-subsidy-project-evidence-review": (
         "사업·회계연도·소관기관·지원 근거를 주장 단위로 분리",
@@ -1217,6 +1359,15 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
             ]
             if len(matches) != 1 or not _skill_contract_matches(matches[0], expected_contract):
                 errors.append(f"{domain}/{expected_name}: national-operations minimum-five contract mismatch")
+        expected_law_safety_skills = LAW_SAFETY_WAVE_A_SKILL_CONTRACTS.get(domain, {})
+        for expected_name, expected_contract in expected_law_safety_skills.items():
+            matches = [
+                skill
+                for skill in skills
+                if isinstance(skill, dict) and skill.get("name") == expected_name
+            ]
+            if len(matches) != 1 or not _skill_contract_matches(matches[0], expected_contract):
+                errors.append(f"{domain}/{expected_name}: law-safety-wave-a contract mismatch")
         primary_count = sum(isinstance(skill, dict) and skill.get("role") == "primary" for skill in skills)
         if primary_count != 1:
             errors.append(f"{domain}: requires exactly one primary Skill, got {primary_count}")

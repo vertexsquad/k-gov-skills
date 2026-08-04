@@ -7,11 +7,11 @@
 ## 요약
 
 - 전체 domain: **60개**
-- domain-owned Skill: **168개** (primary 60 / additional 108)
+- domain-owned Skill: **178개** (primary 60 / additional 118)
 - domain별 목표 Skill: **최소 5개**
-- 목표 충족 domain: **18/60개**
+- 목표 충족 domain: **23/60개**
 - 단계적 enforcement는 catalog의 `enforced_minimum_skills_by_domain`을 따릅니다.
-- 현재 enforcement 합계: **160개**
+- 현재 enforcement 합계: **170개**
 - 직접 reference 확인: **35개**
 - 인접 capability 활용: **16개**
 - 신규 설계 필요: **8개**
@@ -130,15 +130,21 @@
 | 사법 | `direct` | `primary` | 법령·법원공고·등기 조사 | `law-court-registry-research` | `korean-law-bill-research` | `korean-law-search`, `court-auction-notice-search`, `iros-registry-automation`, `court-payment-order-assistant` | `read-only` |
 | 사법 | `direct` | `additional` | 판결 인용 근거 팩 | `judgment-citation-evidence-pack` | `korean-legal-citation-verification` | — | `draft-only` |
 | 사법 | `direct` | `additional` | 법원 통계 근거 브리프 | `court-statistics-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
+| 사법 | `direct` | `additional` | 사법 기록공개·비식별 검토 | `judicial-records-disclosure-redaction-review` | `public-record-disclosure-redaction-review` | — | `draft-only` |
+| 사법 | `direct` | `additional` | 사법 기록물 생애주기 검토 | `judicial-records-lifecycle-review` | `public-records-lifecycle-review` | — | `draft-only` |
 | 검찰 | `adjacent` | `primary` | 검찰업무 법적 근거 조사 | `prosecution-legal-basis-research` | `korean-law-bill-research` | `korean-law-search` | `read-only` |
 | 교정 | `new` | `primary` | 교정 관련 규정 검색 | `corrections-regulation-search` | `korean-law-bill-research` | — | `read-only` |
 | 보호관찰 | `new` | `primary` | 보호관찰 처분·준수사항 검색 | `probation-compliance-search` | `korean-law-bill-research` | — | `read-only` |
 | 출입국 | `new` | `primary` | 체류·비자 절차 검색 | `immigration-procedure-search` | `official-source-research` | — | `read-only` |
 | 출입국 | `new` | `additional` | 출입국 민원 분류·답변 초안 | `immigration-civil-complaint-triage-draft` | `civil-complaint-triage-draft` | — | `draft-only` |
 | 출입국 | `new` | `additional` | 출입국 통계·정책 근거 브리프 | `immigration-statistics-policy-brief` | `public-policy-evidence-pack` | — | `draft-only` |
+| 출입국 | `new` | `additional` | 출입국 법령 인용 근거 검토 | `immigration-law-citation-evidence-review` | `korean-legal-citation-verification` | — | `draft-only` |
+| 출입국 | `new` | `additional` | 출입국 기록공개·비식별 검토 | `immigration-records-disclosure-redaction-review` | `public-record-disclosure-redaction-review` | — | `draft-only` |
 | 경찰 | `direct` | `primary` | LOST112 유실물 조회 | `police-lost-property-lookup` | `official-source-research` | `subway-lost-property` | `read-only` |
 | 경찰 | `direct` | `additional` | 경찰 민원 분류·답변 초안 | `police-civil-complaint-triage-draft` | `civil-complaint-triage-draft` | — | `draft-only` |
 | 경찰 | `direct` | `additional` | 경찰 범죄통계 브리프 | `police-crime-statistics-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 경찰 | `direct` | `additional` | 경찰 법령 인용 근거 검토 | `police-law-citation-evidence-review` | `korean-legal-citation-verification` | — | `draft-only` |
+| 경찰 | `direct` | `additional` | 경찰 기록공개·비식별 검토 | `police-records-disclosure-redaction-review` | `public-record-disclosure-redaction-review` | — | `draft-only` |
 | 해양경찰 | `adjacent` | `primary` | 해양기상·안전상황 브리프 | `maritime-safety-brief` | `disaster-geospatial-brief` | `korea-weather`, `han-river-water-level` | `draft-only` |
 
 ## 안전·국방
@@ -148,9 +154,13 @@
 | 소방 | `adjacent` | `primary` | 응급실·재난자원 브리프 | `fire-emergency-resource-brief` | `disaster-geospatial-brief` | `emergency-room-beds`, `korea-weather` | `draft-only` |
 | 소방 | `adjacent` | `additional` | 소방안전 기준 근거 팩 | `fire-safety-standard-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
 | 소방 | `adjacent` | `additional` | 소방 대응통계 브리프 | `fire-response-statistics-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 소방 | `adjacent` | `additional` | 소방 법령 인용 근거 검토 | `fire-law-citation-evidence-review` | `korean-legal-citation-verification` | — | `draft-only` |
+| 소방 | `adjacent` | `additional` | 소방 기록공개·비식별 검토 | `fire-records-disclosure-redaction-review` | `public-record-disclosure-redaction-review` | — | `draft-only` |
 | 재난안전 | `direct` | `primary` | 기상·수위·대기 재난브리프 | `disaster-situation-brief` | `disaster-geospatial-brief` | `korea-weather`, `fine-dust-location`, `han-river-water-level`, `emergency-room-beds` | `draft-only` |
 | 재난안전 | `direct` | `additional` | 재난 공공안내문 초안 검토 | `disaster-public-message-draft-review` | `disaster-geospatial-brief` | — | `draft-only` |
 | 재난안전 | `direct` | `additional` | 재난 대응계획 근거 검토 | `disaster-response-plan-evidence-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 재난안전 | `direct` | `additional` | 재난안전 법령 인용 근거 검토 | `disaster-law-citation-evidence-review` | `korean-legal-citation-verification` | — | `draft-only` |
+| 재난안전 | `direct` | `additional` | 재난안전 기록공개·비식별 검토 | `disaster-records-disclosure-redaction-review` | `public-record-disclosure-redaction-review` | — | `draft-only` |
 | 국방 | `direct` | `primary` | 국방조달 공개공고 조회 | `defense-procurement-notice-search` | `public-procurement-research` | `d2b-notice-search` | `read-only` |
 | 군무 | `new` | `primary` | 군무 관련 규정 검색 | `civilian-military-regulation-search` | `official-source-research` | — | `read-only` |
 | 경호 | `sensitive` | `primary` | 공개행사 안전점검 | `public-event-security-review` | `official-source-research` | — | `manual-review-only` |

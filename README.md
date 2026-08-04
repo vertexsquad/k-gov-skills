@@ -7,7 +7,7 @@
 ```text
 CLAUDE.md                                      # canonical 저장소 작업 계약
 AGENTS.md                                      # cross-runtime thin adapter
-catalog/domain-skills.json                     # 60 domain·168 Skill·22 capability SSOT
+catalog/domain-skills.json                     # 60 domain·178 Skill·22 capability SSOT
 domains/<한글 domain>/skills/<slug>/SKILL.md   # 공개 Skill 진입점
 kgov_runtime/capabilities/<module>.py           # domain 간 공유하는 내부 실행 구현
 docs/capabilities/<capability>/                 # 절차·runtime contract·live 증거
@@ -24,10 +24,10 @@ scripts/check.py                                # 전체 deterministic 검증 �
 공통 adapter 코드는 `kgov_runtime/capabilities/`에서 한 번만 구현하고 domain Skill이 이를 호출합니다.
 
 Catalog schema v5의 domain `skills[]`는 `primary` 하나와 선택적 `additional` Skill을 명시합니다.
-모든 `name`은 저장소 전체에서 고유합니다. 60개 domain에 primary 60개와 additional 108개,
-총 168개 domain-owned Skill 진입점이 있습니다. 모든 domain의 목표는 최소 5개이며,
+모든 `name`은 저장소 전체에서 고유합니다. 60개 domain에 primary 60개와 additional 118개,
+총 178개 domain-owned Skill 진입점이 있습니다. 모든 domain의 목표는 최소 5개이며,
 `target_skills_per_domain`과 `enforced_minimum_skills_by_domain`으로 단계적 확대 상태를 검증합니다.
-현재 국가운영 9개 domain과 교육·교육행정·사회복지·고용노동·보건의료·식품의약을 포함한 18개 domain이 목표를 충족합니다.
+현재 국가운영 9개 domain과 교육·교육행정·사회복지·고용노동·보건의료·식품의약·사법·출입국·경찰·소방·재난안전을 포함한 23개 domain이 목표를 충족합니다.
 
 ## 현재 capability
 
