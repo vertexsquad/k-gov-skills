@@ -1,6 +1,6 @@
 ---
 name: security-protection-official-source-evidence-review
-description: "경호 업무의 경호 공식자료 검색 절차. 내부 official-source-research capability를 사용하며 draft-only 경계를 지킵니다."
+description: "경호 업무의 경호 공식자료 검색 절차. 내부 official-source-research capability를 사용하며 manual-review-only 경계를 지킵니다."
 metadata:
   kgov:
     domain: "경호"
@@ -15,7 +15,7 @@ metadata:
 - Domain: **경호**
 - 내부 capability: `official-source-research`
 - 실행 상태: `live-verified` / live smoke `passed`
-- 실행 경계: `draft-only`
+- 실행 경계: `manual-review-only`
 - Reference Skill: 없음
 
 ## 업무별 추가 체크

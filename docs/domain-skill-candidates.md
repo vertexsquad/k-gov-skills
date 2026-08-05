@@ -184,9 +184,9 @@
 | 군무 | `new` | `additional` | 군무 행정문서 검토 | `military-civil-service-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
 | 군무 | `new` | `additional` | 군무 정책·민원 브리프 | `military-civil-service-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 경호 | `sensitive` | `primary` | 공개행사 안전점검 | `public-event-security-review` | `official-source-research` | — | `manual-review-only` |
-| 경호 | `sensitive` | `additional` | 경호 공식자료 검색 | `security-protection-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
-| 경호 | `sensitive` | `additional` | 경호 통계 근거 브리프 | `security-protection-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
-| 경호 | `sensitive` | `additional` | 경호 행정문서 검토 | `security-protection-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 경호 | `sensitive` | `additional` | 경호 공식자료 검색 | `security-protection-official-source-evidence-review` | `official-source-research` | — | `manual-review-only` |
+| 경호 | `sensitive` | `additional` | 경호 통계 근거 브리프 | `security-protection-statistics-evidence-brief` | `kosis-official-statistics` | — | `manual-review-only` |
+| 경호 | `sensitive` | `additional` | 경호 행정문서 검토 | `security-protection-administrative-document-review` | `administrative-document-draft-review` | — | `manual-review-only` |
 | 경호 | `sensitive` | `additional` | 경호 정책·민원 브리프 | `security-protection-policy-evidence-brief` | `public-policy-evidence-pack` | — | `manual-review-only` |
 
 ## 사회서비스
