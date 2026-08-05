@@ -7,11 +7,7 @@
 ## 요약
 
 - 전체 domain: **60개**
-- domain-owned Skill: **178개** (primary 60 / additional 118)
-- domain별 목표 Skill: **최소 5개**
-- 목표 충족 domain: **23/60개**
-- 단계적 enforcement는 catalog의 `enforced_minimum_skills_by_domain`을 따릅니다.
-- 현재 enforcement 합계: **170개**
+- domain-owned Skill: **308개** (primary 60 / additional 248)
 - 직접 reference 확인: **35개**
 - 인접 capability 활용: **16개**
 - 신규 설계 필요: **8개**
@@ -133,8 +129,20 @@
 | 사법 | `direct` | `additional` | 사법 기록공개·비식별 검토 | `judicial-records-disclosure-redaction-review` | `public-record-disclosure-redaction-review` | — | `draft-only` |
 | 사법 | `direct` | `additional` | 사법 기록물 생애주기 검토 | `judicial-records-lifecycle-review` | `public-records-lifecycle-review` | — | `draft-only` |
 | 검찰 | `adjacent` | `primary` | 검찰업무 법적 근거 조사 | `prosecution-legal-basis-research` | `korean-law-bill-research` | `korean-law-search` | `read-only` |
+| 검찰 | `adjacent` | `additional` | 검찰 공식자료 검색 | `prosecution-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 검찰 | `adjacent` | `additional` | 검찰 통계 근거 브리프 | `prosecution-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 검찰 | `adjacent` | `additional` | 검찰 행정문서 검토 | `prosecution-administrative-document-review` | `korean-legal-citation-verification` | — | `draft-only` |
+| 검찰 | `adjacent` | `additional` | 검찰 정책·민원 브리프 | `prosecution-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 교정 | `new` | `primary` | 교정 관련 규정 검색 | `corrections-regulation-search` | `korean-law-bill-research` | — | `read-only` |
+| 교정 | `new` | `additional` | 교정 공식자료 검색 | `corrections-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 교정 | `new` | `additional` | 교정 통계 근거 브리프 | `corrections-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 교정 | `new` | `additional` | 교정 행정문서 검토 | `corrections-administrative-document-review` | `korean-legal-citation-verification` | — | `draft-only` |
+| 교정 | `new` | `additional` | 교정 정책·민원 브리프 | `corrections-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 보호관찰 | `new` | `primary` | 보호관찰 처분·준수사항 검색 | `probation-compliance-search` | `korean-law-bill-research` | — | `read-only` |
+| 보호관찰 | `new` | `additional` | 보호관찰 공식자료 검색 | `probation-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 보호관찰 | `new` | `additional` | 보호관찰 통계 근거 브리프 | `probation-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 보호관찰 | `new` | `additional` | 보호관찰 행정문서 검토 | `probation-administrative-document-review` | `korean-legal-citation-verification` | — | `draft-only` |
+| 보호관찰 | `new` | `additional` | 보호관찰 정책·민원 브리프 | `probation-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 출입국 | `new` | `primary` | 체류·비자 절차 검색 | `immigration-procedure-search` | `official-source-research` | — | `read-only` |
 | 출입국 | `new` | `additional` | 출입국 민원 분류·답변 초안 | `immigration-civil-complaint-triage-draft` | `civil-complaint-triage-draft` | — | `draft-only` |
 | 출입국 | `new` | `additional` | 출입국 통계·정책 근거 브리프 | `immigration-statistics-policy-brief` | `public-policy-evidence-pack` | — | `draft-only` |
@@ -146,6 +154,10 @@
 | 경찰 | `direct` | `additional` | 경찰 법령 인용 근거 검토 | `police-law-citation-evidence-review` | `korean-legal-citation-verification` | — | `draft-only` |
 | 경찰 | `direct` | `additional` | 경찰 기록공개·비식별 검토 | `police-records-disclosure-redaction-review` | `public-record-disclosure-redaction-review` | — | `draft-only` |
 | 해양경찰 | `adjacent` | `primary` | 해양기상·안전상황 브리프 | `maritime-safety-brief` | `disaster-geospatial-brief` | `korea-weather`, `han-river-water-level` | `draft-only` |
+| 해양경찰 | `adjacent` | `additional` | 해양경찰 공식자료 검색 | `coast-guard-official-source-evidence-review` | `disaster-geospatial-brief` | — | `draft-only` |
+| 해양경찰 | `adjacent` | `additional` | 해양경찰 통계 근거 브리프 | `coast-guard-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 해양경찰 | `adjacent` | `additional` | 해양경찰 행정문서 검토 | `coast-guard-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 해양경찰 | `adjacent` | `additional` | 해양경찰 정책·민원 브리프 | `coast-guard-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 
 ## 안전·국방
 
@@ -162,8 +174,20 @@
 | 재난안전 | `direct` | `additional` | 재난안전 법령 인용 근거 검토 | `disaster-law-citation-evidence-review` | `korean-legal-citation-verification` | — | `draft-only` |
 | 재난안전 | `direct` | `additional` | 재난안전 기록공개·비식별 검토 | `disaster-records-disclosure-redaction-review` | `public-record-disclosure-redaction-review` | — | `draft-only` |
 | 국방 | `direct` | `primary` | 국방조달 공개공고 조회 | `defense-procurement-notice-search` | `public-procurement-research` | `d2b-notice-search` | `read-only` |
+| 국방 | `direct` | `additional` | 국방 공식자료 검색 | `defense-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 국방 | `direct` | `additional` | 국방 통계 근거 브리프 | `defense-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 국방 | `direct` | `additional` | 국방 행정문서 검토 | `defense-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 국방 | `direct` | `additional` | 국방 정책·민원 브리프 | `defense-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 군무 | `new` | `primary` | 군무 관련 규정 검색 | `civilian-military-regulation-search` | `official-source-research` | — | `read-only` |
+| 군무 | `new` | `additional` | 군무 공식자료 검색 | `military-civil-service-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 군무 | `new` | `additional` | 군무 통계 근거 브리프 | `military-civil-service-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 군무 | `new` | `additional` | 군무 행정문서 검토 | `military-civil-service-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 군무 | `new` | `additional` | 군무 정책·민원 브리프 | `military-civil-service-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 경호 | `sensitive` | `primary` | 공개행사 안전점검 | `public-event-security-review` | `official-source-research` | — | `manual-review-only` |
+| 경호 | `sensitive` | `additional` | 경호 공식자료 검색 | `security-protection-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 경호 | `sensitive` | `additional` | 경호 통계 근거 브리프 | `security-protection-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 경호 | `sensitive` | `additional` | 경호 행정문서 검토 | `security-protection-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 경호 | `sensitive` | `additional` | 경호 정책·민원 브리프 | `security-protection-policy-evidence-brief` | `public-policy-evidence-pack` | — | `manual-review-only` |
 
 ## 사회서비스
 
@@ -205,12 +229,40 @@
 | Domain | Evidence | Role | Skill | Slug | Capability | Reference Skill | 경계 |
 |---|---|---|---|---|---|---|---|
 | 농업 | `adjacent` | `primary` | 농업통계·기상 조회 | `agriculture-weather-statistics` | `kosis-official-statistics` | `kosis-stats`, `korea-weather` | `read-only` |
+| 농업 | `adjacent` | `additional` | 농업 공식자료 검색 | `agriculture-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 농업 | `adjacent` | `additional` | 농업 통계 근거 브리프 | `agriculture-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 농업 | `adjacent` | `additional` | 농업 행정문서 검토 | `agriculture-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 농업 | `adjacent` | `additional` | 농업 정책·민원 브리프 | `agriculture-policy-evidence-brief` | `welfare-health-safety-research` | — | `draft-only` |
 | 축산 | `adjacent` | `primary` | 가축질병·축산통계 조회 | `livestock-disease-statistics` | `kosis-official-statistics` | `kosis-stats`, `korea-weather` | `read-only` |
+| 축산 | `adjacent` | `additional` | 축산 공식자료 검색 | `livestock-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 축산 | `adjacent` | `additional` | 축산 통계 근거 브리프 | `livestock-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 축산 | `adjacent` | `additional` | 축산 행정문서 검토 | `livestock-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 축산 | `adjacent` | `additional` | 축산 정책·민원 브리프 | `livestock-policy-evidence-brief` | `welfare-health-safety-research` | — | `draft-only` |
 | 농촌지도 | `adjacent` | `primary` | 영농지도 근거 브리프 | `rural-extension-brief` | `kosis-official-statistics` | `kosis-stats`, `korea-weather` | `draft-only` |
+| 농촌지도 | `adjacent` | `additional` | 농촌지도 공식자료 검색 | `rural-extension-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 농촌지도 | `adjacent` | `additional` | 농촌지도 통계 근거 브리프 | `rural-extension-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 농촌지도 | `adjacent` | `additional` | 농촌지도 행정문서 검토 | `rural-extension-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 농촌지도 | `adjacent` | `additional` | 농촌지도 정책·민원 브리프 | `rural-extension-policy-evidence-brief` | `welfare-health-safety-research` | — | `draft-only` |
 | 산림 | `direct` | `primary` | 산림휴양·기상 조회 | `forest-recreation-weather` | `disaster-geospatial-brief` | `foresttrip-vacancy`, `korea-weather` | `read-only` |
+| 산림 | `direct` | `additional` | 산림 공식자료 검색 | `forestry-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 산림 | `direct` | `additional` | 산림 통계 근거 브리프 | `forestry-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 산림 | `direct` | `additional` | 산림 행정문서 검토 | `forestry-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 산림 | `direct` | `additional` | 산림 정책·민원 브리프 | `forestry-policy-evidence-brief` | `welfare-health-safety-research` | — | `draft-only` |
 | 해양수산 | `adjacent` | `primary` | 해양기상·수산통계 조회 | `fisheries-weather-statistics` | `kosis-official-statistics` | `kosis-stats`, `korea-weather`, `han-river-water-level` | `read-only` |
+| 해양수산 | `adjacent` | `additional` | 해양수산 공식자료 검색 | `marine-fisheries-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 해양수산 | `adjacent` | `additional` | 해양수산 통계 근거 브리프 | `marine-fisheries-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 해양수산 | `adjacent` | `additional` | 해양수산 행정문서 검토 | `marine-fisheries-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 해양수산 | `adjacent` | `additional` | 해양수산 정책·민원 브리프 | `marine-fisheries-policy-evidence-brief` | `welfare-health-safety-research` | — | `draft-only` |
 | 환경 | `direct` | `primary` | 대기·수위·폐기물 정보 조회 | `environment-air-water-waste` | `disaster-geospatial-brief` | `fine-dust-location`, `han-river-water-level`, `household-waste-info`, `korea-weather` | `read-only` |
+| 환경 | `direct` | `additional` | 환경 공식자료 검색 | `environment-official-source-evidence-review` | `disaster-geospatial-brief` | — | `draft-only` |
+| 환경 | `direct` | `additional` | 환경 통계 근거 브리프 | `environment-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 환경 | `direct` | `additional` | 환경 행정문서 검토 | `environment-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 환경 | `direct` | `additional` | 환경 정책·민원 브리프 | `environment-policy-evidence-brief` | `welfare-health-safety-research` | — | `draft-only` |
 | 기상 | `direct` | `primary` | 기상청 예보 조회 | `kma-weather-forecast` | `disaster-geospatial-brief` | `korea-weather` | `read-only` |
+| 기상 | `direct` | `additional` | 기상 공식자료 검색 | `meteorology-official-source-evidence-review` | `disaster-geospatial-brief` | — | `draft-only` |
+| 기상 | `direct` | `additional` | 기상 통계 근거 브리프 | `meteorology-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 기상 | `direct` | `additional` | 기상 행정문서 검토 | `meteorology-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 기상 | `direct` | `additional` | 기상 정책·민원 브리프 | `meteorology-policy-evidence-brief` | `welfare-health-safety-research` | — | `draft-only` |
 
 ## 국토·산업
 
@@ -219,16 +271,38 @@
 | 국토교통 | `direct` | `primary` | 대중교통·지도 경로 조사 | `public-transit-map-research` | `land-housing-geospatial-research` | `korean-transit-route`, `kakao-map` | `read-only` |
 | 국토교통 | `direct` | `additional` | 교통정책·사업 근거 팩 | `transport-policy-project-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
 | 국토교통 | `direct` | `additional` | 교통안전 통계 근거 브리프 | `traffic-safety-statistics-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 국토교통 | `direct` | `additional` | 국토교통 절차·근거 검토 | `land-transport-procedure-evidence-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 국토교통 | `direct` | `additional` | 국토교통 통계·성과 브리프 | `land-transport-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
 | 토목시설 | `adjacent` | `primary` | 공사·시설점검 자료 조사 | `civil-facility-project-review` | `land-housing-geospatial-research` | `kakao-map`, `gongsijiga-search` | `draft-only` |
 | 토목시설 | `adjacent` | `additional` | 건설기준·BIM 적합성 사전점검 | `construction-standard-bim-compliance-precheck` | `construction-standard-bim-compliance-precheck` | — | `draft-only` |
 | 토목시설 | `adjacent` | `additional` | 기반시설 유지관리 근거 검토 | `infrastructure-maintenance-evidence-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 토목시설 | `adjacent` | `additional` | 토목시설 절차·근거 검토 | `infrastructure-procedure-evidence-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 토목시설 | `adjacent` | `additional` | 토목시설 통계·성과 브리프 | `infrastructure-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
 | 건축 | `direct` | `primary` | 토지·등기·공공주택 조사 | `land-building-housing-research` | `land-housing-geospatial-research` | `gongsijiga-search`, `iros-registry-automation`, `lh-notice-search`, `sh-notice-search` | `read-only` |
 | 건축 | `direct` | `additional` | 건축 인허가 서류 사전점검 | `building-permit-document-precheck` | `building-permit-document-precheck` | — | `draft-only` |
 | 건축 | `direct` | `additional` | 건축기준 조문 인용 점검 | `building-code-citation-check` | `korean-legal-citation-verification` | — | `draft-only` |
+| 건축 | `direct` | `additional` | 건축 절차·근거 검토 | `architecture-procedure-evidence-review` | `building-permit-document-precheck` | — | `draft-only` |
+| 건축 | `direct` | `additional` | 건축 통계·성과 브리프 | `architecture-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
 | 도시계획 | `direct` | `primary` | 혼잡도·토지·주택 조사 | `urban-planning-density-land` | `land-housing-geospatial-research` | `seoul-density`, `gongsijiga-search`, `lh-notice-search`, `sh-notice-search` | `read-only` |
+| 도시계획 | `direct` | `additional` | 도시계획 공식자료 검색 | `urban-planning-official-source-evidence-review` | `land-housing-geospatial-research` | — | `draft-only` |
+| 도시계획 | `direct` | `additional` | 도시계획 통계 근거 브리프 | `urban-planning-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 도시계획 | `direct` | `additional` | 도시계획 행정문서 검토 | `urban-planning-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 도시계획 | `direct` | `additional` | 도시계획 정책·민원 브리프 | `urban-planning-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 산업 | `direct` | `primary` | 기업공시·산업정보 조회 | `corporate-industry-information` | `official-source-research` | `k-dart`, `fsc-corporate-info` | `read-only` |
+| 산업 | `direct` | `additional` | 산업 공식자료 검색 | `industry-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 산업 | `direct` | `additional` | 산업 통계 근거 브리프 | `industry-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 산업 | `direct` | `additional` | 산업 행정문서 검토 | `industry-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 산업 | `direct` | `additional` | 산업 정책·민원 브리프 | `industry-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 에너지 | `direct` | `primary` | 유가·에너지통계 조회 | `fuel-energy-statistics` | `kosis-official-statistics` | `cheap-gas-nearby`, `kosis-stats` | `read-only` |
+| 에너지 | `direct` | `additional` | 에너지 공식자료 검색 | `energy-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 에너지 | `direct` | `additional` | 에너지 통계 근거 브리프 | `energy-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 에너지 | `direct` | `additional` | 에너지 행정문서 검토 | `energy-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 에너지 | `direct` | `additional` | 에너지 정책·민원 브리프 | `energy-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 중소기업 | `direct` | `primary` | 창업지원·사업자 실사 | `sme-startup-due-diligence` | `official-source-research` | `kstartup-search`, `biz-health-check`, `nts-business-registration` | `read-only` |
+| 중소기업 | `direct` | `additional` | 중소기업 공식자료 검색 | `sme-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 중소기업 | `direct` | `additional` | 중소기업 통계 근거 브리프 | `sme-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 중소기업 | `direct` | `additional` | 중소기업 행정문서 검토 | `sme-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 중소기업 | `direct` | `additional` | 중소기업 정책·민원 브리프 | `sme-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 
 ## 과학·디지털
 
@@ -237,31 +311,73 @@
 | 과학기술 | `adjacent` | `primary` | 과학기술 특허·동향 조사 | `science-technology-trend-search` | `official-source-research` | `korean-patent-search`, `kosis-stats` | `draft-only` |
 | 과학기술 | `adjacent` | `additional` | 국가 R&D 사업 근거 브리프 | `national-rd-program-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 과학기술 | `adjacent` | `additional` | 과학기술 영향 근거 팩 | `technology-impact-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
+| 과학기술 | `adjacent` | `additional` | 과학기술 절차·근거 검토 | `science-technology-procedure-evidence-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 과학기술 | `adjacent` | `additional` | 과학기술 통계·성과 브리프 | `science-technology-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
 | 특허 | `direct` | `primary` | KIPRIS 특허 조회 | `korean-patent-lookup` | `patent-prior-art-evidence-pack` | `korean-patent-search` | `read-only` |
 | 특허 | `direct` | `additional` | 특허 청구항 인용 근거 검토 | `patent-claim-citation-evidence-review` | `patent-prior-art-evidence-pack` | — | `draft-only` |
 | 특허 | `direct` | `additional` | 지식재산 정책통계 근거 브리프 | `ip-policy-statistics-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
+| 특허 | `direct` | `additional` | 특허 절차·근거 검토 | `patent-procedure-evidence-review` | `patent-prior-art-evidence-pack` | — | `draft-only` |
+| 특허 | `direct` | `additional` | 특허 통계·성과 브리프 | `patent-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
 | 정보통신 | `adjacent` | `primary` | WHOIS·정보통신 정책 조사 | `ict-policy-domain-research` | `official-source-research` | `kr-whois-lookup`, `korean-privacy-terms` | `read-only` |
+| 정보통신 | `adjacent` | `additional` | 정보통신 공식자료 검색 | `ict-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 정보통신 | `adjacent` | `additional` | 정보통신 통계 근거 브리프 | `ict-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 정보통신 | `adjacent` | `additional` | 정보통신 행정문서 검토 | `ict-administrative-document-review` | `public-it-project-procedure-review` | — | `draft-only` |
+| 정보통신 | `adjacent` | `additional` | 정보통신 정책·민원 브리프 | `ict-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 전산 | `new` | `primary` | 공공시스템 운영점검 | `public-it-operations-check` | `official-source-research` | — | `draft-only` |
 | 전산 | `new` | `additional` | 공공 정보화사업 절차 점검 | `public-it-project-procedure-check` | `public-it-project-procedure-review` | — | `draft-only` |
 | 전산 | `new` | `additional` | 공공 정보시스템 보안 체크리스트 검토 | `public-it-security-checklist-review` | `public-it-project-procedure-review` | — | `draft-only` |
+| 전산 | `new` | `additional` | 전산 절차·근거 검토 | `public-it-procedure-evidence-review` | `public-it-project-procedure-review` | — | `draft-only` |
+| 전산 | `new` | `additional` | 전산 통계·성과 브리프 | `public-it-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
 | 사이버보안 | `adjacent` | `primary` | 개인정보·보안기준 검토 | `privacy-security-baseline-review` | `official-source-research` | `korean-privacy-terms` | `draft-only` |
 | 사이버보안 | `adjacent` | `additional` | 개인정보 영향평가 근거 검토 | `privacy-impact-evidence-review` | `public-policy-evidence-pack` | — | `draft-only` |
 | 사이버보안 | `adjacent` | `additional` | 사이버 침해사고 대응계획 근거 검토 | `cyber-incident-response-plan-evidence-review` | `public-policy-evidence-pack` | — | `draft-only` |
+| 사이버보안 | `adjacent` | `additional` | 사이버보안 절차·근거 검토 | `cybersecurity-procedure-evidence-review` | `public-it-project-procedure-review` | — | `draft-only` |
+| 사이버보안 | `adjacent` | `additional` | 사이버보안 통계·성과 브리프 | `cybersecurity-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
 
 ## 문화·지식
 
 | Domain | Evidence | Role | Skill | Slug | Capability | Reference Skill | 경계 |
 |---|---|---|---|---|---|---|---|
 | 문화예술 | `direct` | `primary` | 공연예술·시설 조회 | `performance-arts-search` | `official-source-research` | `kopis-performance-search` | `read-only` |
+| 문화예술 | `direct` | `additional` | 문화예술 공식자료 검색 | `arts-culture-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 문화예술 | `direct` | `additional` | 문화예술 통계 근거 브리프 | `arts-culture-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 문화예술 | `direct` | `additional` | 문화예술 행정문서 검토 | `arts-culture-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 문화예술 | `direct` | `additional` | 문화예술 정책·민원 브리프 | `arts-culture-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 체육 | `direct` | `primary` | 경기결과·체육정보 조회 | `sports-results-facility-search` | `official-source-research` | `kbo-results`, `kbl-results`, `kleague-results`, `korean-marathon-schedule` | `read-only` |
+| 체육 | `direct` | `additional` | 체육 공식자료 검색 | `sports-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 체육 | `direct` | `additional` | 체육 통계 근거 브리프 | `sports-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 체육 | `direct` | `additional` | 체육 행정문서 검토 | `sports-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 체육 | `direct` | `additional` | 체육 정책·민원 브리프 | `sports-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 관광 | `direct` | `primary` | 공공 관광정보 조사 | `public-tourism-information` | `official-source-research` | `foresttrip-vacancy`, `kakao-map`, `myrealtrip-search` | `read-only` |
+| 관광 | `direct` | `additional` | 관광 공식자료 검색 | `tourism-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 관광 | `direct` | `additional` | 관광 통계 근거 브리프 | `tourism-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 관광 | `direct` | `additional` | 관광 행정문서 검토 | `tourism-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 관광 | `direct` | `additional` | 관광 정책·민원 브리프 | `tourism-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 문화유산 | `direct` | `primary` | 문화유산 공식자료 검색 | `cultural-heritage-source-search` | `official-source-research` | `joseon-sillok-search` | `read-only` |
+| 문화유산 | `direct` | `additional` | 문화유산 공식자료 검색 | `cultural-heritage-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 문화유산 | `direct` | `additional` | 문화유산 통계 근거 브리프 | `cultural-heritage-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 문화유산 | `direct` | `additional` | 문화유산 행정문서 검토 | `cultural-heritage-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 문화유산 | `direct` | `additional` | 문화유산 정책·민원 브리프 | `cultural-heritage-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 기록관리 | `adjacent` | `primary` | 기록물분류·HWPX 검토 | `records-classification-hwpx` | `public-document-hwpx` | `hwp`, `rhwp-edit`, `joseon-sillok-search` | `draft-only` |
 | 기록관리 | `adjacent` | `additional` | 공공기록 공개·마스킹 검토 | `public-record-disclosure-redaction-review` | `public-record-disclosure-redaction-review` | — | `draft-only` |
 | 기록관리 | `adjacent` | `additional` | 기록물 보존기간표 검토 | `records-retention-schedule-review` | `public-records-lifecycle-review` | — | `draft-only` |
+| 기록관리 | `adjacent` | `additional` | 기록관리 절차·근거 검토 | `records-management-procedure-evidence-review` | `public-records-lifecycle-review` | — | `draft-only` |
+| 기록관리 | `adjacent` | `additional` | 기록관리 통계·성과 브리프 | `records-management-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
 | 도서관 | `direct` | `primary` | 공공도서관 소장자료 조회 | `public-library-holdings-search` | `official-source-research` | `library-book-search` | `read-only` |
+| 도서관 | `direct` | `additional` | 도서관 공식자료 검색 | `library-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 도서관 | `direct` | `additional` | 도서관 통계 근거 브리프 | `library-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 도서관 | `direct` | `additional` | 도서관 행정문서 검토 | `library-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 도서관 | `direct` | `additional` | 도서관 정책·민원 브리프 | `library-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 학예연구 | `adjacent` | `primary` | 유물·자료 출처 조사 | `museum-object-provenance-research` | `official-source-research` | `joseon-sillok-search`, `library-book-search` | `draft-only` |
+| 학예연구 | `adjacent` | `additional` | 학예연구 공식자료 검색 | `museum-research-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 학예연구 | `adjacent` | `additional` | 학예연구 통계 근거 브리프 | `museum-research-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 학예연구 | `adjacent` | `additional` | 학예연구 행정문서 검토 | `museum-research-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 학예연구 | `adjacent` | `additional` | 학예연구 정책·민원 브리프 | `museum-research-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 연구 | `direct` | `primary` | 공식출처 연구 브리프 | `official-research-brief` | `official-source-research` | `kosis-stats`, `k-dart`, `naver-news-search`, `daishin-report-search` | `draft-only` |
+| 연구 | `direct` | `additional` | 연구 공식자료 검색 | `research-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 연구 | `direct` | `additional` | 연구 통계 근거 브리프 | `research-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 연구 | `direct` | `additional` | 연구 행정문서 검토 | `research-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 연구 | `direct` | `additional` | 연구 정책·민원 브리프 | `research-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 
 ## 지역·생활행정
 
@@ -273,10 +389,20 @@
 | 지방자치 | `direct` | `additional` | 정책 근거 묶음 | `local-government-public-policy-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
 | 지방자치 | `direct` | `additional` | 자치법규안 초안 검토 | `local-ordinance-draft-review` | `local-ordinance-draft-review` | — | `draft-only` |
 | 지역개발 | `direct` | `primary` | 주택·토지·혼잡도 개발정보 조회 | `regional-development-housing-land` | `land-housing-geospatial-research` | `lh-notice-search`, `sh-notice-search`, `gongsijiga-search`, `seoul-density` | `read-only` |
+| 지역개발 | `direct` | `additional` | 지역개발 공식자료 검색 | `regional-development-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 지역개발 | `direct` | `additional` | 지역개발 통계 근거 브리프 | `regional-development-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 지역개발 | `direct` | `additional` | 지역개발 행정문서 검토 | `regional-development-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 지역개발 | `direct` | `additional` | 지역개발 정책·민원 브리프 | `regional-development-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 지방의회 | `adjacent` | `primary` | 회의록·조례안 조사 | `local-council-minutes-ordinance` | `korean-law-bill-research` | `assembly-bill-vote-search`, `korean-law-search` | `read-only` |
 | 지방의회 | `adjacent` | `additional` | 지방의회 의안·상정안 초안 검토 | `local-council-agenda-draft-review` | `administrative-document-draft-review` | — | `draft-only` |
 | 지방의회 | `adjacent` | `additional` | 지방의회 예산안 비교 브리프 | `local-council-budget-bill-comparison` | `public-policy-evidence-pack` | — | `draft-only` |
+| 지방의회 | `adjacent` | `additional` | 지방의회 절차·근거 검토 | `local-council-procedure-evidence-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 지방의회 | `adjacent` | `additional` | 지방의회 통계·성과 브리프 | `local-council-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
 | 우정 | `direct` | `primary` | 우편번호·배송조회 | `postal-code-delivery-tracking` | `official-source-research` | `delivery-tracking`, `zipcode-search` | `read-only` |
+| 우정 | `direct` | `additional` | 우정 공식자료 검색 | `postal-official-source-evidence-review` | `official-source-research` | — | `draft-only` |
+| 우정 | `direct` | `additional` | 우정 통계 근거 브리프 | `postal-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
+| 우정 | `direct` | `additional` | 우정 행정문서 검토 | `postal-administrative-document-review` | `administrative-document-draft-review` | — | `draft-only` |
+| 우정 | `direct` | `additional` | 우정 정책·민원 브리프 | `postal-policy-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 
 ## 근거와 경계
 

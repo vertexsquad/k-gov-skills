@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 import sys
@@ -28,6 +29,44 @@ def run(command: list[str], *, quiet: bool = False) -> None:
     if result.returncode:
         raise SystemExit(result.returncode)
 
+
+def check_diff_whitespace() -> None:
+    result = subprocess.run(
+        ["git", "diff", "--check"],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode == 0:
+        return
+    detail = f"{result.stdout}{result.stderr}"
+    if "mmap failed: Resource deadlock avoided" not in detail:
+        raise SystemExit(detail.strip() or "git diff --check failed")
+
+    # iCloud-backed checkouts can fail before Git reads the diff index. Keep the
+    # whitespace gate fail-closed by checking every modified tracked file
+    # directly, while preserving any other Git failure as a hard error.
+    listed = subprocess.run(
+        ["git", "ls-files", "-m", "-z"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+    )
+    bad: list[str] = []
+    for raw_path in listed.stdout.split(b"\0"):
+        if not raw_path:
+            continue
+        path = ROOT / os.fsdecode(raw_path)
+        try:
+            body = path.read_bytes()
+        except OSError as exc:
+            raise SystemExit(f"cannot read modified file for whitespace check: {path}: {exc}") from exc
+        if any(line.rstrip(b" \t") != line for line in body.splitlines()):
+            bad.append(str(path.relative_to(ROOT)))
+    if bad:
+        raise SystemExit(f"trailing whitespace: {', '.join(sorted(bad))}")
+    print("WARN git diff --check unavailable on iCloud index; direct modified-file check passed", file=sys.stderr)
 
 def scan_secrets() -> None:
     hits: list[str] = []
@@ -67,7 +106,7 @@ def main() -> int:
     run([python, "-m", "compileall", "-q", "kgov_runtime", "scripts", "tests"])
     scan_secrets()
     if (ROOT / ".git").exists():
-        run(["git", "diff", "--check"])
+        check_diff_whitespace()
     print(
         f"CHECK PASS root_suites={root_suites} capability_suites={capability_suites} "
         f"fixtures={capability_suites} domain_skills={sum(len(item['skills']) for item in data['domains'])} secret_hits=0"
