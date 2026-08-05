@@ -57,7 +57,7 @@ class CatalogContractTest(unittest.TestCase):
         self.assertEqual({"direct": 35, "adjacent": 16, "new": 8, "sensitive": 1}, dict(counts))
 
     def test_capability_runtime_manifest_is_complete(self) -> None:
-        self.assertEqual(4, self.data["schema_version"])
+        self.assertEqual(5, self.data["schema_version"])
         capabilities = self.data["shared_capabilities"]
         self.assertEqual(22, len(capabilities))
         required = {
@@ -86,7 +86,47 @@ class CatalogContractTest(unittest.TestCase):
         self.assertEqual(308, len(names))
         self.assertEqual(len(names), len(set(names)))
 
+    def test_minimum_skill_rollout_contract(self) -> None:
+        target = self.data["target_skills_per_domain"]
+        minimums = self.data["enforced_minimum_skills_by_domain"]
+        domain_names = {domain["domain"] for domain in self.data["domains"]}
+        self.assertEqual(5, target)
+        self.assertEqual(domain_names, set(minimums))
+        self.assertTrue(all(value == 5 for value in minimums.values()))
+        for domain in self.data["domains"]:
+            self.assertGreaterEqual(len(domain["skills"]), minimums[domain["domain"]])
+
+    def test_minimum_skill_rollout_mutations_fail_closed(self) -> None:
+        changed = copy.deepcopy(self.data)
+        changed["enforced_minimum_skills_by_domain"].pop("교육")
+        self.assertTrue(any("minimum Skill map/domain mismatch" in error for error in validate(changed, ROOT)))
+
+        changed = copy.deepcopy(self.data)
+        changed["enforced_minimum_skills_by_domain"]["가짜도메인"] = 5
+        self.assertTrue(any("minimum Skill map/domain mismatch" in error for error in validate(changed, ROOT)))
+
+        for invalid_target in (4, "5", None):
+            with self.subTest(target=invalid_target):
+                changed = copy.deepcopy(self.data)
+                changed["target_skills_per_domain"] = invalid_target
+                self.assertIn("target_skills_per_domain must be integer 5", validate(changed, ROOT))
+
+        for invalid_minimum in (0, 6, "5"):
+            with self.subTest(minimum=invalid_minimum):
+                changed = copy.deepcopy(self.data)
+                changed["enforced_minimum_skills_by_domain"]["교육"] = invalid_minimum
+                self.assertTrue(any("교육: invalid enforced minimum" in error for error in validate(changed, ROOT)))
+
+        changed = copy.deepcopy(self.data)
+        domain = next(item for item in changed["domains"] if item["domain"] == "경호")
+        draft = next(skill for skill in domain["skills"] if skill["role"] == "additional")
+        draft["boundary"] = "draft-only"
+        self.assertTrue(
+            any("경호/" in error and "sensitive evidence requires manual-review-only" in error for error in validate(changed, ROOT))
+        )
+
     def test_additional_capabilities_are_domain_owned(self) -> None:
+
         shared_expected = {
             "civil-complaint-triage-draft",
             "administrative-document-draft-review",
@@ -207,7 +247,7 @@ class CatalogContractTest(unittest.TestCase):
                 by_domain["세무"]["skills"].append(moved)
                 errors = validate(changed, ROOT)
                 self.assertIn(
-                    f"{domain_name}: requires at least 5 Skills in minimum-five rollout, got 4",
+                    f"{domain_name}: requires at least 5 Skills (target 5), got 4",
                     errors,
                 )
 
@@ -319,7 +359,7 @@ class CatalogContractTest(unittest.TestCase):
                 by_domain["세무"]["skills"].append(moved)
                 errors = validate(changed, ROOT)
                 self.assertIn(
-                    f"{domain_name}: requires at least 5 Skills in minimum-five rollout, got 4",
+                    f"{domain_name}: requires at least 5 Skills (target 5), got 4",
                     errors,
                 )
 
@@ -523,7 +563,7 @@ class CatalogContractTest(unittest.TestCase):
                     by_domain["세무"]["skills"].append(moved)
                     errors = validate(changed, ROOT)
                     self.assertIn(
-                        f"{domain_name}: requires at least 5 Skills in minimum-five rollout, got 4",
+                        f"{domain_name}: requires at least 5 Skills (target 5), got 4",
                         errors,
                     )
 
@@ -679,7 +719,7 @@ class CatalogContractTest(unittest.TestCase):
                     by_domain["세무"]["skills"].append(moved)
                     errors = validate(changed, ROOT)
                     self.assertIn(
-                        f"{domain_name}: requires at least 5 Skills in minimum-five rollout, got 4",
+                        f"{domain_name}: requires at least 5 Skills (target 5), got 4",
                         errors,
                     )
 
@@ -832,7 +872,7 @@ class CatalogContractTest(unittest.TestCase):
                     by_domain["세무"]["skills"].append(moved)
                     errors = validate(changed, ROOT)
                     self.assertIn(
-                        f"{domain_name}: requires at least 5 Skills in minimum-five rollout, got 4",
+                        f"{domain_name}: requires at least 5 Skills (target 5), got 4",
                         errors,
                     )
 
@@ -994,7 +1034,7 @@ class CatalogContractTest(unittest.TestCase):
                     by_domain["세무"]["skills"].append(moved)
                     errors = validate(changed, ROOT)
                     self.assertIn(
-                        f"{domain_name}: requires at least 5 Skills in minimum-five rollout, got 4",
+                        f"{domain_name}: requires at least 5 Skills (target 5), got 4",
                         errors,
                     )
         self.assertEqual(66, mutation_count)
@@ -1157,7 +1197,7 @@ class CatalogContractTest(unittest.TestCase):
                     by_domain["세무"]["skills"].append(moved)
                     errors = validate(changed, ROOT)
                     self.assertIn(
-                        f"{domain_name}: requires at least 5 Skills in minimum-five rollout, got 4",
+                        f"{domain_name}: requires at least 5 Skills (target 5), got 4",
                         errors,
                     )
         for mutation in (

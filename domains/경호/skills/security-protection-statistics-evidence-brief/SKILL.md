@@ -1,6 +1,6 @@
 ---
 name: security-protection-statistics-evidence-brief
-description: "경호 업무의 경호 통계 근거 브리프 절차. 내부 kosis-official-statistics capability를 사용하며 draft-only 경계를 지킵니다."
+description: "경호 업무의 경호 통계 근거 브리프 절차. 내부 kosis-official-statistics capability를 사용하며 manual-review-only 경계를 지킵니다."
 metadata:
   kgov:
     domain: "경호"
@@ -15,7 +15,7 @@ metadata:
 - Domain: **경호**
 - 내부 capability: `kosis-official-statistics`
 - 실행 상태: `fixture-verified` / live smoke `not-run`
-- 실행 경계: `draft-only`
+- 실행 경계: `manual-review-only`
 - Reference Skill: 없음
 
 ## 업무별 추가 체크

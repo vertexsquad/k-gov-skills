@@ -23,9 +23,11 @@ scripts/check.py                                # 전체 deterministic 검증 �
 `domains/<domain>/skills/` 하위에 있어야 하며 별도 top-level `skills/`는 허용하지 않습니다.
 공통 adapter 코드는 `kgov_runtime/capabilities/`에서 한 번만 구현하고 domain Skill이 이를 호출합니다.
 
-Catalog schema v4의 domain `skills[]`는 `primary` 하나와 선택적 `additional` Skill을 명시합니다.
+Catalog schema v5의 domain `skills[]`는 `primary` 하나와 선택적 `additional` Skill을 명시합니다.
 모든 `name`은 저장소 전체에서 고유합니다. 60개 domain에 primary 60개와 additional 248개,
-총 308개 domain-owned Skill 진입점이 있습니다.
+총 308개 domain-owned Skill 진입점이 있습니다. 모든 domain의 목표는 최소 5개이며,
+`target_skills_per_domain`과 `enforced_minimum_skills_by_domain`으로 최소값을 검증합니다.
+현재 60개 domain 모두 목표 5개를 충족합니다.
 
 ## 현재 capability
 

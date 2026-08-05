@@ -38,6 +38,7 @@ PROXY_MODES = {"none", "optional", "required", "mixed"}
 SIDE_EFFECT_CLASSES = {"read-only", "document-read", "draft-only"}
 EXECUTION_STATUSES = {"planned", "fixture-verified", "live-verified", "blocked"}
 LIVE_SMOKE_STATUSES = {"not-run", "passed", "failed", "blocked"}
+TARGET_SKILLS_PER_DOMAIN = 5
 WAVE_ONE_TASK_CHECKS = {
     "national-subsidy-project-evidence-review": (
         "사업·회계연도·소관기관·지원 근거를 주장 단위로 분리",
@@ -771,8 +772,15 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
     errors: list[str] = []
     if not isinstance(data, dict):
         return ["catalog root must be a JSON object"]
-    if data.get("schema_version") != 4:
-        errors.append("schema_version must be 4")
+    if data.get("schema_version") != 5:
+        errors.append("schema_version must be 5")
+    target_skills = data.get("target_skills_per_domain")
+    if type(target_skills) is not int or target_skills != TARGET_SKILLS_PER_DOMAIN:
+        errors.append("target_skills_per_domain must be integer 5")
+    enforced_minimums = data.get("enforced_minimum_skills_by_domain")
+    if not isinstance(enforced_minimums, dict):
+        errors.append("enforced_minimum_skills_by_domain must be an object")
+        enforced_minimums = {}
     domains = data.get("domains")
     if not isinstance(domains, list):
         return errors + ["domains must be a list"]
@@ -809,9 +817,16 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
         if not isinstance(skills, list) or not skills:
             errors.append(f"{domain}: skills must be a non-empty list")
             continue
-        if len(skills) < 5:
+        enforced_minimum = enforced_minimums.get(domain)
+        if (
+            type(enforced_minimum) is not int
+            or not 1 <= enforced_minimum <= TARGET_SKILLS_PER_DOMAIN
+        ):
+            errors.append(f"{domain}: invalid enforced minimum {enforced_minimum!r}")
+        elif len(skills) < enforced_minimum:
             errors.append(
-                f"{domain}: requires at least 5 Skills in minimum-five rollout, got {len(skills)}"
+                f"{domain}: requires at least {enforced_minimum} Skills "
+                f"(target {TARGET_SKILLS_PER_DOMAIN}), got {len(skills)}"
             )
         wave_two_contract = WAVE_TWO_SKILL_CONTRACTS.get(domain)
         if wave_two_contract is not None:
@@ -945,12 +960,21 @@ def validate(data: dict[str, Any], root: Path = ROOT) -> list[str]:
                     errors.append(f"{domain}: {evidence} evidence requires primary reference_skills")
                 if evidence in {"new", "sensitive"} and references:
                     errors.append(f"{domain}: {evidence} evidence must not claim primary reference_skills")
-                if evidence == "sensitive" and boundary != "manual-review-only":
-                    errors.append(f"{domain}: sensitive evidence requires manual-review-only")
+            if evidence == "sensitive" and boundary != "manual-review-only":
+                errors.append(
+                    f"{domain}/{name}: sensitive evidence requires manual-review-only, got {boundary}"
+                )
             declared_entrypoints.add(Path("domains") / domain / "skills" / name / "SKILL.md")
 
     if total_skills != 308:
         errors.append(f"catalog must declare 308 domain Skills, got {total_skills}")
+    minimum_domains = set(enforced_minimums)
+    if minimum_domains != seen_domains:
+        errors.append(
+            "minimum Skill map/domain mismatch "
+            f"missing={sorted(seen_domains - minimum_domains)} "
+            f"extra={sorted(minimum_domains - seen_domains)}"
+        )
     domains_root = root / "domains"
     actual_domains = {path.name for path in domains_root.iterdir() if path.is_dir()} if domains_root.is_dir() else set()
     if actual_domains != seen_domains:
