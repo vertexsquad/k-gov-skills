@@ -1,68 +1,5 @@
 {
-  "schema_version": 5,
-  "target_skills_per_domain": 5,
-  "enforced_minimum_skills_by_domain": {
-    "행정": 5,
-    "재정": 5,
-    "세무": 5,
-    "관세": 5,
-    "감사": 5,
-    "통계": 5,
-    "조달": 5,
-    "외교": 5,
-    "통일": 5,
-    "선거관리": 5,
-    "입법": 5,
-    "사법": 5,
-    "검찰": 1,
-    "교정": 1,
-    "보호관찰": 1,
-    "출입국": 5,
-    "경찰": 5,
-    "해양경찰": 1,
-    "소방": 5,
-    "재난안전": 5,
-    "국방": 1,
-    "군무": 1,
-    "경호": 1,
-    "교육": 5,
-    "교육행정": 5,
-    "사회복지": 5,
-    "고용노동": 5,
-    "보건의료": 5,
-    "식품의약": 5,
-    "농업": 1,
-    "축산": 1,
-    "농촌지도": 1,
-    "산림": 1,
-    "해양수산": 1,
-    "환경": 1,
-    "기상": 1,
-    "국토교통": 3,
-    "토목시설": 3,
-    "건축": 3,
-    "도시계획": 1,
-    "산업": 1,
-    "에너지": 1,
-    "중소기업": 1,
-    "과학기술": 3,
-    "특허": 3,
-    "정보통신": 1,
-    "전산": 3,
-    "사이버보안": 3,
-    "문화예술": 1,
-    "체육": 1,
-    "관광": 1,
-    "문화유산": 1,
-    "기록관리": 3,
-    "도서관": 1,
-    "학예연구": 1,
-    "연구": 1,
-    "지방자치": 5,
-    "지역개발": 1,
-    "지방의회": 3,
-    "우정": 1
-  },
+  "schema_version": 4,
   "research_source": {
     "wiki_authority": "domains/harness-engineering/korea-local-agent-skillpack-runtime-contract.md",
     "wiki_source_map": "raw/2026-05-28-nomadamas-k-skill-source-map.md",
@@ -1317,6 +1254,58 @@
             "korean-law-search"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "prosecution-official-source-evidence-review",
+          "title": "검찰 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "검찰 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "검찰 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "prosecution-statistics-evidence-brief",
+          "title": "검찰 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "검찰 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "검찰 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "prosecution-administrative-document-review",
+          "title": "검찰 행정문서 검토",
+          "capability": "korean-legal-citation-verification",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "검찰 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "검찰 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "prosecution-policy-evidence-brief",
+          "title": "검찰 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "검찰 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "검찰 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -1332,6 +1321,58 @@
           "role": "primary",
           "reference_skills": [],
           "boundary": "read-only"
+        },
+        {
+          "name": "corrections-official-source-evidence-review",
+          "title": "교정 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "교정 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "교정 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "corrections-statistics-evidence-brief",
+          "title": "교정 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "교정 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "교정 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "corrections-administrative-document-review",
+          "title": "교정 행정문서 검토",
+          "capability": "korean-legal-citation-verification",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "교정 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "교정 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "corrections-policy-evidence-brief",
+          "title": "교정 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "교정 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "교정 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -1347,6 +1388,58 @@
           "role": "primary",
           "reference_skills": [],
           "boundary": "read-only"
+        },
+        {
+          "name": "probation-official-source-evidence-review",
+          "title": "보호관찰 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "보호관찰 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "보호관찰 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "probation-statistics-evidence-brief",
+          "title": "보호관찰 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "보호관찰 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "보호관찰 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "probation-administrative-document-review",
+          "title": "보호관찰 행정문서 검토",
+          "capability": "korean-legal-citation-verification",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "보호관찰 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "보호관찰 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "probation-policy-evidence-brief",
+          "title": "보호관찰 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "보호관찰 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "보호관찰 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -1501,6 +1594,58 @@
             "han-river-water-level"
           ],
           "boundary": "draft-only"
+        },
+        {
+          "name": "coast-guard-official-source-evidence-review",
+          "title": "해양경찰 공식자료 검색",
+          "capability": "disaster-geospatial-brief",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "해양경찰 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "해양경찰 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "coast-guard-statistics-evidence-brief",
+          "title": "해양경찰 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "해양경찰 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "해양경찰 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "coast-guard-administrative-document-review",
+          "title": "해양경찰 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "해양경찰 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "해양경찰 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "coast-guard-policy-evidence-brief",
+          "title": "해양경찰 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "해양경찰 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "해양경찰 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -1660,6 +1805,58 @@
             "d2b-notice-search"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "defense-official-source-evidence-review",
+          "title": "국방 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "국방 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "국방 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "defense-statistics-evidence-brief",
+          "title": "국방 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "국방 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "국방 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "defense-administrative-document-review",
+          "title": "국방 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "국방 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "국방 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "defense-policy-evidence-brief",
+          "title": "국방 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "국방 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "국방 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -1675,6 +1872,58 @@
           "role": "primary",
           "reference_skills": [],
           "boundary": "read-only"
+        },
+        {
+          "name": "military-civil-service-official-source-evidence-review",
+          "title": "군무 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "군무 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "군무 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "military-civil-service-statistics-evidence-brief",
+          "title": "군무 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "군무 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "군무 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "military-civil-service-administrative-document-review",
+          "title": "군무 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "군무 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "군무 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "military-civil-service-policy-evidence-brief",
+          "title": "군무 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "군무 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "군무 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -1690,6 +1939,58 @@
           "role": "primary",
           "reference_skills": [],
           "boundary": "manual-review-only"
+        },
+        {
+          "name": "security-protection-official-source-evidence-review",
+          "title": "경호 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "경호 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "경호 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "security-protection-statistics-evidence-brief",
+          "title": "경호 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "경호 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "경호 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "security-protection-administrative-document-review",
+          "title": "경호 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "경호 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "경호 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "security-protection-policy-evidence-brief",
+          "title": "경호 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "manual-review-only",
+          "task_checks": [
+            "경호 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "경호 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2130,6 +2431,58 @@
             "korea-weather"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "agriculture-official-source-evidence-review",
+          "title": "농업 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "농업 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "농업 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "agriculture-statistics-evidence-brief",
+          "title": "농업 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "농업 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "농업 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "agriculture-administrative-document-review",
+          "title": "농업 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "농업 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "농업 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "agriculture-policy-evidence-brief",
+          "title": "농업 정책·민원 브리프",
+          "capability": "welfare-health-safety-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "농업 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "농업 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2148,6 +2501,58 @@
             "korea-weather"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "livestock-official-source-evidence-review",
+          "title": "축산 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "축산 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "축산 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "livestock-statistics-evidence-brief",
+          "title": "축산 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "축산 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "축산 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "livestock-administrative-document-review",
+          "title": "축산 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "축산 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "축산 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "livestock-policy-evidence-brief",
+          "title": "축산 정책·민원 브리프",
+          "capability": "welfare-health-safety-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "축산 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "축산 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2166,6 +2571,58 @@
             "korea-weather"
           ],
           "boundary": "draft-only"
+        },
+        {
+          "name": "rural-extension-official-source-evidence-review",
+          "title": "농촌지도 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "농촌지도 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "농촌지도 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "rural-extension-statistics-evidence-brief",
+          "title": "농촌지도 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "농촌지도 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "농촌지도 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "rural-extension-administrative-document-review",
+          "title": "농촌지도 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "농촌지도 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "농촌지도 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "rural-extension-policy-evidence-brief",
+          "title": "농촌지도 정책·민원 브리프",
+          "capability": "welfare-health-safety-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "농촌지도 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "농촌지도 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2184,6 +2641,58 @@
             "korea-weather"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "forestry-official-source-evidence-review",
+          "title": "산림 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "산림 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "산림 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "forestry-statistics-evidence-brief",
+          "title": "산림 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "산림 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "산림 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "forestry-administrative-document-review",
+          "title": "산림 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "산림 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "산림 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "forestry-policy-evidence-brief",
+          "title": "산림 정책·민원 브리프",
+          "capability": "welfare-health-safety-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "산림 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "산림 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2203,6 +2712,58 @@
             "han-river-water-level"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "marine-fisheries-official-source-evidence-review",
+          "title": "해양수산 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "해양수산 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "해양수산 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "marine-fisheries-statistics-evidence-brief",
+          "title": "해양수산 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "해양수산 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "해양수산 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "marine-fisheries-administrative-document-review",
+          "title": "해양수산 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "해양수산 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "해양수산 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "marine-fisheries-policy-evidence-brief",
+          "title": "해양수산 정책·민원 브리프",
+          "capability": "welfare-health-safety-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "해양수산 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "해양수산 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2223,6 +2784,58 @@
             "korea-weather"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "environment-official-source-evidence-review",
+          "title": "환경 공식자료 검색",
+          "capability": "disaster-geospatial-brief",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "환경 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "환경 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "environment-statistics-evidence-brief",
+          "title": "환경 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "환경 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "환경 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "environment-administrative-document-review",
+          "title": "환경 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "환경 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "환경 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "environment-policy-evidence-brief",
+          "title": "환경 정책·민원 브리프",
+          "capability": "welfare-health-safety-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "환경 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "환경 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2240,6 +2853,58 @@
             "korea-weather"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "meteorology-official-source-evidence-review",
+          "title": "기상 공식자료 검색",
+          "capability": "disaster-geospatial-brief",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "기상 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "기상 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "meteorology-statistics-evidence-brief",
+          "title": "기상 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "기상 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "기상 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "meteorology-administrative-document-review",
+          "title": "기상 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "기상 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "기상 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "meteorology-policy-evidence-brief",
+          "title": "기상 정책·민원 브리프",
+          "capability": "welfare-health-safety-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "기상 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "기상 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2284,6 +2949,32 @@
             "KOSIS 통계표 코드·작성기관·조회일·통계 기준·개정 상태를 보존",
             "위험도 순위·단속·시설 개선 우선순위는 교통안전 담당기관 검토로 이관"
           ]
+        },
+        {
+          "name": "land-transport-procedure-evidence-review",
+          "title": "국토교통 절차·근거 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "국토교통 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "국토교통 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "land-transport-statistics-evidence-brief",
+          "title": "국토교통 통계·성과 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "국토교통 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "국토교통 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
         }
       ]
     },
@@ -2327,6 +3018,32 @@
             "시설·구간·점검일·손상유형·조치상태·증빙을 분리",
             "공식 기준·점검보고서·사진·도면 참조와 증빙 공백을 구분",
             "시설 안전등급·통제·보수 우선순위는 기술자·관리기관 승인으로 이관"
+          ]
+        },
+        {
+          "name": "infrastructure-procedure-evidence-review",
+          "title": "토목시설 절차·근거 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "토목시설 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "토목시설 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "infrastructure-statistics-evidence-brief",
+          "title": "토목시설 통계·성과 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "토목시설 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "토목시설 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
           ]
         }
       ]
@@ -2374,6 +3091,32 @@
             "국가법령정보센터의 조문·시행일·인용문과 공식 URL을 보존",
             "설계 적합성·허가 가능 여부·법적 해석은 건축사·허가권자 검토로 이관"
           ]
+        },
+        {
+          "name": "architecture-procedure-evidence-review",
+          "title": "건축 절차·근거 검토",
+          "capability": "building-permit-document-precheck",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "건축 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "건축 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "architecture-statistics-evidence-brief",
+          "title": "건축 통계·성과 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "건축 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "건축 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
         }
       ]
     },
@@ -2394,6 +3137,58 @@
             "sh-notice-search"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "urban-planning-official-source-evidence-review",
+          "title": "도시계획 공식자료 검색",
+          "capability": "land-housing-geospatial-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "도시계획 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "도시계획 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "urban-planning-statistics-evidence-brief",
+          "title": "도시계획 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "도시계획 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "도시계획 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "urban-planning-administrative-document-review",
+          "title": "도시계획 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "도시계획 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "도시계획 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "urban-planning-policy-evidence-brief",
+          "title": "도시계획 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "도시계획 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "도시계획 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2412,6 +3207,58 @@
             "fsc-corporate-info"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "industry-official-source-evidence-review",
+          "title": "산업 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "산업 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "산업 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "industry-statistics-evidence-brief",
+          "title": "산업 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "산업 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "산업 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "industry-administrative-document-review",
+          "title": "산업 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "산업 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "산업 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "industry-policy-evidence-brief",
+          "title": "산업 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "산업 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "산업 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2430,6 +3277,58 @@
             "kosis-stats"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "energy-official-source-evidence-review",
+          "title": "에너지 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "에너지 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "에너지 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "energy-statistics-evidence-brief",
+          "title": "에너지 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "에너지 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "에너지 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "energy-administrative-document-review",
+          "title": "에너지 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "에너지 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "에너지 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "energy-policy-evidence-brief",
+          "title": "에너지 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "에너지 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "에너지 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2449,6 +3348,58 @@
             "nts-business-registration"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "sme-official-source-evidence-review",
+          "title": "중소기업 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "중소기업 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "중소기업 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "sme-statistics-evidence-brief",
+          "title": "중소기업 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "중소기업 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "중소기업 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "sme-administrative-document-review",
+          "title": "중소기업 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "중소기업 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "중소기업 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "sme-policy-evidence-brief",
+          "title": "중소기업 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "중소기업 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "중소기업 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2492,6 +3443,32 @@
             "기술·정책 주장별 기준선·지표·기간·대상·단위와 상관 또는 인과 표현을 분리",
             "공식 자료로 입력된 URL·발행기관·공표일·조회일·방법론·문서 버전과 상충·미수집 근거를 구분",
             "인과효과·기술성숙도·투자·규제·사업 우선순위 판단은 과학기술 담당자와 전문가 검토로 이관"
+          ]
+        },
+        {
+          "name": "science-technology-procedure-evidence-review",
+          "title": "과학기술 절차·근거 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "과학기술 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "과학기술 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "science-technology-statistics-evidence-brief",
+          "title": "과학기술 통계·성과 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "과학기술 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "과학기술 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
           ]
         }
       ]
@@ -2541,6 +3518,32 @@
             "공식 자료로 입력된 특허청·KIPRIS URL·보고서 또는 통계표 식별자·공표일·조회일·개정 상태와 결측을 구분",
             "인과관계·정책효과·산업경쟁력·지원 또는 규제 우선순위 판단은 지식재산 담당자 검토로 이관"
           ]
+        },
+        {
+          "name": "patent-procedure-evidence-review",
+          "title": "특허 절차·근거 검토",
+          "capability": "patent-prior-art-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "특허 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "특허 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "patent-statistics-evidence-brief",
+          "title": "특허 통계·성과 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "특허 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "특허 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
         }
       ]
     },
@@ -2559,6 +3562,58 @@
             "korean-privacy-terms"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "ict-official-source-evidence-review",
+          "title": "정보통신 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "정보통신 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "정보통신 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "ict-statistics-evidence-brief",
+          "title": "정보통신 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "정보통신 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "정보통신 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "ict-administrative-document-review",
+          "title": "정보통신 행정문서 검토",
+          "capability": "public-it-project-procedure-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "정보통신 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "정보통신 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "ict-policy-evidence-brief",
+          "title": "정보통신 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "정보통신 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "정보통신 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2599,6 +3654,32 @@
             "시스템·데이터등급·위협·통제·검증증빙을 항목별로 분리",
             "공식 보안·개인정보·정보화 지침의 버전·URL·조회일을 보존",
             "보안 적합성·취약점 수용·운영 승인은 보안책임자 검토로 이관"
+          ]
+        },
+        {
+          "name": "public-it-procedure-evidence-review",
+          "title": "전산 절차·근거 검토",
+          "capability": "public-it-project-procedure-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "전산 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "전산 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "public-it-statistics-evidence-brief",
+          "title": "전산 통계·성과 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "전산 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "전산 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
           ]
         }
       ]
@@ -2643,6 +3724,32 @@
             "공식 자료로 입력된 KISA·국가 또는 기관 보안기준 URL·문서버전·시행일·조회일과 상충·미수집 근거를 구분",
             "사고등급·차단·격리·포렌식·외부신고·현장대응 실행은 보안책임자와 관할기관 검토로 이관"
           ]
+        },
+        {
+          "name": "cybersecurity-procedure-evidence-review",
+          "title": "사이버보안 절차·근거 검토",
+          "capability": "public-it-project-procedure-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "사이버보안 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "사이버보안 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "cybersecurity-statistics-evidence-brief",
+          "title": "사이버보안 통계·성과 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "사이버보안 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "사이버보안 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
         }
       ]
     },
@@ -2660,6 +3767,58 @@
             "kopis-performance-search"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "arts-culture-official-source-evidence-review",
+          "title": "문화예술 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "문화예술 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "문화예술 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "arts-culture-statistics-evidence-brief",
+          "title": "문화예술 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "문화예술 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "문화예술 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "arts-culture-administrative-document-review",
+          "title": "문화예술 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "문화예술 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "문화예술 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "arts-culture-policy-evidence-brief",
+          "title": "문화예술 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "문화예술 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "문화예술 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2680,6 +3839,58 @@
             "korean-marathon-schedule"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "sports-official-source-evidence-review",
+          "title": "체육 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "체육 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "체육 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "sports-statistics-evidence-brief",
+          "title": "체육 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "체육 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "체육 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "sports-administrative-document-review",
+          "title": "체육 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "체육 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "체육 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "sports-policy-evidence-brief",
+          "title": "체육 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "체육 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "체육 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2699,6 +3910,58 @@
             "myrealtrip-search"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "tourism-official-source-evidence-review",
+          "title": "관광 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "관광 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "관광 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "tourism-statistics-evidence-brief",
+          "title": "관광 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "관광 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "관광 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "tourism-administrative-document-review",
+          "title": "관광 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "관광 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "관광 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "tourism-policy-evidence-brief",
+          "title": "관광 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "관광 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "관광 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2716,6 +3979,58 @@
             "joseon-sillok-search"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "cultural-heritage-official-source-evidence-review",
+          "title": "문화유산 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "문화유산 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "문화유산 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "cultural-heritage-statistics-evidence-brief",
+          "title": "문화유산 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "문화유산 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "문화유산 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "cultural-heritage-administrative-document-review",
+          "title": "문화유산 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "문화유산 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "문화유산 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "cultural-heritage-policy-evidence-brief",
+          "title": "문화유산 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "문화유산 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "문화유산 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2761,6 +4076,32 @@
             "공식 기록관리기준·법령 URL과 조회일 및 근거 공백을 보존",
             "보존기간 확정·평가·이관·폐기·원본 변경은 기록물관리 담당자 승인으로 이관"
           ]
+        },
+        {
+          "name": "records-management-procedure-evidence-review",
+          "title": "기록관리 절차·근거 검토",
+          "capability": "public-records-lifecycle-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "기록관리 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "기록관리 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "records-management-statistics-evidence-brief",
+          "title": "기록관리 통계·성과 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "기록관리 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "기록관리 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
         }
       ]
     },
@@ -2778,6 +4119,58 @@
             "library-book-search"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "library-official-source-evidence-review",
+          "title": "도서관 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "도서관 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "도서관 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "library-statistics-evidence-brief",
+          "title": "도서관 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "도서관 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "도서관 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "library-administrative-document-review",
+          "title": "도서관 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "도서관 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "도서관 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "library-policy-evidence-brief",
+          "title": "도서관 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "도서관 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "도서관 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2796,6 +4189,58 @@
             "library-book-search"
           ],
           "boundary": "draft-only"
+        },
+        {
+          "name": "museum-research-official-source-evidence-review",
+          "title": "학예연구 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "학예연구 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "학예연구 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "museum-research-statistics-evidence-brief",
+          "title": "학예연구 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "학예연구 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "학예연구 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "museum-research-administrative-document-review",
+          "title": "학예연구 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "학예연구 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "학예연구 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "museum-research-policy-evidence-brief",
+          "title": "학예연구 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "학예연구 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "학예연구 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2816,6 +4261,58 @@
             "daishin-report-search"
           ],
           "boundary": "draft-only"
+        },
+        {
+          "name": "research-official-source-evidence-review",
+          "title": "연구 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "연구 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "연구 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "research-statistics-evidence-brief",
+          "title": "연구 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "연구 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "연구 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "research-administrative-document-review",
+          "title": "연구 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "연구 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "연구 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "research-policy-evidence-brief",
+          "title": "연구 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "연구 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "연구 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2892,6 +4389,58 @@
             "seoul-density"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "regional-development-official-source-evidence-review",
+          "title": "지역개발 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "지역개발 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "지역개발 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "regional-development-statistics-evidence-brief",
+          "title": "지역개발 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "지역개발 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "지역개발 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "regional-development-administrative-document-review",
+          "title": "지역개발 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "지역개발 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "지역개발 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "regional-development-policy-evidence-brief",
+          "title": "지역개발 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "지역개발 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "지역개발 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     },
@@ -2936,6 +4485,32 @@
             "공식 의안·회의록·예산서 URL과 조회일 및 문서 버전을 보존",
             "증감 적정성·재정 영향·의결 판단은 지방의회 담당자 검토로 이관"
           ]
+        },
+        {
+          "name": "local-council-procedure-evidence-review",
+          "title": "지방의회 절차·근거 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "지방의회 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "지방의회 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "local-council-statistics-evidence-brief",
+          "title": "지방의회 통계·성과 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "지방의회 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "지방의회 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
         }
       ]
     },
@@ -2954,6 +4529,58 @@
             "zipcode-search"
           ],
           "boundary": "read-only"
+        },
+        {
+          "name": "postal-official-source-evidence-review",
+          "title": "우정 공식자료 검색",
+          "capability": "official-source-research",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "우정 업무 대상·기관·기준일·검색 범위를 분리",
+            "공식 원문 URL·발행기관·공표일·조회일과 근거 공백을 보존",
+            "우정 사실 확정·자격·허가·운영 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "postal-statistics-evidence-brief",
+          "title": "우정 통계 근거 브리프",
+          "capability": "kosis-official-statistics",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "우정 지표·기준기간·분모·단위를 분리",
+            "공식 통계표 코드·작성기관·공표일·조회일·개정 상태를 보존",
+            "우정 추세·인과관계·정책효과 판단은 담당기관 검토로 이관"
+          ]
+        },
+        {
+          "name": "postal-administrative-document-review",
+          "title": "우정 행정문서 검토",
+          "capability": "administrative-document-draft-review",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "우정 대상·적용 기준·시행일·문서 상태·증빙을 분리",
+            "공식 법령·지침·문서 URL과 조회일·버전을 보존",
+            "우정 적합성·승인·제출·집행 판단은 담당자 검토로 이관"
+          ]
+        },
+        {
+          "name": "postal-policy-evidence-brief",
+          "title": "우정 정책·민원 브리프",
+          "capability": "public-policy-evidence-pack",
+          "role": "additional",
+          "reference_skills": [],
+          "boundary": "draft-only",
+          "task_checks": [
+            "우정 정책 주장·대상·기준일·지표를 분리",
+            "공식 자료 URL·발행기관·조회일·문서 버전을 보존",
+            "우정 정책 결정·지원·집행·개별 판단은 담당자 승인으로 이관"
+          ]
         }
       ]
     }
