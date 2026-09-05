@@ -1,5 +1,5 @@
 {
-  "schema_version": 5,
+  "schema_version": 6,
   "target_skills_per_domain": 5,
   "enforced_minimum_skills_by_domain": {
     "행정": 5,
@@ -69,6 +69,39 @@
     "reference_repository": "https://github.com/NomaDamas/k-skill",
     "reference_head": "0c1bcdc9288545297897b0eee349d30ab2e1b230"
   },
+  "source_policies": [
+    {"id": "law-go-kr-drf-api", "revision": 1, "enabled": false, "institution": "국가법령정보센터", "channel": "api", "scope": {"origins": ["https://www.law.go.kr"], "path_rules": [{"match": "exact", "path": "/DRF/lawSearch.do"}, {"match": "exact", "path": "/DRF/lawService.do"}], "methods": ["GET"]}, "robots": {"status": "unreviewed"}, "terms": {"status": "unreviewed"}, "rate_limit": {"status": "unreviewed"}, "response": {"status": "unreviewed"}, "license": {"status": "unreviewed"}, "retention": {"raw_content": "none", "receipts": "metadata-only"}},
+    {"id": "kosis-statistics-api", "revision": 1, "enabled": false, "institution": "KOSIS", "channel": "api", "scope": {"origins": ["https://kosis.kr"], "path_rules": [{"match": "exact", "path": "/openapi/Param/statisticsParameterData.do"}], "methods": ["GET"]}, "robots": {"status": "unreviewed"}, "terms": {"status": "unreviewed"}, "rate_limit": {"status": "unreviewed"}, "response": {"status": "unreviewed"}, "license": {"status": "unreviewed"}, "retention": {"raw_content": "none", "receipts": "metadata-only"}},
+    {"id": "data-go-kr-order-plan-api", "revision": 1, "enabled": false, "institution": "조달청", "channel": "api", "scope": {"origins": ["https://apis.data.go.kr"], "path_rules": [{"match": "exact", "path": "/1230000/ao/OrderPlanSttusService"}], "methods": ["GET"]}, "robots": {"status": "unreviewed"}, "terms": {"status": "unreviewed"}, "rate_limit": {"status": "unreviewed"}, "response": {"status": "unreviewed"}, "license": {"status": "unreviewed"}, "retention": {"raw_content": "none", "receipts": "metadata-only"}},
+    {"id": "data-go-kr-village-forecast-api", "revision": 1, "enabled": false, "institution": "기상청", "channel": "api", "scope": {"origins": ["https://apis.data.go.kr"], "path_rules": [{"match": "exact", "path": "/1360000/VilageFcstInfoService_2.0/getVilageFcst"}], "methods": ["GET"]}, "robots": {"status": "unreviewed"}, "terms": {"status": "unreviewed"}, "rate_limit": {"status": "unreviewed"}, "response": {"status": "unreviewed"}, "license": {"status": "unreviewed"}, "retention": {"raw_content": "none", "receipts": "metadata-only"}},
+    {"id": "gov-kr-web", "revision": 1, "enabled": false, "institution": "정부24", "channel": "web", "scope": {"origins": ["https://www.gov.kr"], "path_rules": [{"match": "prefix", "path": "/"}], "methods": ["GET"]}, "robots": {"status": "unreviewed"}, "terms": {"status": "unreviewed"}, "rate_limit": {"status": "unreviewed"}, "response": {"status": "unreviewed"}, "license": {"status": "unreviewed"}, "retention": {"raw_content": "none", "receipts": "metadata-only"}},
+    {"id": "kipris-web", "revision": 1, "enabled": false, "institution": "KIPRIS", "channel": "web", "scope": {"origins": ["https://www.kipris.or.kr"], "path_rules": [{"match": "prefix", "path": "/"}], "methods": ["GET"]}, "robots": {"status": "unreviewed"}, "terms": {"status": "unreviewed"}, "rate_limit": {"status": "unreviewed"}, "response": {"status": "unreviewed"}, "license": {"status": "unreviewed"}, "retention": {"raw_content": "none", "receipts": "metadata-only"}},
+    {"id": "kipo-web", "revision": 1, "enabled": false, "institution": "특허청", "channel": "web", "scope": {"origins": ["https://www.kipo.go.kr"], "path_rules": [{"match": "prefix", "path": "/"}], "methods": ["GET"]}, "robots": {"status": "unreviewed"}, "terms": {"status": "unreviewed"}, "rate_limit": {"status": "unreviewed"}, "response": {"status": "unreviewed"}, "license": {"status": "unreviewed"}, "retention": {"raw_content": "none", "receipts": "metadata-only"}}
+  ],
+  "runtime_contracts": [
+    {"id": "kgov/public-document-hwpx/v1", "capability_slug": "public-document-hwpx", "module": "kgov_runtime.capabilities.public_document_hwpx", "kind": "local-document", "network_mode": "none", "default_operation_id": "kgov/public-document-hwpx/inspect-document/v1", "operations": [{"id": "kgov/public-document-hwpx/inspect-document/v1", "schema_status": "declared", "source_policy_ids": [], "source_output_mode": "none", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/korean-law-bill-research/v1", "capability_slug": "korean-law-bill-research", "module": "kgov_runtime.capabilities.korean_law_bill_research", "kind": "retrieval", "network_mode": "optional-live", "default_operation_id": "kgov/korean-law-bill-research/search-laws/v1", "operations": [{"id": "kgov/korean-law-bill-research/search-laws/v1", "schema_status": "declared", "source_policy_ids": ["law-go-kr-drf-api"], "source_output_mode": "projected-records", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/kosis-official-statistics/v1", "capability_slug": "kosis-official-statistics", "module": "kgov_runtime.capabilities.kosis_official_statistics", "kind": "retrieval", "network_mode": "optional-live", "default_operation_id": "kgov/kosis-official-statistics/query-statistics/v1", "operations": [{"id": "kgov/kosis-official-statistics/query-statistics/v1", "schema_status": "declared", "source_policy_ids": ["kosis-statistics-api"], "source_output_mode": "projected-records", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/public-procurement-research/v1", "capability_slug": "public-procurement-research", "module": "kgov_runtime.capabilities.public_procurement_research", "kind": "retrieval", "network_mode": "optional-live", "default_operation_id": "kgov/public-procurement-research/query-order-plans/v1", "operations": [{"id": "kgov/public-procurement-research/query-order-plans/v1", "schema_status": "declared", "source_policy_ids": ["data-go-kr-order-plan-api"], "source_output_mode": "projected-records", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/disaster-geospatial-brief/v1", "capability_slug": "disaster-geospatial-brief", "module": "kgov_runtime.capabilities.disaster_geospatial_brief", "kind": "retrieval", "network_mode": "optional-live", "default_operation_id": "kgov/disaster-geospatial-brief/query-village-forecast/v1", "operations": [{"id": "kgov/disaster-geospatial-brief/query-village-forecast/v1", "schema_status": "declared", "source_policy_ids": ["data-go-kr-village-forecast-api"], "source_output_mode": "projected-records", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/welfare-health-safety-research/v1", "capability_slug": "welfare-health-safety-research", "module": "kgov_runtime.capabilities.welfare_health_safety_research", "kind": "retrieval", "network_mode": "blocked", "default_operation_id": "kgov/welfare-health-safety-research/blocked-dataset-query/v1", "operations": [{"id": "kgov/welfare-health-safety-research/blocked-dataset-query/v1", "schema_status": "declared", "source_policy_ids": [], "source_output_mode": "projected-records", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/land-housing-geospatial-research/v1", "capability_slug": "land-housing-geospatial-research", "module": "kgov_runtime.capabilities.land_housing_geospatial_research", "kind": "retrieval", "network_mode": "blocked", "default_operation_id": "kgov/land-housing-geospatial-research/blocked-dataset-query/v1", "operations": [{"id": "kgov/land-housing-geospatial-research/blocked-dataset-query/v1", "schema_status": "declared", "source_policy_ids": [], "source_output_mode": "projected-records", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/official-source-research/v1", "capability_slug": "official-source-research", "module": "kgov_runtime.capabilities.official_source_research", "kind": "retrieval", "network_mode": "optional-live", "default_operation_id": "kgov/official-source-research/inspect-page/v1", "operations": [{"id": "kgov/official-source-research/inspect-page/v1", "schema_status": "declared", "source_policy_ids": ["gov-kr-web"], "source_output_mode": "link-only", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/civil-complaint-triage-draft/v1", "capability_slug": "civil-complaint-triage-draft", "module": "kgov_runtime.capabilities.civil_complaint_triage_draft", "kind": "admission", "network_mode": "none", "default_operation_id": "kgov/civil-complaint-triage-draft/admit-draft/v1", "operations": [{"id": "kgov/civil-complaint-triage-draft/admit-draft/v1", "schema_status": "declared", "source_policy_ids": [], "source_output_mode": "none", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/administrative-document-draft-review/v1", "capability_slug": "administrative-document-draft-review", "module": "kgov_runtime.capabilities.administrative_document_draft_review", "kind": "admission", "network_mode": "none", "default_operation_id": "kgov/administrative-document-draft-review/review-draft/v1", "operations": [{"id": "kgov/administrative-document-draft-review/review-draft/v1", "schema_status": "declared", "source_policy_ids": [], "source_output_mode": "none", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/public-policy-evidence-pack/v1", "capability_slug": "public-policy-evidence-pack", "module": "kgov_runtime.capabilities.public_policy_evidence_pack", "kind": "admission", "network_mode": "none", "default_operation_id": "kgov/public-policy-evidence-pack/build-pack/v1", "operations": [{"id": "kgov/public-policy-evidence-pack/build-pack/v1", "schema_status": "declared", "source_policy_ids": [], "source_output_mode": "none", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/korean-legal-citation-verification/v1", "capability_slug": "korean-legal-citation-verification", "module": "kgov_runtime.capabilities.korean_legal_citation_verification", "kind": "verification", "network_mode": "optional-live", "default_operation_id": "kgov/korean-legal-citation-verification/verify-citations/v1", "operations": [{"id": "kgov/korean-legal-citation-verification/verify-citations/v1", "schema_status": "declared", "source_policy_ids": ["law-go-kr-drf-api"], "source_output_mode": "link-only", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/public-ai-governance-review/v1", "capability_slug": "public-ai-governance-review", "module": "kgov_runtime.capabilities.public_ai_governance_review", "kind": "admission", "network_mode": "none", "default_operation_id": "kgov/public-ai-governance-review/review-case/v1", "operations": [{"id": "kgov/public-ai-governance-review/review-case/v1", "schema_status": "declared", "source_policy_ids": [], "source_output_mode": "none", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/public-it-project-procedure-review/v1", "capability_slug": "public-it-project-procedure-review", "module": "kgov_runtime.capabilities.public_it_project_procedure_review", "kind": "admission", "network_mode": "none", "default_operation_id": "kgov/public-it-project-procedure-review/review-case/v1", "operations": [{"id": "kgov/public-it-project-procedure-review/review-case/v1", "schema_status": "declared", "source_policy_ids": [], "source_output_mode": "none", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/public-record-disclosure-redaction-review/v1", "capability_slug": "public-record-disclosure-redaction-review", "module": "kgov_runtime.capabilities.public_record_disclosure_redaction_review", "kind": "admission", "network_mode": "none", "default_operation_id": "kgov/public-record-disclosure-redaction-review/review-case/v1", "operations": [{"id": "kgov/public-record-disclosure-redaction-review/review-case/v1", "schema_status": "declared", "source_policy_ids": [], "source_output_mode": "none", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/local-ordinance-draft-review/v1", "capability_slug": "local-ordinance-draft-review", "module": "kgov_runtime.capabilities.local_ordinance_draft_review", "kind": "admission", "network_mode": "none", "default_operation_id": "kgov/local-ordinance-draft-review/review-case/v1", "operations": [{"id": "kgov/local-ordinance-draft-review/review-case/v1", "schema_status": "declared", "source_policy_ids": [], "source_output_mode": "none", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/construction-standard-bim-compliance-precheck/v1", "capability_slug": "construction-standard-bim-compliance-precheck", "module": "kgov_runtime.capabilities.construction_standard_bim_compliance_precheck", "kind": "admission", "network_mode": "none", "default_operation_id": "kgov/construction-standard-bim-compliance-precheck/review-case/v1", "operations": [{"id": "kgov/construction-standard-bim-compliance-precheck/review-case/v1", "schema_status": "declared", "source_policy_ids": [], "source_output_mode": "none", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/building-permit-document-precheck/v1", "capability_slug": "building-permit-document-precheck", "module": "kgov_runtime.capabilities.building_permit_document_precheck", "kind": "admission", "network_mode": "none", "default_operation_id": "kgov/building-permit-document-precheck/review-case/v1", "operations": [{"id": "kgov/building-permit-document-precheck/review-case/v1", "schema_status": "declared", "source_policy_ids": [], "source_output_mode": "none", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/official-notice-multilingual-translation-review/v1", "capability_slug": "official-notice-multilingual-translation-review", "module": "kgov_runtime.capabilities.official_notice_multilingual_translation_review", "kind": "admission", "network_mode": "none", "default_operation_id": "kgov/official-notice-multilingual-translation-review/review-case/v1", "operations": [{"id": "kgov/official-notice-multilingual-translation-review/review-case/v1", "schema_status": "declared", "source_policy_ids": [], "source_output_mode": "none", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/patent-prior-art-evidence-pack/v1", "capability_slug": "patent-prior-art-evidence-pack", "module": "kgov_runtime.capabilities.patent_prior_art_evidence_pack", "kind": "hybrid", "network_mode": "mixed", "default_operation_id": "kgov/patent-prior-art-evidence-pack/review-case/v1", "operations": [{"id": "kgov/patent-prior-art-evidence-pack/review-case/v1", "schema_status": "declared", "source_policy_ids": [], "source_output_mode": "none", "fixture_argv": ["--fixture"]}, {"id": "kgov/patent-prior-art-evidence-pack/inspect-source/v1", "schema_status": "declared", "source_policy_ids": ["kipris-web", "kipo-web"], "source_output_mode": "link-only"}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/public-records-lifecycle-review/v1", "capability_slug": "public-records-lifecycle-review", "module": "kgov_runtime.capabilities.public_records_lifecycle_review", "kind": "admission", "network_mode": "none", "default_operation_id": "kgov/public-records-lifecycle-review/review-case/v1", "operations": [{"id": "kgov/public-records-lifecycle-review/review-case/v1", "schema_status": "declared", "source_policy_ids": [], "source_output_mode": "none", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]},
+    {"id": "kgov/regulated-trade-procedure-precheck/v1", "capability_slug": "regulated-trade-procedure-precheck", "module": "kgov_runtime.capabilities.regulated_trade_procedure_precheck", "kind": "admission", "network_mode": "none", "default_operation_id": "kgov/regulated-trade-procedure-precheck/review-case/v1", "operations": [{"id": "kgov/regulated-trade-procedure-precheck/review-case/v1", "schema_status": "declared", "source_policy_ids": [], "source_output_mode": "none", "fixture_argv": ["--fixture"]}], "exit_codes": {"success": 0, "review_blocked": 1, "input_error": 2, "policy_blocked": 3, "upstream_error": 4}, "forbidden_output_keys": ["authorization", "body", "cookie", "credential", "headers", "raw", "text"]}
+  ],
   "shared_capabilities": [
     {
       "slug": "public-document-hwpx",
@@ -83,7 +116,9 @@
         "https://www.hancom.com/"
       ],
       "execution_status": "fixture-verified",
-      "live_smoke": "not-run"
+      "live_smoke": "not-run",
+      "source_policy_ids": [],
+      "runtime_contract_id": "kgov/public-document-hwpx/v1"
     },
     {
       "slug": "korean-law-bill-research",
@@ -99,7 +134,9 @@
         "https://open.assembly.go.kr/"
       ],
       "execution_status": "fixture-verified",
-      "live_smoke": "not-run"
+      "live_smoke": "not-run",
+      "source_policy_ids": ["law-go-kr-drf-api"],
+      "runtime_contract_id": "kgov/korean-law-bill-research/v1"
     },
     {
       "slug": "kosis-official-statistics",
@@ -114,7 +151,9 @@
         "https://kosis.kr/openapi/"
       ],
       "execution_status": "fixture-verified",
-      "live_smoke": "not-run"
+      "live_smoke": "not-run",
+      "source_policy_ids": ["kosis-statistics-api"],
+      "runtime_contract_id": "kgov/kosis-official-statistics/v1"
     },
     {
       "slug": "public-procurement-research",
@@ -130,7 +169,9 @@
         "https://www.data.go.kr/"
       ],
       "execution_status": "fixture-verified",
-      "live_smoke": "not-run"
+      "live_smoke": "not-run",
+      "source_policy_ids": ["data-go-kr-order-plan-api"],
+      "runtime_contract_id": "kgov/public-procurement-research/v1"
     },
     {
       "slug": "disaster-geospatial-brief",
@@ -146,7 +187,9 @@
         "https://www.data.go.kr/"
       ],
       "execution_status": "fixture-verified",
-      "live_smoke": "not-run"
+      "live_smoke": "not-run",
+      "source_policy_ids": ["data-go-kr-village-forecast-api"],
+      "runtime_contract_id": "kgov/disaster-geospatial-brief/v1"
     },
     {
       "slug": "welfare-health-safety-research",
@@ -161,7 +204,9 @@
         "https://www.data.go.kr/"
       ],
       "execution_status": "fixture-verified",
-      "live_smoke": "not-run"
+      "live_smoke": "not-run",
+      "source_policy_ids": [],
+      "runtime_contract_id": "kgov/welfare-health-safety-research/v1"
     },
     {
       "slug": "land-housing-geospatial-research",
@@ -176,7 +221,9 @@
         "https://www.data.go.kr/"
       ],
       "execution_status": "fixture-verified",
-      "live_smoke": "not-run"
+      "live_smoke": "not-run",
+      "source_policy_ids": [],
+      "runtime_contract_id": "kgov/land-housing-geospatial-research/v1"
     },
     {
       "slug": "official-source-research",
@@ -191,7 +238,9 @@
         "https://www.gov.kr/"
       ],
       "execution_status": "live-verified",
-      "live_smoke": "passed"
+      "live_smoke": "passed",
+      "source_policy_ids": ["gov-kr-web"],
+      "runtime_contract_id": "kgov/official-source-research/v1"
     },
     {
       "slug": "civil-complaint-triage-draft",
@@ -207,7 +256,9 @@
         "https://www.acrc.go.kr/"
       ],
       "execution_status": "fixture-verified",
-      "live_smoke": "not-run"
+      "live_smoke": "not-run",
+      "source_policy_ids": [],
+      "runtime_contract_id": "kgov/civil-complaint-triage-draft/v1"
     },
     {
       "slug": "administrative-document-draft-review",
@@ -230,7 +281,9 @@
         "https://www.suwon.go.kr/"
       ],
       "execution_status": "fixture-verified",
-      "live_smoke": "not-run"
+      "live_smoke": "not-run",
+      "source_policy_ids": [],
+      "runtime_contract_id": "kgov/administrative-document-draft-review/v1"
     },
     {
       "slug": "public-policy-evidence-pack",
@@ -247,7 +300,9 @@
         "https://kosis.kr/openapi/"
       ],
       "execution_status": "fixture-verified",
-      "live_smoke": "not-run"
+      "live_smoke": "not-run",
+      "source_policy_ids": [],
+      "runtime_contract_id": "kgov/public-policy-evidence-pack/v1"
     },
     {
       "slug": "korean-legal-citation-verification",
@@ -266,7 +321,9 @@
         "https://open.law.go.kr/LSO/openApi/guideResult.do?htmlName=precInfoGuide"
       ],
       "execution_status": "live-verified",
-      "live_smoke": "passed"
+      "live_smoke": "passed",
+      "source_policy_ids": ["law-go-kr-drf-api"],
+      "runtime_contract_id": "kgov/korean-legal-citation-verification/v1"
     },
     {
       "slug": "public-ai-governance-review",
@@ -283,7 +340,9 @@
         "https://www.pipc.go.kr/"
       ],
       "execution_status": "fixture-verified",
-      "live_smoke": "not-run"
+      "live_smoke": "not-run",
+      "source_policy_ids": [],
+      "runtime_contract_id": "kgov/public-ai-governance-review/v1"
     },
     {
       "slug": "public-it-project-procedure-review",
@@ -299,7 +358,9 @@
         "https://www.law.go.kr/"
       ],
       "execution_status": "fixture-verified",
-      "live_smoke": "not-run"
+      "live_smoke": "not-run",
+      "source_policy_ids": [],
+      "runtime_contract_id": "kgov/public-it-project-procedure-review/v1"
     },
     {
       "slug": "public-record-disclosure-redaction-review",
@@ -315,7 +376,9 @@
         "https://www.archives.go.kr/"
       ],
       "execution_status": "fixture-verified",
-      "live_smoke": "not-run"
+      "live_smoke": "not-run",
+      "source_policy_ids": [],
+      "runtime_contract_id": "kgov/public-record-disclosure-redaction-review/v1"
     },
     {
       "slug": "local-ordinance-draft-review",
@@ -331,7 +394,9 @@
         "https://www.law.go.kr/"
       ],
       "execution_status": "fixture-verified",
-      "live_smoke": "not-run"
+      "live_smoke": "not-run",
+      "source_policy_ids": [],
+      "runtime_contract_id": "kgov/local-ordinance-draft-review/v1"
     },
     {
       "slug": "construction-standard-bim-compliance-precheck",
@@ -346,7 +411,9 @@
         "https://www.kcsc.re.kr/"
       ],
       "execution_status": "fixture-verified",
-      "live_smoke": "not-run"
+      "live_smoke": "not-run",
+      "source_policy_ids": [],
+      "runtime_contract_id": "kgov/construction-standard-bim-compliance-precheck/v1"
     },
     {
       "slug": "building-permit-document-precheck",
@@ -362,7 +429,9 @@
         "https://www.law.go.kr/"
       ],
       "execution_status": "fixture-verified",
-      "live_smoke": "blocked"
+      "live_smoke": "blocked",
+      "source_policy_ids": [],
+      "runtime_contract_id": "kgov/building-permit-document-precheck/v1"
     },
     {
       "slug": "official-notice-multilingual-translation-review",
@@ -378,7 +447,9 @@
         "https://www.korean.go.kr/"
       ],
       "execution_status": "fixture-verified",
-      "live_smoke": "not-run"
+      "live_smoke": "not-run",
+      "source_policy_ids": [],
+      "runtime_contract_id": "kgov/official-notice-multilingual-translation-review/v1"
     },
     {
       "slug": "patent-prior-art-evidence-pack",
@@ -394,7 +465,9 @@
         "https://www.kipo.go.kr/"
       ],
       "execution_status": "fixture-verified",
-      "live_smoke": "not-run"
+      "live_smoke": "not-run",
+      "source_policy_ids": ["kipris-web", "kipo-web"],
+      "runtime_contract_id": "kgov/patent-prior-art-evidence-pack/v1"
     },
     {
       "slug": "public-records-lifecycle-review",
@@ -410,7 +483,9 @@
         "https://www.law.go.kr/"
       ],
       "execution_status": "fixture-verified",
-      "live_smoke": "not-run"
+      "live_smoke": "not-run",
+      "source_policy_ids": [],
+      "runtime_contract_id": "kgov/public-records-lifecycle-review/v1"
     },
     {
       "slug": "regulated-trade-procedure-precheck",
@@ -426,7 +501,9 @@
         "https://unipass.customs.go.kr/csp/index.do"
       ],
       "execution_status": "fixture-verified",
-      "live_smoke": "not-run"
+      "live_smoke": "not-run",
+      "source_policy_ids": [],
+      "runtime_contract_id": "kgov/regulated-trade-procedure-precheck/v1"
     }
   ],
   "domains": [
