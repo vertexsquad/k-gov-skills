@@ -4,5 +4,8 @@
   "content_type": "text/html",
   "title": "정부24",
   "content_length": 0,
-  "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "execution_mode": "synthetic-fixture",
+  "source_receipt": null,
+  "manual_review_required": true
 }
