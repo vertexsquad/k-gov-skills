@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 from kgov_runtime.capabilities import patent_prior_art_evidence_pack as adapter
+from tests.capabilities import review_admission_contract
 from tests.capabilities.review_admission_contract import ReviewAdmissionContractMixin
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -28,6 +29,10 @@ class _Response:
 
     def read(self, limit=-1):
         return self.body if limit < 0 else self.body[:limit]
+
+
+class ReviewAdmissionReceiptTest(review_admission_contract.ReviewAdmissionReceiptTest):
+    pass
 
 
 class AdapterTest(ReviewAdmissionContractMixin, unittest.TestCase):

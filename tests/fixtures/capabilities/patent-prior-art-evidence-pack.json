@@ -8,7 +8,22 @@
   "source_refs": [
     {
       "url": "https://www.kipris.or.kr/",
-      "retrieved_on": "2026-07-25"
+      "retrieved_on": "2026-07-25",
+      "published_or_effective_on": "2026-07-24",
+      "institution": "KIPRIS",
+      "title": "합성 선행기술 공개자료",
+      "license_status": "unreviewed",
+      "terms_url": null,
+      "redistribution": "link-only",
+      "attribution": "KIPRIS 원문 링크",
+      "policy_receipt": {
+        "source_url": "https://www.kipris.or.kr/",
+        "retrieved_on": "2026-07-25",
+        "policy_id": "kipris-web",
+        "policy_revision": 1,
+        "policy_digest": "c8e7450cc9b8292ba9f93dfde108c85a2350e314cd5c710ebf407e520ef6276f",
+        "outcome": "manual-review"
+      }
     }
   ],
   "as_of_date": "2026-07-25",

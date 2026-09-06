@@ -8,7 +8,15 @@
   "source_refs": [
     {
       "url": "https://www.pipc.go.kr/",
-      "retrieved_on": "2026-07-25"
+      "retrieved_on": "2026-07-25",
+      "published_or_effective_on": "2026-07-24",
+      "institution": "개인정보보호위원회",
+      "title": "공공 AI 거버넌스 참고자료",
+      "license_status": "unreviewed",
+      "terms_url": null,
+      "redistribution": "link-only",
+      "attribution": "개인정보보호위원회 원문 링크",
+      "policy_receipt": null
     }
   ],
   "as_of_date": "2026-07-25",
