@@ -1,8 +1,17 @@
 {
-  "count": 1,
-  "sections": [
-    "Contents/section0.xml"
-  ],
-  "text": "테스트 문서",
-  "uncompressed_bytes": 0
+  "extracted_character_count": 8,
+  "identifier_scan_status": "no-match-not-proof-of-redaction",
+  "manual_review_required": true,
+  "section_count": 1,
+  "section_metadata": {
+    "included": [
+      {
+        "character_count": 8,
+        "ordinal": 1
+      }
+    ],
+    "limit": 100,
+    "truncated": false
+  },
+  "text_emitted": false
 }
