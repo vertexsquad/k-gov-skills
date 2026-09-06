@@ -1,9 +1,25 @@
 {
-  "items": [
-    {
-      "capability": "public-procurement-research",
-      "id": "fixture-1",
-      "source": "repository-fixture"
+  "response": {
+    "header": {
+      "resultCode": "00",
+      "resultMsg": "NORMAL SERVICE"
+    },
+    "body": {
+      "items": {
+        "item": [
+          {
+            "orderPlanUntyNo": "PLAN-001",
+            "bizNm": "합성 정보화 사업",
+            "orderInsttNm": "합성기관",
+            "orderPlanAmt": "1000000",
+            "orderPlanDate": "20260101",
+            "contact": "discarded"
+          }
+        ]
+      },
+      "totalCount": 1,
+      "pageNo": 1,
+      "numOfRows": 10
     }
-  ]
+  }
 }

@@ -1,55 +1,44 @@
 from __future__ import annotations
 
-import importlib.util
-import json
-import os
+import subprocess
 import sys
 import unittest
-from pathlib import Path
-from unittest.mock import patch
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
-SPEC = importlib.util.spec_from_file_location("test_welfare_health_safety_research_adapter", REPO_ROOT / "kgov_runtime" / "capabilities" / "welfare_health_safety_research.py")
-assert SPEC and SPEC.loader
-adapter = importlib.util.module_from_spec(SPEC)
-SPEC.loader.exec_module(adapter)
-
-
-class _Response:
-    headers = {"Content-Type": "application/json"}
-    status = 200
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *_):
-        return None
-
-    def read(self, limit=-1):
-        body = json.dumps({"items": [{"id": "live-fixture"}]}).encode("utf-8")
-        return body if limit < 0 else body[:limit]
+from kgov_runtime.capabilities import welfare_health_safety_research as adapter
 
 
 class AdapterTest(unittest.TestCase):
-    def test_fixture_mode_is_deterministic(self) -> None:
-        payload = json.loads((REPO_ROOT / "tests" / "fixtures" / "capabilities" / "welfare-health-safety-research.json").read_text(encoding="utf-8"))
-        from kgov_runtime.http import normalize_records
-        result = normalize_records(payload)
-        self.assertEqual(1, result["count"])
-        self.assertEqual("welfare-health-safety-research", result["records"][0]["capability"])
+    def test_exact_profile_is_absent_and_fixture_reports_block(self) -> None:
+        self.assertIsNone(adapter.OPERATION)
+        self.assertEqual(
+            {
+                "contract_id": "kgov/welfare-health-safety-research/v1",
+                "execution_mode": "synthetic-fixture",
+                "status": "live-operation-blocked",
+                "count": 0,
+                "records": [],
+                "source_receipt": {
+                    "operation_id": "kgov/welfare-health-safety-research/blocked-dataset-query/v1",
+                    "policy_id": None,
+                    "endpoint": None,
+                },
+                "manual_review_required": True,
+            },
+            adapter.fixture_result(),
+        )
 
-    def test_live_query_path_is_mocked_and_read_only(self) -> None:
-        opened = []
-        def opener(request, timeout=0):
-            opened.append(request.full_url)
-            return _Response()
-        with patch.dict(os.environ, {"DATA_GO_KR_API_KEY": "fixture-secret"}, clear=False):
-            result = adapter.query(opener=opener, resolver=lambda _: ["1.1.1.1"])
-        self.assertEqual(1, result["count"])
-        self.assertEqual(1, len(opened))
-        self.assertIn("serviceKey=fixture-secret", opened[0])
+    def test_live_query_is_blocked_before_network(self) -> None:
+        calls = []
+        with self.assertRaisesRegex(RuntimeError, "exact dataset profile"):
+            adapter.query(opener=lambda *_a, **_k: calls.append(True))
+        self.assertEqual([], calls)
+
+    def test_cli_fixture_succeeds_and_live_is_policy_blocked(self) -> None:
+        fixture = subprocess.run([sys.executable, "-m", "kgov_runtime.capabilities.welfare_health_safety_research", "--fixture"], text=True, capture_output=True, check=False)
+        blocked = subprocess.run([sys.executable, "-m", "kgov_runtime.capabilities.welfare_health_safety_research"], text=True, capture_output=True, check=False)
+        self.assertEqual(0, fixture.returncode)
+        self.assertEqual(3, blocked.returncode)
+        self.assertNotIn("Traceback", blocked.stderr)
 
 
 if __name__ == "__main__":

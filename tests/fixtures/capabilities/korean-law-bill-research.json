@@ -1,9 +1,13 @@
 {
-  "items": [
-    {
-      "capability": "korean-law-bill-research",
-      "id": "fixture-1",
-      "source": "repository-fixture"
-    }
-  ]
+  "LawSearch": {
+    "totalCnt": "1",
+    "law": [
+      {
+        "법령명한글": "합성법률",
+        "법령ID": "000001",
+        "시행일자": "20260101",
+        "ignored_upstream": "discarded"
+      }
+    ]
+  }
 }

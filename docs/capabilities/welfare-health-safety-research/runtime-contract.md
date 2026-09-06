@@ -1,11 +1,8 @@
 # Runtime contract — `welfare-health-safety-research`
 
-- 서비스: 복지·보건 공공데이터 API
-- 기본 endpoint: `https://apis.data.go.kr/`
-- 허용 host: `apis.data.go.kr`, `e-gen.or.kr`, `nhis.or.kr`, `mfds.go.kr`
-- credential: 사용자 환경변수 `DATA_GO_KR_API_KEY`; 저장소·로그·fixture에 값을 기록하지 않는다.
-- proxy: 선택 사항이며 endpoint override는 허용 host와 HTTPS/public-IP 검증을 통과해야 한다.
-- side effect: 조회 전용. 제출·예약·계약·원본 변경을 실행하지 않는다.
-- fixture 검증: `python3 -m kgov_runtime.capabilities.welfare_health_safety_research --fixture`
-- live 검증: 필요한 query parameter와 사용자 소유 credential을 준비한 뒤에만 실행한다.
-- 상태 표기: fixture PASS와 live smoke PASS를 서로 대체하지 않는다.
+- contract / declared operation: `kgov/welfare-health-safety-research/v1` / `kgov/welfare-health-safety-research/blocked-dataset-query/v1`
+- live status: **blocked**. exact dataset endpoint, source policy, parameter schema, credential contract, semantic projector가 선언되기 전에는 네트워크를 호출하지 않습니다.
+- generic `apis.data.go.kr` base URL, host-level endpoint override, arbitrary parameter, raw response fallback은 지원하지 않습니다.
+- fixture: `python3 -m kgov_runtime.capabilities.welfare_health_safety_research --fixture`; 빈 projected-record 계약과 차단 상태만 합성 검증합니다.
+- live CLI는 policy-blocked exit code `3`으로 종료합니다.
+- side effect: 조회 전용이며 결과는 담당자가 검토합니다.
