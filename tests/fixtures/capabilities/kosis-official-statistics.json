@@ -1,9 +1,10 @@
-{
-  "items": [
-    {
-      "capability": "kosis-official-statistics",
-      "id": "fixture-1",
-      "source": "repository-fixture"
-    }
-  ]
-}
+[
+  {
+    "TBL_NM": "합성 인구 통계",
+    "PRD_DE": "2025",
+    "C1_NM": "전국",
+    "ITM_NM": "인구",
+    "DT": "100",
+    "UNIT_NM": "명"
+  }
+]
