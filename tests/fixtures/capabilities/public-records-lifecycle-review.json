@@ -8,7 +8,15 @@
   "source_refs": [
     {
       "url": "https://www.archives.go.kr/",
-      "retrieved_on": "2026-07-25"
+      "retrieved_on": "2026-07-25",
+      "published_or_effective_on": "2026-07-24",
+      "institution": "국가기록원",
+      "title": "기록물 생애주기 참고자료",
+      "license_status": "unreviewed",
+      "terms_url": null,
+      "redistribution": "link-only",
+      "attribution": "국가기록원 원문 링크",
+      "policy_receipt": null
     }
   ],
   "as_of_date": "2026-07-25",

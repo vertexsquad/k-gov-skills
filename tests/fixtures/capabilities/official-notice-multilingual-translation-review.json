@@ -8,7 +8,15 @@
   "source_refs": [
     {
       "url": "https://www.korean.go.kr/",
-      "retrieved_on": "2026-07-25"
+      "retrieved_on": "2026-07-25",
+      "published_or_effective_on": "2026-07-24",
+      "institution": "국립국어원",
+      "title": "공공언어 번역 참고자료",
+      "license_status": "unreviewed",
+      "terms_url": null,
+      "redistribution": "link-only",
+      "attribution": "국립국어원 원문 링크",
+      "policy_receipt": null
     }
   ],
   "as_of_date": "2026-07-25",

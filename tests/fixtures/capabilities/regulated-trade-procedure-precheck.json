@@ -8,7 +8,15 @@
   "source_refs": [
     {
       "url": "https://www.customs.go.kr/ftaportalkor/main.do",
-      "retrieved_on": "2026-07-25"
+      "retrieved_on": "2026-07-25",
+      "published_or_effective_on": "2026-07-24",
+      "institution": "관세청",
+      "title": "원산지 증빙 사전점검 참고자료",
+      "license_status": "unreviewed",
+      "terms_url": null,
+      "redistribution": "link-only",
+      "attribution": "관세청 원문 링크",
+      "policy_receipt": null
     }
   ],
   "as_of_date": "2026-07-25",
