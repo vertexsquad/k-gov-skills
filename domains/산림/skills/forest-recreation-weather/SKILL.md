@@ -5,6 +5,8 @@ metadata:
   kgov:
     domain: "산림"
     capability: disaster-geospatial-brief
+    runtime_contract: "kgov/disaster-geospatial-brief/v1"
+    operation: "kgov/disaster-geospatial-brief/query-village-forecast/v1"
     role: primary
 ---
 
@@ -17,6 +19,183 @@ metadata:
 - 실행 상태: `fixture-verified` / live smoke `not-run`
 - 실행 경계: `read-only`
 - Reference Skill: `foresttrip-vacancy`, `korea-weather`
+
+## Runtime binding
+
+- Contract: `kgov/disaster-geospatial-brief/v1`
+- Operation: `kgov/disaster-geospatial-brief/query-village-forecast/v1`
+- Fixed input: `{"argv": ["--fixture"]}`
+- Output fields: `manual_review_required`, `contract_id`, `execution_mode`, `status`, `count`, `records`, `source_receipt`
+
+<!-- kgov-runtime-binding:start -->
+```json
+{
+  "binding": {
+    "contract_id": "kgov/disaster-geospatial-brief/v1",
+    "fixed_input": {
+      "argv": [
+        "--fixture"
+      ]
+    },
+    "operation": "kgov/disaster-geospatial-brief/query-village-forecast/v1"
+  },
+  "example_result": {
+    "contract_id": "kgov/disaster-geospatial-brief/v1",
+    "count": 1,
+    "execution_mode": "synthetic-fixture",
+    "manual_review_required": true,
+    "records": [
+      {
+        "category": "TMP",
+        "forecast_date": "20260101",
+        "forecast_time": "1200",
+        "forecast_value": "3",
+        "grid_x": 60,
+        "grid_y": 127
+      }
+    ],
+    "source_receipt": {
+      "endpoint": "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst",
+      "operation_id": "kgov/disaster-geospatial-brief/query-village-forecast/v1",
+      "policy_id": "data-go-kr-village-forecast-api"
+    },
+    "status": "fixture-validated"
+  },
+  "exit_codes": {
+    "input_error": 2,
+    "policy_blocked": 3,
+    "review_blocked": 1,
+    "success": 0,
+    "upstream_error": 4
+  },
+  "fixture_argv": [
+    "--fixture"
+  ],
+  "input_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "argv": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      }
+    },
+    "required": [
+      "argv"
+    ],
+    "type": "object"
+  },
+  "module": "kgov_runtime.capabilities.disaster_geospatial_brief",
+  "network_mode": "optional-live",
+  "output_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "contract_id": {
+        "const": "kgov/disaster-geospatial-brief/v1",
+        "type": "string"
+      },
+      "count": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "execution_mode": {
+        "enum": [
+          "synthetic-fixture",
+          "official-live"
+        ],
+        "type": "string"
+      },
+      "manual_review_required": {
+        "const": true,
+        "type": "boolean"
+      },
+      "records": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "category": {
+              "type": "string"
+            },
+            "forecast_date": {
+              "type": "string"
+            },
+            "forecast_time": {
+              "type": "string"
+            },
+            "forecast_value": {
+              "type": "string"
+            },
+            "grid_x": {
+              "type": "integer"
+            },
+            "grid_y": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "category",
+            "forecast_date",
+            "forecast_time",
+            "forecast_value",
+            "grid_x",
+            "grid_y"
+          ],
+          "type": "object"
+        },
+        "maxItems": 100,
+        "type": "array"
+      },
+      "source_receipt": {
+        "additionalProperties": false,
+        "properties": {
+          "endpoint": {
+            "const": "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst",
+            "type": "string"
+          },
+          "operation_id": {
+            "const": "kgov/disaster-geospatial-brief/query-village-forecast/v1",
+            "type": "string"
+          },
+          "policy_id": {
+            "const": "data-go-kr-village-forecast-api",
+            "type": "string"
+          }
+        },
+        "required": [
+          "operation_id",
+          "policy_id",
+          "endpoint"
+        ],
+        "type": "object"
+      },
+      "status": {
+        "enum": [
+          "fixture-validated",
+          "records-retrieved"
+        ],
+        "type": "string"
+      }
+    },
+    "required": [
+      "manual_review_required",
+      "contract_id",
+      "execution_mode",
+      "status",
+      "count",
+      "records",
+      "source_receipt"
+    ],
+    "type": "object"
+  },
+  "schema_status": "active",
+  "source_output_mode": "projected-records",
+  "source_policy_ids": [
+    "data-go-kr-village-forecast-api"
+  ]
+}
+```
+<!-- kgov-runtime-binding:end -->
 
 ## 절차
 

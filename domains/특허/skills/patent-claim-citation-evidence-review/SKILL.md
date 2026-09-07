@@ -5,6 +5,8 @@ metadata:
   kgov:
     domain: "특허"
     capability: patent-prior-art-evidence-pack
+    runtime_contract: "kgov/patent-prior-art-evidence-pack/v1"
+    operation: "kgov/patent-prior-art-evidence-pack/review-case/v1"
     role: additional
 ---
 
@@ -17,6 +19,194 @@ metadata:
 - 실행 상태: `fixture-verified` / live smoke `not-run`
 - 실행 경계: `draft-only`
 - Reference Skill: 없음
+
+## Runtime binding
+
+- Contract: `kgov/patent-prior-art-evidence-pack/v1`
+- Operation: `kgov/patent-prior-art-evidence-pack/review-case/v1`
+- Fixed input: `{"argv": ["--fixture"]}`
+- Output fields: `manual_review_required`, `fact_count`, `source_ref_count`, `review_type`, `receipt_assurance`, `source_output_mode`, `basic_identifier_scan`, `manual_review_reasons`, `prohibited_decisions`, `required_checks`, `source_assurance_levels`, `accepted`, `status`, `permitted_output`
+
+<!-- kgov-runtime-binding:start -->
+```json
+{
+  "binding": {
+    "contract_id": "kgov/patent-prior-art-evidence-pack/v1",
+    "fixed_input": {
+      "argv": [
+        "--fixture"
+      ]
+    },
+    "operation": "kgov/patent-prior-art-evidence-pack/review-case/v1"
+  },
+  "example_result": {
+    "accepted": true,
+    "basic_identifier_scan": "no-match-not-proof-of-redaction",
+    "fact_count": 1,
+    "manual_review_reasons": [
+      "license-unverified",
+      "policy-outcome-manual-review",
+      "redistribution-link-only"
+    ],
+    "manual_review_required": true,
+    "permitted_output": "prior-art-evidence-pack-draft-only",
+    "prohibited_decisions": [
+      "novelty-decision",
+      "inventive-step-decision",
+      "infringement-or-registration-opinion"
+    ],
+    "receipt_assurance": "policy-matched-not-cryptographic-authenticity-proof",
+    "required_checks": [
+      "publication-number-and-date",
+      "claim-element-citation-map",
+      "family-duplicate-and-gap-review"
+    ],
+    "review_type": "prior-art-evidence-pack",
+    "source_assurance_levels": [
+      "policy-verified-not-authenticity-proof"
+    ],
+    "source_output_mode": "link-only",
+    "source_ref_count": 2,
+    "status": "admitted-pending-human-review"
+  },
+  "exit_codes": {
+    "input_error": 2,
+    "policy_blocked": 3,
+    "review_blocked": 1,
+    "success": 0,
+    "upstream_error": 4
+  },
+  "fixture_argv": [
+    "--fixture"
+  ],
+  "input_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "argv": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      }
+    },
+    "required": [
+      "argv"
+    ],
+    "type": "object"
+  },
+  "module": "kgov_runtime.capabilities.patent_prior_art_evidence_pack",
+  "network_mode": "mixed",
+  "output_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "accepted": {
+        "const": true,
+        "type": "boolean"
+      },
+      "basic_identifier_scan": {
+        "const": "no-match-not-proof-of-redaction",
+        "type": "string"
+      },
+      "fact_count": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "manual_review_reasons": {
+        "items": {
+          "enum": [
+            "caller-declared-source",
+            "policy-outcome-manual-review",
+            "license-unverified",
+            "redistribution-link-only"
+          ],
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "manual_review_required": {
+        "const": true,
+        "type": "boolean"
+      },
+      "permitted_output": {
+        "const": "prior-art-evidence-pack-draft-only",
+        "type": "string"
+      },
+      "prohibited_decisions": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "receipt_assurance": {
+        "enum": [
+          "policy-matched-not-cryptographic-authenticity-proof",
+          "caller-declared-not-live-retrieval-proof"
+        ],
+        "type": "string"
+      },
+      "required_checks": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "review_type": {
+        "enum": [
+          "claim-element-mapping",
+          "prior-art-evidence-pack"
+        ],
+        "type": "string"
+      },
+      "source_assurance_levels": {
+        "items": {
+          "enum": [
+            "caller-declared",
+            "policy-verified-not-authenticity-proof"
+          ],
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "source_output_mode": {
+        "enum": [
+          "projected-records",
+          "link-only"
+        ],
+        "type": "string"
+      },
+      "source_ref_count": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "status": {
+        "const": "admitted-pending-human-review",
+        "type": "string"
+      }
+    },
+    "required": [
+      "manual_review_required",
+      "fact_count",
+      "source_ref_count",
+      "review_type",
+      "receipt_assurance",
+      "source_output_mode",
+      "basic_identifier_scan",
+      "manual_review_reasons",
+      "prohibited_decisions",
+      "required_checks",
+      "source_assurance_levels",
+      "accepted",
+      "status",
+      "permitted_output"
+    ],
+    "type": "object"
+  },
+  "schema_status": "active",
+  "source_output_mode": "none",
+  "source_policy_ids": []
+}
+```
+<!-- kgov-runtime-binding:end -->
 
 ## 업무별 추가 체크
 

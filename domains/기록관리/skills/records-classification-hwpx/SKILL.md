@@ -5,6 +5,8 @@ metadata:
   kgov:
     domain: "기록관리"
     capability: public-document-hwpx
+    runtime_contract: "kgov/public-document-hwpx/v1"
+    operation: "kgov/public-document-hwpx/inspect-document/v1"
     role: primary
 ---
 
@@ -17,6 +19,153 @@ metadata:
 - 실행 상태: `fixture-verified` / live smoke `not-run`
 - 실행 경계: `draft-only`
 - Reference Skill: `hwp`, `rhwp-edit`, `joseon-sillok-search`
+
+## Runtime binding
+
+- Contract: `kgov/public-document-hwpx/v1`
+- Operation: `kgov/public-document-hwpx/inspect-document/v1`
+- Fixed input: `{"argv": ["--fixture"]}`
+- Output fields: `manual_review_required`, `section_count`, `extracted_character_count`, `section_metadata`, `identifier_scan_status`, `text_emitted`
+
+<!-- kgov-runtime-binding:start -->
+```json
+{
+  "binding": {
+    "contract_id": "kgov/public-document-hwpx/v1",
+    "fixed_input": {
+      "argv": [
+        "--fixture"
+      ]
+    },
+    "operation": "kgov/public-document-hwpx/inspect-document/v1"
+  },
+  "example_result": {
+    "extracted_character_count": 8,
+    "identifier_scan_status": "no-match-not-proof-of-redaction",
+    "manual_review_required": true,
+    "section_count": 1,
+    "section_metadata": {
+      "included": [
+        {
+          "character_count": 8,
+          "ordinal": 1
+        }
+      ],
+      "limit": 100,
+      "truncated": false
+    },
+    "text_emitted": false
+  },
+  "exit_codes": {
+    "input_error": 2,
+    "policy_blocked": 3,
+    "review_blocked": 1,
+    "success": 0,
+    "upstream_error": 4
+  },
+  "fixture_argv": [
+    "--fixture"
+  ],
+  "input_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "argv": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      }
+    },
+    "required": [
+      "argv"
+    ],
+    "type": "object"
+  },
+  "module": "kgov_runtime.capabilities.public_document_hwpx",
+  "network_mode": "none",
+  "output_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "extracted_character_count": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "identifier_scan_status": {
+        "enum": [
+          "match-detected-review-blocked",
+          "no-match-not-proof-of-redaction"
+        ],
+        "type": "string"
+      },
+      "manual_review_required": {
+        "const": true,
+        "type": "boolean"
+      },
+      "section_count": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "section_metadata": {
+        "additionalProperties": false,
+        "properties": {
+          "included": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "character_count": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "ordinal": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "ordinal",
+                "character_count"
+              ],
+              "type": "object"
+            },
+            "maxItems": 100,
+            "type": "array"
+          },
+          "limit": {
+            "const": 100,
+            "type": "integer"
+          },
+          "truncated": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "limit",
+          "truncated",
+          "included"
+        ],
+        "type": "object"
+      },
+      "text_emitted": {
+        "const": false,
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "manual_review_required",
+      "section_count",
+      "extracted_character_count",
+      "section_metadata",
+      "identifier_scan_status",
+      "text_emitted"
+    ],
+    "type": "object"
+  },
+  "schema_status": "active",
+  "source_output_mode": "none",
+  "source_policy_ids": []
+}
+```
+<!-- kgov-runtime-binding:end -->
 
 ## 절차
 

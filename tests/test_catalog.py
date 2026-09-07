@@ -1,3 +1,9 @@
+"""Catalog regression suite.
+
+# noqa: SIZE_OK -- Issue #33 confines catalog regressions to this existing suite;
+# extracting its legacy test classes would violate isolated file ownership.
+"""
+
 from __future__ import annotations
 
 import copy
@@ -100,12 +106,10 @@ class CatalogContractTest(unittest.TestCase):
         expected = [
             f'V6_CONTRACT_INVARIANT "/domains/{domain_index}/skills/{skill_index}/{field}"'
         ]
-        if (
-            domain_name == "관세"
-            and skill_name == "customs-origin-document-precheck"
-            and field == "capability"
-        ):
-            expected.append('V6_CONTRACT_INVARIANT "/shared_capabilities"')
+        if field == "capability":
+            expected = [
+                f'V6_BINDING_MISMATCH "/domains/{domain_index}/skills/{skill_index}/runtime_binding/contract_id"'
+            ]
         self.assertEqual(expected, errors)
 
     def assert_capability_contract_field_error(
@@ -1473,7 +1477,7 @@ class CatalogContractTest(unittest.TestCase):
     def test_live_status_requires_matching_smoke_evidence(self) -> None:
         changed = copy.deepcopy(self.data)
         capability = next(item for item in changed["shared_capabilities"] if item["slug"] == "official-source-research")
-        capability["live_smoke"] = "not-run"
+        capability["execution_status"] = "live-verified"
         errors = validate(changed, ROOT)
         self.assertEqual(
             ['V6_INVALID_VALUE "/shared_capabilities/7/live_smoke"'],
@@ -1544,7 +1548,7 @@ class CatalogContractTest(unittest.TestCase):
         )
         self.assertEqual(
             "PASS schema=6 domains=60 domain_skills=308 capabilities=22 source_policies=7 "
-            "runtime_contracts=22 operations=23 active_operations=0 bindings=0 top_level_skills=0 "
+            "runtime_contracts=22 operations=23 active_operations=22 bindings=308 top_level_skills=0 "
             "direct=35 adjacent=16 new=8 sensitive=1\n",
             result.stdout,
         )
@@ -2514,8 +2518,8 @@ class RuntimeContractV6Test(unittest.TestCase):
         ("kosis-official-statistics", "retrieval", "optional-live", "query-statistics", ("kosis-statistics-api",), "projected-records"),
         ("public-procurement-research", "retrieval", "optional-live", "query-order-plans", ("data-go-kr-order-plan-api",), "projected-records"),
         ("disaster-geospatial-brief", "retrieval", "optional-live", "query-village-forecast", ("data-go-kr-village-forecast-api",), "projected-records"),
-        ("welfare-health-safety-research", "retrieval", "blocked", "blocked-dataset-query", (), "projected-records"),
-        ("land-housing-geospatial-research", "retrieval", "blocked", "blocked-dataset-query", (), "projected-records"),
+        ("welfare-health-safety-research", "retrieval", "blocked", "blocked-dataset-query", (), "none"),
+        ("land-housing-geospatial-research", "retrieval", "blocked", "blocked-dataset-query", (), "none"),
         ("official-source-research", "retrieval", "optional-live", "inspect-page", ("gov-kr-web",), "link-only"),
         ("civil-complaint-triage-draft", "admission", "none", "admit-draft", (), "none"),
         ("administrative-document-draft-review", "admission", "none", "review-draft", (), "none"),
@@ -2704,8 +2708,8 @@ class RuntimeContractV6Test(unittest.TestCase):
             ("kgov/kosis-official-statistics/query-statistics/v1", "retrieval", "optional-live", ("kosis-statistics-api",), "projected-records", ("--fixture",)),
             ("kgov/public-procurement-research/query-order-plans/v1", "retrieval", "optional-live", ("data-go-kr-order-plan-api",), "projected-records", ("--fixture",)),
             ("kgov/disaster-geospatial-brief/query-village-forecast/v1", "retrieval", "optional-live", ("data-go-kr-village-forecast-api",), "projected-records", ("--fixture",)),
-            ("kgov/welfare-health-safety-research/blocked-dataset-query/v1", "retrieval", "blocked", (), "projected-records", ("--fixture",)),
-            ("kgov/land-housing-geospatial-research/blocked-dataset-query/v1", "retrieval", "blocked", (), "projected-records", ("--fixture",)),
+            ("kgov/welfare-health-safety-research/blocked-dataset-query/v1", "retrieval", "blocked", (), "none", ("--fixture",)),
+            ("kgov/land-housing-geospatial-research/blocked-dataset-query/v1", "retrieval", "blocked", (), "none", ("--fixture",)),
             ("kgov/official-source-research/inspect-page/v1", "retrieval", "optional-live", ("gov-kr-web",), "link-only", ("--fixture",)),
             ("kgov/civil-complaint-triage-draft/admit-draft/v1", "admission", "none", (), "none", ("--fixture",)),
             ("kgov/administrative-document-draft-review/review-draft/v1", "admission", "none", (), "none", ("--fixture",)),
@@ -4072,20 +4076,21 @@ class CatalogV6IntegrationTest(unittest.TestCase):
         )
 
         expected_policy_manifest = SourcePolicyV6Test.candidate()["source_policies"]
-        expected_runtime_manifest = RuntimeContractV6Test.candidate()["runtime_contracts"]
+        operations = [
+            operation
+            for contract in candidate["runtime_contracts"]
+            for operation in contract["operations"]
+        ]
 
         self.assertEqual(expected_root_keys, tuple(candidate))
         self.assertEqual(expected_policy_ids, tuple(policy["id"] for policy in candidate["source_policies"]))
         self.assertEqual(expected_policy_manifest, candidate["source_policies"])
         self.assertEqual(expected_contract_ids, tuple(contract["id"] for contract in candidate["runtime_contracts"]))
-        self.assertEqual(expected_runtime_manifest, candidate["runtime_contracts"])
+        self.assertEqual(22, sum(operation["schema_status"] == "active" for operation in operations))
+        self.assertEqual(1, sum(operation["schema_status"] == "declared" for operation in operations))
         self.assertEqual(
             expected_operation_ids,
-            tuple(
-                operation["id"]
-                for contract in candidate["runtime_contracts"]
-                for operation in contract["operations"]
-            ),
+            tuple(operation["id"] for operation in operations),
         )
 
     def test_capability_policy_and_contract_links_are_exact(self) -> None:
@@ -4140,7 +4145,7 @@ class CatalogV6IntegrationTest(unittest.TestCase):
         self.assertEqual(15, sum(not capability["source_policy_ids"] for capability in candidate["shared_capabilities"]))
         self.assertEqual(expected_links, actual_links)
 
-    def test_live_operations_are_declared_without_schemas_and_skills_are_unbound(self) -> None:
+    def test_live_operations_are_active_with_schemas_and_skills_are_bound(self) -> None:
         candidate = self.v6_candidate()
         operations = [
             operation
@@ -4155,9 +4160,96 @@ class CatalogV6IntegrationTest(unittest.TestCase):
         ]
 
         self.assertEqual(23, len(operations))
-        self.assertEqual(23, sum(operation["schema_status"] == "declared" for operation in operations))
-        self.assertEqual(0, sum("input_schema" in operation or "output_schema" in operation for operation in operations))
-        self.assertEqual([], bindings)
+        self.assertEqual(22, sum(operation["schema_status"] == "active" for operation in operations))
+        self.assertEqual(22, sum("input_schema" in operation and "output_schema" in operation for operation in operations))
+        secondary = candidate["runtime_contracts"][19]["operations"][1]
+        self.assertEqual("declared", secondary["schema_status"])
+        self.assertNotIn("input_schema", secondary)
+        self.assertNotIn("output_schema", secondary)
+        self.assertEqual(308, len(bindings))
+        contracts = {item["capability_slug"]: item for item in candidate["runtime_contracts"]}
+        for domain in candidate["domains"]:
+            for skill in domain["skills"]:
+                contract = contracts[skill["capability"]]
+                self.assertEqual(
+                    {"contract_id": contract["id"], "operation": contract["default_operation_id"],
+                     "fixed_input": {"argv": ["--fixture"]}},
+                    skill["runtime_binding"],
+                )
+
+    def test_binding_is_required_when_a_skill_omits_it(self) -> None:
+        # Given a catalog Skill without its required runtime binding.
+        candidate = self.v6_candidate()
+        candidate["domains"][0]["skills"][0].pop("runtime_binding", None)
+        # When the catalog boundary parses the Skill.
+        errors = self.validate_candidate(candidate)
+        # Then omission fails before artifact checks.
+        self.assertEqual(['V6_REQUIRED_FIELD "/domains/0/skills/0/runtime_binding"'], errors)
+
+    def test_fixture_binding_fails_closed_when_its_fixed_input_changes(self) -> None:
+        for fixed_input, suffix, code in (
+            ({}, "/argv", "V6_REQUIRED_FIELD"),
+            ({"argv": []}, "/argv", "V6_INVALID_VALUE"),
+            ({"argv": ["--live"]}, "/argv", "V6_INVALID_VALUE"),
+            ({"argv": [1]}, "/argv/0", "V6_INVALID_TYPE"),
+            ({"argv": ["--fixture"], "url": "SECRET"}, "/url", "V6_INVALID_VALUE"),
+        ):
+            with self.subTest(fixed_input=fixed_input):
+                # Given a changed shipped binding, not a generic partial preset.
+                candidate = self.v6_candidate()
+                candidate["domains"][0]["skills"][0]["runtime_binding"]["fixed_input"] = fixed_input
+                errors: list[str] = []
+                # When the catalog registry validates the binding against fixture_argv.
+                validate_catalog._validate_v6_registries(candidate, date(2026, 9, 5), errors)
+                # Then the precise field is rejected without echoing values.
+                self.assertEqual(
+                    [f'{code} "/domains/0/skills/0/runtime_binding/fixed_input{suffix}"'], errors,
+                )
+                self.assertNotIn("SECRET", "\n".join(errors))
+
+    def test_capability_mutation_fails_at_binding_when_skill_identity_is_unchanged(self) -> None:
+        # Given a shipped Skill whose capability no longer owns its bound contract.
+        candidate = self.v6_candidate()
+        candidate["domains"][0]["skills"][0]["capability"] = "official-source-research"
+        # When the catalog boundary resolves its binding.
+        errors = self.validate_candidate(candidate)
+        # Then rejection precedes generated artifact validation.
+        self.assertEqual(
+            ['V6_BINDING_MISMATCH "/domains/0/skills/0/runtime_binding/contract_id"'], errors,
+        )
+
+    def test_catalog_schemas_are_closed_when_fixture_defaults_are_active(self) -> None:
+        # Given the shipped catalog independently of generated artifacts.
+        candidate = self.v6_candidate()
+        errors: list[str] = []
+        # When registries and the approved executable manifest are checked.
+        validate_catalog._validate_v6_registries(candidate, date(2026, 9, 5), errors)
+        validate_catalog._validate_approved_runtime_manifest(candidate, errors)
+        # Then all nested schemas and 308 bindings validate.
+        self.assertEqual([], errors)
+
+    def test_blocked_operations_cannot_project_records_when_activated(self) -> None:
+        for index in (5, 6):
+            with self.subTest(index=index):
+                # Given a blocked default whose source mode is illegally widened.
+                candidate = self.v6_candidate()
+                candidate["runtime_contracts"][index]["operations"][0]["source_output_mode"] = "projected-records"
+                # When runtime policy semantics are checked.
+                errors = RuntimeContractV6Test.validate_contracts(candidate)
+                # Then fixture activation does not authorize source projection.
+                self.assertEqual(
+                    [f'V6_CONTRACT_INVARIANT "/runtime_contracts/{index}/operations/0/source_policy_ids"'], errors,
+                )
+
+    def test_live_evidence_is_downgraded_when_no_fresh_smoke_exists(self) -> None:
+        # Given the two capabilities whose historical smoke predates source policies.
+        candidate = self.v6_candidate()
+        # When their machine-consumed evidence states are selected.
+        states = {(item["execution_status"], item["live_smoke"])
+                  for item in candidate["shared_capabilities"]
+                  if item["slug"] in {"official-source-research", "korean-legal-citation-verification"}}
+        # Then synthetic evidence makes no live claim.
+        self.assertEqual({("fixture-verified", "blocked")}, states)
 
     def test_v6_phase_mutations_return_complete_exact_vectors(self) -> None:
         version = self.v6_candidate()
@@ -4335,10 +4427,7 @@ class CatalogV6IntegrationTest(unittest.TestCase):
                 lambda candidate: candidate["domains"][0]["skills"][0].__setitem__(
                     "capability", "official-source-research",
                 ),
-                [
-                    'V6_CONTRACT_INVARIANT "/domains"',
-                    'V6_CONTRACT_INVARIANT "/domains/0/skills/0"',
-                ],
+                ['V6_BINDING_MISMATCH "/domains/0/skills/0/runtime_binding/contract_id"'],
             ),
             (
                 lambda candidate: candidate["domains"][0]["skills"][0].__setitem__(
@@ -4541,11 +4630,50 @@ class CatalogV6IntegrationTest(unittest.TestCase):
         self.assertEqual(0, result.returncode)
         self.assertEqual(
             "PASS schema=6 domains=60 domain_skills=308 capabilities=22 source_policies=7 "
-            "runtime_contracts=22 operations=23 active_operations=0 bindings=0 top_level_skills=0 "
+            "runtime_contracts=22 operations=23 active_operations=22 bindings=308 top_level_skills=0 "
             "direct=35 adjacent=16 new=8 sensitive=1\n",
             result.stdout,
         )
         self.assertEqual("", result.stderr)
+
+
+class ActiveCatalogOutputTest(unittest.TestCase):
+    def test_real_fixture_outputs_match_catalog_schemas_when_defaults_execute(self) -> None:
+        from kgov_runtime.contracts import load_contracts
+
+        # Given the real catalog parser and fixture-backed capability CLIs.
+        for contract in load_contracts():
+            with self.subTest(capability=contract.capability_slug):
+                operation = contract.operations[0]
+                # When the executable fixture operation runs through its real surface.
+                result = subprocess.run(
+                    [sys.executable, "-m", contract.module, *operation.fixture_argv],
+                    cwd=ROOT, capture_output=True, text=True, check=False, timeout=20,
+                )
+                # Then the actual output satisfies the catalog-owned closed schema.
+                self.assertEqual(0, result.returncode, result.stderr)
+                contract.validate_output(operation.id, json.loads(result.stdout))
+
+    def test_nested_output_keys_are_rejected_when_not_in_the_catalog_schema(self) -> None:
+        from kgov_runtime.contracts import ContractError, load_contracts
+
+        # Given a real nested HWPX output with an undeclared metadata field.
+        contract = load_contracts()[0]
+        operation = contract.operations[0]
+        result = subprocess.run(
+            [sys.executable, "-m", contract.module, "--fixture"],
+            cwd=ROOT, capture_output=True, text=True, check=True, timeout=20,
+        )
+        for key, code in (("unexpected", "schema-additional-property"), ("raw", "forbidden-output-key")):
+            with self.subTest(key=key):
+                output = json.loads(result.stdout)
+                output["section_metadata"]["included"][0][key] = "SECRET"
+                # When the actual runtime parser validates the mutated response.
+                with self.assertRaises(ContractError) as caught:
+                    contract.validate_output(operation.id, output)
+                # Then nested extensions and sensitive fields both fail closed.
+                self.assertEqual(code, caught.exception.code)
+                self.assertNotIn("SECRET", str(caught.exception))
 
 
 if __name__ == "__main__":

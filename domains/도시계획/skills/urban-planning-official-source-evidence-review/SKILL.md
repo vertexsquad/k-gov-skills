@@ -5,6 +5,8 @@ metadata:
   kgov:
     domain: "도시계획"
     capability: land-housing-geospatial-research
+    runtime_contract: "kgov/land-housing-geospatial-research/v1"
+    operation: "kgov/land-housing-geospatial-research/blocked-dataset-query/v1"
     role: additional
 ---
 
@@ -17,6 +19,138 @@ metadata:
 - 실행 상태: `fixture-verified` / live smoke `not-run`
 - 실행 경계: `draft-only`
 - Reference Skill: 없음
+
+## Runtime binding
+
+- Contract: `kgov/land-housing-geospatial-research/v1`
+- Operation: `kgov/land-housing-geospatial-research/blocked-dataset-query/v1`
+- Fixed input: `{"argv": ["--fixture"]}`
+- Output fields: `manual_review_required`, `contract_id`, `execution_mode`, `status`, `count`, `records`, `source_receipt`
+
+<!-- kgov-runtime-binding:start -->
+```json
+{
+  "binding": {
+    "contract_id": "kgov/land-housing-geospatial-research/v1",
+    "fixed_input": {
+      "argv": [
+        "--fixture"
+      ]
+    },
+    "operation": "kgov/land-housing-geospatial-research/blocked-dataset-query/v1"
+  },
+  "example_result": {
+    "contract_id": "kgov/land-housing-geospatial-research/v1",
+    "count": 0,
+    "execution_mode": "synthetic-fixture",
+    "manual_review_required": true,
+    "records": [],
+    "source_receipt": {
+      "endpoint": null,
+      "operation_id": "kgov/land-housing-geospatial-research/blocked-dataset-query/v1",
+      "policy_id": null
+    },
+    "status": "live-operation-blocked"
+  },
+  "exit_codes": {
+    "input_error": 2,
+    "policy_blocked": 3,
+    "review_blocked": 1,
+    "success": 0,
+    "upstream_error": 4
+  },
+  "fixture_argv": [
+    "--fixture"
+  ],
+  "input_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "argv": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      }
+    },
+    "required": [
+      "argv"
+    ],
+    "type": "object"
+  },
+  "module": "kgov_runtime.capabilities.land_housing_geospatial_research",
+  "network_mode": "blocked",
+  "output_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "contract_id": {
+        "const": "kgov/land-housing-geospatial-research/v1",
+        "type": "string"
+      },
+      "count": {
+        "const": 0,
+        "type": "integer"
+      },
+      "execution_mode": {
+        "const": "synthetic-fixture",
+        "type": "string"
+      },
+      "manual_review_required": {
+        "const": true,
+        "type": "boolean"
+      },
+      "records": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {},
+          "required": [],
+          "type": "object"
+        },
+        "maxItems": 0,
+        "type": "array"
+      },
+      "source_receipt": {
+        "additionalProperties": false,
+        "properties": {
+          "endpoint": {
+            "type": "null"
+          },
+          "operation_id": {
+            "const": "kgov/land-housing-geospatial-research/blocked-dataset-query/v1",
+            "type": "string"
+          },
+          "policy_id": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "operation_id",
+          "policy_id",
+          "endpoint"
+        ],
+        "type": "object"
+      },
+      "status": {
+        "const": "live-operation-blocked",
+        "type": "string"
+      }
+    },
+    "required": [
+      "manual_review_required",
+      "contract_id",
+      "execution_mode",
+      "status",
+      "count",
+      "records",
+      "source_receipt"
+    ],
+    "type": "object"
+  },
+  "schema_status": "active",
+  "source_output_mode": "none",
+  "source_policy_ids": []
+}
+```
+<!-- kgov-runtime-binding:end -->
 
 ## 업무별 추가 체크
 

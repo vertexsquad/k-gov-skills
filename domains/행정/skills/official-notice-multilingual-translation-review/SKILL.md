@@ -5,6 +5,8 @@ metadata:
   kgov:
     domain: "행정"
     capability: official-notice-multilingual-translation-review
+    runtime_contract: "kgov/official-notice-multilingual-translation-review/v1"
+    operation: "kgov/official-notice-multilingual-translation-review/review-case/v1"
     role: additional
 ---
 
@@ -17,6 +19,194 @@ metadata:
 - 실행 상태: `fixture-verified` / live smoke `not-run`
 - 실행 경계: `draft-only`
 - Reference Skill: 없음
+
+## Runtime binding
+
+- Contract: `kgov/official-notice-multilingual-translation-review/v1`
+- Operation: `kgov/official-notice-multilingual-translation-review/review-case/v1`
+- Fixed input: `{"argv": ["--fixture"]}`
+- Output fields: `manual_review_required`, `fact_count`, `source_ref_count`, `review_type`, `receipt_assurance`, `source_output_mode`, `basic_identifier_scan`, `manual_review_reasons`, `prohibited_decisions`, `required_checks`, `source_assurance_levels`, `accepted`, `status`, `permitted_output`
+
+<!-- kgov-runtime-binding:start -->
+```json
+{
+  "binding": {
+    "contract_id": "kgov/official-notice-multilingual-translation-review/v1",
+    "fixed_input": {
+      "argv": [
+        "--fixture"
+      ]
+    },
+    "operation": "kgov/official-notice-multilingual-translation-review/review-case/v1"
+  },
+  "example_result": {
+    "accepted": true,
+    "basic_identifier_scan": "no-match-not-proof-of-redaction",
+    "fact_count": 1,
+    "manual_review_reasons": [
+      "caller-declared-source",
+      "license-unverified",
+      "redistribution-link-only"
+    ],
+    "manual_review_required": true,
+    "permitted_output": "translation-review-draft-only",
+    "prohibited_decisions": [
+      "automatic-publication",
+      "legal-meaning-certification",
+      "medical-meaning-certification"
+    ],
+    "receipt_assurance": "caller-declared-not-live-retrieval-proof",
+    "required_checks": [
+      "meaning-and-official-terms",
+      "numbers-dates-contact-consistency",
+      "language-specialist-review-route"
+    ],
+    "review_type": "multilingual-translation-review",
+    "source_assurance_levels": [
+      "caller-declared"
+    ],
+    "source_output_mode": "link-only",
+    "source_ref_count": 1,
+    "status": "admitted-pending-human-review"
+  },
+  "exit_codes": {
+    "input_error": 2,
+    "policy_blocked": 3,
+    "review_blocked": 1,
+    "success": 0,
+    "upstream_error": 4
+  },
+  "fixture_argv": [
+    "--fixture"
+  ],
+  "input_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "argv": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      }
+    },
+    "required": [
+      "argv"
+    ],
+    "type": "object"
+  },
+  "module": "kgov_runtime.capabilities.official_notice_multilingual_translation_review",
+  "network_mode": "none",
+  "output_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "accepted": {
+        "const": true,
+        "type": "boolean"
+      },
+      "basic_identifier_scan": {
+        "const": "no-match-not-proof-of-redaction",
+        "type": "string"
+      },
+      "fact_count": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "manual_review_reasons": {
+        "items": {
+          "enum": [
+            "caller-declared-source",
+            "policy-outcome-manual-review",
+            "license-unverified",
+            "redistribution-link-only"
+          ],
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "manual_review_required": {
+        "const": true,
+        "type": "boolean"
+      },
+      "permitted_output": {
+        "const": "translation-review-draft-only",
+        "type": "string"
+      },
+      "prohibited_decisions": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "receipt_assurance": {
+        "enum": [
+          "policy-matched-not-cryptographic-authenticity-proof",
+          "caller-declared-not-live-retrieval-proof"
+        ],
+        "type": "string"
+      },
+      "required_checks": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "review_type": {
+        "enum": [
+          "multilingual-translation-review",
+          "terminology-consistency-review"
+        ],
+        "type": "string"
+      },
+      "source_assurance_levels": {
+        "items": {
+          "enum": [
+            "caller-declared",
+            "policy-verified-not-authenticity-proof"
+          ],
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "source_output_mode": {
+        "enum": [
+          "projected-records",
+          "link-only"
+        ],
+        "type": "string"
+      },
+      "source_ref_count": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "status": {
+        "const": "admitted-pending-human-review",
+        "type": "string"
+      }
+    },
+    "required": [
+      "manual_review_required",
+      "fact_count",
+      "source_ref_count",
+      "review_type",
+      "receipt_assurance",
+      "source_output_mode",
+      "basic_identifier_scan",
+      "manual_review_reasons",
+      "prohibited_decisions",
+      "required_checks",
+      "source_assurance_levels",
+      "accepted",
+      "status",
+      "permitted_output"
+    ],
+    "type": "object"
+  },
+  "schema_status": "active",
+  "source_output_mode": "none",
+  "source_policy_ids": []
+}
+```
+<!-- kgov-runtime-binding:end -->
 
 ## 업무별 추가 체크
 
