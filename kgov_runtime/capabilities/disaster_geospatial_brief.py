@@ -6,7 +6,7 @@ from __future__ import annotations
 import sys
 from datetime import date
 from pathlib import Path
-from typing import Any, Callable, Iterable, Mapping
+from typing import Final, Any, Callable, Iterable, Mapping
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -123,6 +123,10 @@ def fixture_result() -> dict[str, Any]:
 
 def main() -> int:
     return run_json_cli(OPERATION, FIXTURE)
+
+
+RUNTIME_CONTRACT_ID: Final[str] = "kgov/disaster-geospatial-brief/v1"
+RUNTIME_OPERATION_IDS: Final[tuple[str, ...]] = ("kgov/disaster-geospatial-brief/query-village-forecast/v1",)
 
 
 if __name__ == "__main__":

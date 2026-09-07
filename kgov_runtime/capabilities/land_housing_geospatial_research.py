@@ -7,7 +7,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any, Callable, Iterable, Mapping
+from typing import Final, Any, Callable, Iterable, Mapping
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -45,6 +45,10 @@ def main() -> int:
         parser.exit(3, "ERROR live operation is blocked until an exact dataset profile is declared\n")
     print(json.dumps(fixture_result(), ensure_ascii=False, indent=2, sort_keys=True, allow_nan=False))
     return 0
+
+
+RUNTIME_CONTRACT_ID: Final[str] = "kgov/land-housing-geospatial-research/v1"
+RUNTIME_OPERATION_IDS: Final[tuple[str, ...]] = ("kgov/land-housing-geospatial-research/blocked-dataset-query/v1",)
 
 
 if __name__ == "__main__":

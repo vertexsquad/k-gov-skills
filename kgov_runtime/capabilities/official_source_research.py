@@ -13,7 +13,7 @@ import time
 from datetime import date
 from html import unescape
 from pathlib import Path
-from typing import TypedDict
+from typing import Final, TypedDict
 from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -155,6 +155,10 @@ def main() -> int:
         parser.exit(2, f"ERROR {exc}\n")
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
     return 0
+
+
+RUNTIME_CONTRACT_ID: Final[str] = "kgov/official-source-research/v1"
+RUNTIME_OPERATION_IDS: Final[tuple[str, ...]] = ("kgov/official-source-research/inspect-page/v1",)
 
 
 if __name__ == "__main__":

@@ -244,5 +244,9 @@ def main() -> int:
     return 1 if result["identifier_scan_status"] == "match-detected-review-blocked" else 0
 
 
+RUNTIME_CONTRACT_ID: Final[str] = "kgov/public-document-hwpx/v1"
+RUNTIME_OPERATION_IDS: Final[tuple[str, ...]] = ("kgov/public-document-hwpx/inspect-document/v1",)
+
+
 if __name__ == "__main__":
     raise SystemExit(main())
