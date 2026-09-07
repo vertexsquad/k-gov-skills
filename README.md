@@ -1,6 +1,6 @@
 # k-gov-skills
 
-한국 공무원의 업무 분야별 반복 업무를, **공식 원문으로 근거를 확인하는 Agent Skill**로 패키징한 프로젝트입니다.
+한국 공무원의 업무 분야별 반복 업무를, **공식 출처와 합성 fixture를 구분해 근거를 정리하는 Agent Skill**로 패키징한 프로젝트입니다.
 
 60개 업무 분야(domain)에 308개 Skill이 있고, 그 안쪽은 22개 공통 capability가 실제로 실행합니다.
 
@@ -21,6 +21,7 @@
 - [예제: 법령·판례 인용 검증](#예제-법령판례-인용-검증)
 - [저장소 구조](#저장소-구조)
 - [개발·검증](#개발검증)
+- [증거를 읽는 법](#증거를-읽는-법)
 - [안전 경계와 외부 reference](#안전-경계와-외부-reference)
 
 ## 무엇을 해결하나요
@@ -29,7 +30,7 @@
 
 | 이런 상황 | 이 저장소의 접근 |
 |---|---|
-| LLM이 그럴듯한 법 조항을 지어냄 | 실행 시점에 공식 원문을 다시 조회해 대조 |
+| LLM이 그럴듯한 법 조항을 지어냄 | 합성 fixture로 계약을 검사하고, 별도 승인된 live 정책이 있을 때만 공식 원문을 조회해 대조 |
 | 검색 snippet만 보고 근거로 인용 | 1차 출처 URL과 함께 통과·불일치 상태를 분리 보고 |
 | 애매하면 알아서 비슷한 걸로 채움 | 검색 0건·복수 후보·불일치는 **fail-closed**로 차단 |
 | 민원 원문에 개인정보가 섞여 들어감 | 비식별 인용 후보만 입력받고 직접 식별자를 차단 |
@@ -93,16 +94,16 @@ Agent(Claude 등)에게는 Skill 이름으로 직접 요청합니다.
 
 **4. Evidence (근거 강도)** — domain의 `direct`/`adjacent`/`new`/`sensitive`는 **완성도가 아니라 근거 강도와 도입 경계**입니다. 현재 direct 35 · adjacent 16 · new 8 · sensitive 1.
 
-여기에 **검증 상태**가 따로 있습니다. `fixture-verified`(합성 fixture 통과) 20개, `live-verified`(공식 원문 live 조회 확인) 2개입니다. Domain Skill은 연결된 capability보다 강한 검증 상태를 주장하지 않습니다.
+여기에 **검증 상태**가 따로 있습니다. 현재 22개 capability 모두 `fixture-verified`입니다. `live_smoke`는 19개 `not-run`, 3개 `blocked`이며 현재 `passed`는 없습니다. Domain Skill은 연결된 capability보다 강한 검증 상태를 주장하지 않습니다.
 
 ## capability 22개 목록
 
-`Live`가 `passed`인 것만 공식 원문 live 조회까지 확인됐습니다. 나머지는 fixture 계약 검증 단계입니다.
+`Live`는 현재 catalog의 machine status입니다. `blocked`는 정책 또는 workflow 조건이 충족되지 않아 network 전에 차단됨을, `not-run`은 현재 증거가 없음을 뜻합니다. 과거 URL 도달 기록은 현재 `passed`로 승격하지 않습니다.
 
 | Capability | 경계 | Credential | Live |
 |---|---|---|---|
-| `official-source-research` | read-only | none | **passed** |
-| `korean-legal-citation-verification` | draft-only | mixed | **passed** |
+| `official-source-research` | read-only | none | blocked |
+| `korean-legal-citation-verification` | draft-only | mixed | blocked |
 | `public-document-hwpx` | document-read | none | not-run |
 | `korean-law-bill-research` | read-only | mixed | not-run |
 | `kosis-official-statistics` | read-only | user-held | not-run |
@@ -119,7 +120,7 @@ Agent(Claude 등)에게는 Skill 이름으로 직접 요청합니다.
 | `public-record-disclosure-redaction-review` | draft-only | none | not-run |
 | `local-ordinance-draft-review` | draft-only | none | not-run |
 | `construction-standard-bim-compliance-precheck` | draft-only | none | not-run |
-| `building-permit-document-precheck` | draft-only | none | not-run |
+| `building-permit-document-precheck` | draft-only | none | blocked |
 | `official-notice-multilingual-translation-review` | draft-only | none | not-run |
 | `public-records-lifecycle-review` | draft-only | none | not-run |
 | `regulated-trade-procedure-precheck` | draft-only | none | not-run |
@@ -128,7 +129,7 @@ Agent(Claude 등)에게는 Skill 이름으로 직접 요청합니다.
 
 ## 예제: 법령·판례 인용 검증
 
-가장 성숙한 Skill인 [`public-administration-legal-citation-verification`](domains/행정/skills/public-administration-legal-citation-verification/SKILL.md)을 예로 전체 흐름을 봅니다. 보고서·민원 답변에 넣을 **법령 조문과 판례 인용 후보**를 국가법령정보 공식 원문과 대조하는 draft-only evidence gate입니다.
+[`public-administration-legal-citation-verification`](domains/행정/skills/public-administration-legal-citation-verification/SKILL.md)을 예로 전체 흐름을 봅니다. 현재 사용할 수 있는 것은 합성 fixture 계약 검증이며, 국가법령정보 공식 원문 조회는 reviewed policy가 활성화된 경우에만 가능한 draft-only evidence gate입니다.
 
 ### 언제 쓰나요
 
@@ -145,7 +146,9 @@ Agent(Claude 등)에게는 Skill 이름으로 직접 요청합니다.
 python3 -m kgov_runtime.capabilities.korean_legal_citation_verification --fixture
 ```
 
-**2단계 — 인증값 설정.** 환경변수로만 설정하고 명령 인수·URL·fixture·로그·커밋에 넣지 않습니다.
+아래 2~5단계는 **현재 catalog에서는 차단됩니다.** `law-go-kr-drf-api` policy가 reviewed evidence와 함께 활성화되기 전에는 credential을 읽거나 network를 호출하지 않고 exit `3`으로 종료합니다.
+
+**2단계 — 정책 승인 뒤 인증값 설정.** 환경변수로만 설정하고 명령 인수·URL·fixture·로그·커밋에 넣지 않습니다.
 
 ```bash
 export LAW_OC='사용자 소유 인증값'
@@ -188,7 +191,7 @@ python3 -m kgov_runtime.capabilities.korean_legal_citation_verification citation
 
 | 장점 | 실제로 달라지는 점 |
 |---|---|
-| 공식 1차 출처 직접 검증 | 검색 snippet·블로그·LLM 주장 대신 실행 중 국가법령정보 원문을 다시 조회 |
+| 공식 1차 출처 직접 검증 | policy-authorized live 실행에서만 검색 snippet·블로그·LLM 주장 대신 국가법령정보 record를 조회 |
 | 잘못된 인용 차단 | 법령 ID·기준일·조·항·호·목과 판례일련번호·사건번호·법원·선고일·인용문이 **함께** 맞아야 통과 |
 | 기준일에 맞는 법령 선택 | `as_of_date` 이하 최신 단일 연혁을 선택해 현재법과 과거법을 섞는 위험 감소 |
 | 그럴듯한 자동 보완 방지 | 검색 0건·복수 후보·API 오류·metadata 불일치를 추정으로 메우지 않고 fail-closed |
@@ -198,7 +201,7 @@ python3 -m kgov_runtime.capabilities.korean_legal_citation_verification citation
 
 ### 보증 범위
 
-이 Skill이 보증하는 것은 **실행 시점에 조회한 공식 record와 후보 인용의 구조적 일치**뿐입니다.
+`verified-official-live-match`가 policy-authorized 실행에서 생성된 경우에만 **그 실행 시점에 조회한 공식 record와 후보 인용의 구조적 일치**를 뜻합니다. 현재 fixture 결과는 이 보증을 제공하지 않습니다.
 
 보증하지 않는 것: 법률 해석, 사실관계 적용, 판례의 현재 효력, 반대·제한 판례 검색의 완전성, 최종 문서의 법적 적합성. 최종 인용·결재·제출·발송은 담당 공무원 또는 법무 검토자가 승인해야 합니다.
 
@@ -250,10 +253,26 @@ python3 scripts/check.py
 
 자세한 작업 계약은 [CLAUDE.md](CLAUDE.md)에 있습니다.
 
+## 증거를 읽는 법
+
+이 저장소는 다음 다섯 차원을 서로 대체하지 않습니다.
+
+| 차원 | 확인하는 것 | 확인하지 않는 것 |
+|---|---|---|
+| Fixture contract | 합성 입력의 CLI·schema·exit 계약 | URL 도달, 실제 자료, 현재성 |
+| URL reachability | 특정 시점의 HTTP 응답 | policy 승인, 내용의 정확성·이용허락 |
+| Policy-authorized live retrieval | exact operation과 reviewed policy에 따른 조회 및 receipt | 법적 이용허락, 사실·법률 판단 |
+| Substantive correctness | 담당자의 내용·맥락·최신성 검토 | 저작권·약관 승인 |
+| Human/legal approval | 권한 있는 담당자의 이용·공개·제출 결정 | runtime이 대신할 수 있는 자동 판정 |
+
+`robots.txt`는 접근에 관한 신호일 뿐 저작권이나 약관상 이용허락이 아닙니다. `source_receipt`도 operation·policy·응답 처리 이력을 기록할 뿐 법률 판단이나 cryptographic authenticity를 증명하지 않습니다. 자세한 기준은 [source usage policy](docs/source-usage-policy.md)를 확인하십시오.
+
 ## 안전 경계와 외부 reference
 
 - 비밀값·인증정보·원문 개인정보를 소스·fixture·로그·결과에 저장하지 않습니다.
 - 예약·결제·제출·메시지·문서 원본 변경·민감 경호업무는 명시 승인과 manual handoff 없이 자동화하지 않습니다.
 - fixture 성공, URL 도달, live API 성공을 같은 증거로 표현하지 않습니다.
+- 직접 식별자 scan의 no-match는 완전한 비식별 증명이 아닙니다.
+- Runtime은 stdout redirection, downstream copy, backup, caller database를 지우거나 secure memory·SSD deletion을 보증할 수 없습니다.
 - `mouseco/k-gov-skills`, `NomaDamas/k-skill`, `legalize-kr/agent-skills`, `Sungmin-Cho/skill-legal-kr`는 **별개 프로젝트**이며 참고 자료로만 사용합니다. 외부 코드·프롬프트·문서를 복사하거나 미러링하지 않습니다.
 - adapter 변경 전 공식 API·이용약관·인증정보 소유자·proxy·개인정보·side effect를 재검증합니다.

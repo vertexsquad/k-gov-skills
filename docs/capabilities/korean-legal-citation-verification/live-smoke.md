@@ -1,4 +1,6 @@
-# Live smoke — `korean-legal-citation-verification`
+# Historical live observation — `korean-legal-citation-verification`
+
+> 현재 catalog 상태는 `fixture-verified` / `live_smoke=blocked`입니다. 아래 기록은 현재 policy digest·source receipt admission 도입 전의 관측이며 현재 `passed` live evidence가 아닙니다.
 
 - 실행 시각(UTC): `2026-07-20T03:40:16Z`
 - 공식 endpoint: 국가법령정보 공동활용 `lawSearch.do`, `lawService.do`
@@ -39,3 +41,5 @@
 - 최종 보고서·민원 답변에서의 인용 적합성
 
 fixture 검증과 live smoke는 서로 대체하지 않습니다. 실제 운영에서는 사용자 소유 `LAW_OC`와 담당 공무원 또는 법무 검토자의 원문 확인이 필요합니다.
+
+이 기록에는 현재 요구되는 reviewed policy revision/digest, enforcer-issued receipt, projected field 목록과 수동 검토자 evidence가 없습니다. 따라서 [source usage policy](../../source-usage-policy.md)의 live smoke admission을 충족하지 않습니다.
