@@ -54,7 +54,7 @@ Only the enforcer projector sees page text. Lookup returns exactly `url`
 (scheme/host/path, no query), `status`, normalized `content_type`, `title`, UTF-8
 `content_length`, `sha256`, `execution_mode=official-live`,
 `manual_review_required=true`, and `source_receipt`.
-The authentic source receipt retains `operation_id`, `policy_id`,
+The enforcer-issued source receipt retains `operation_id`, `policy_id`,
 `policy_revision`, `policy_digest`, and `outcome=allowed`. There is one receipt
 per successfully projected source page, not per wire exchange. Required robots
 requests reserve budget separately but return no source receipt; failed
@@ -71,8 +71,9 @@ both KIPRIS and KIPO. Invalid encoded UTF-8 and any intermediate view over
 250,000 UTF-8 bytes fail as `response-invalid`. Neither a lookup result nor an
 allowed receipt is returned for those failures. Views are never written back:
 nested `%2540` becomes only `%40`, not `@`, while safe title spelling and
-authentic receipt fields remain unchanged. Importing this pure scanner performs
-no credential, policy-state, or network work; local admission remains local.
+enforcer-issued receipt fields remain unchanged. Importing this pure scanner
+performs no credential, policy-state, or network work; local admission remains
+local.
 
 Only HTML/XHTML pages can be projected. PDF, image, SVG, drawing, binary and
 other attachment media are rejected even when a broad reviewed response policy
@@ -101,3 +102,5 @@ control flow, not credential-derived reflection. Coincidental equality with a
 credential does not remove the necessary status or change its exit code;
 receipt, caller and upstream material must still remain suppressed when unsafe.
 Fixture and injected-transport success do not establish live-source success.
+
+Fixture, URL reachability, policy-authorized retrieval, substantive correctness와 human/legal approval은 별도 차원입니다. 공통 robots·license·receipt·삭제 한계는 [source usage policy](../../source-usage-policy.md)를 따릅니다.

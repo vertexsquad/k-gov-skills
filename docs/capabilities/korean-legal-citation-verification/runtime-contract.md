@@ -118,7 +118,7 @@ Precedent candidate exact fields:
 
 ## 보증 경계
 
-- 보증: 실행 시점에 직접 조회한 공식 record와 식별자·기준일·locator·인용문이 구조적으로 일치함
+- 보증: policy-authorized live 실행에서 생성된 `verified-official-live-match`에 한해, 그 실행 시점에 조회한 공식 record와 식별자·기준일·locator·인용문이 구조적으로 일치함
 - 보증하지 않음: 법률 해석, 사실관계 적용, 판례의 현재 효력, 반대·제한 판례 검색 완전성, 최종 문서 적합성
 - `manual_review_required=true`; 최종 인용·결재·발송은 담당 공무원 또는 법무 검토자가 승인합니다.
 - 제출·결재·발송·업로드·전자소송·원본 변경은 금지합니다.
@@ -185,6 +185,7 @@ entry containing:
   and search `page` (including default page 1) or `null` for detail;
 - `source_receipt`: unchanged enforcer fields `operation_id`, `policy_id`,
   `policy_revision`, `policy_digest`, `outcome=allowed` for live-mode retrieval.
+  이 enforcer-issued receipt는 cryptographic authenticity, 법률적 타당성 또는 이용허락의 증명이 아닙니다.
 
 Every history page and repeated fetch remains in order; receipts are never
 deduplicated by policy. Verification with a supplied precedent serial makes no
@@ -201,7 +202,7 @@ One request-local `LegalSession` boundary protects projected values (including
 not-found), appended receipts, complete public outputs and library exception
 traces. It captures credential material only after authorization. Conflicting
 caller `citation_id` values become `null` in boundary-owned copies, including
-successful citation results; caller input and authentic receipt fields are never
+successful citation results; caller input and enforcer-issued receipt fields are never
 rewritten. Any remaining credential collision in a value or field name fails
 closed as `response-invalid`, with empty `source_receipts` and
 `failed_call=null`. The CLI only serializes already-safe library errors and exits
@@ -226,14 +227,14 @@ finite-float, and boolean scalars are covered, so an identifier-shaped
 `total_count` cannot bypass screening by becoming an integer. Invalid UTF-8,
 oversized views, non-finite values, encoded email/phone/resident identifiers,
 and composed percent/entity/fullwidth forms fail before an allowed receipt.
-Authentic earlier receipts are retained without rewriting; a failing fetch does
+Earlier enforcer-issued receipts are retained without rewriting; a failing fetch does
 not receive a receipt.
 
 Stable protocol status tokens, such as `response-invalid` and
 `upstream-403-manual`, are implementation constants selected by runtime control
 flow, not credential-derived reflection. If `LAW_OC` happens to equal such a
 token, the necessary error status and its stable exit code remain present.
-Caller metadata, authentic receipt fields and upstream material remain subject
+Caller metadata, enforcer-issued receipt fields and upstream material remain subject
 to the credential boundary; equality does not permit them to be emitted or a
 receipt to be falsified. Tests distinguish the mandatory protocol status from
 credential-bearing payload/trace material rather than trying to hide constants.
@@ -331,3 +332,5 @@ on every synthetic call entry. No live citation or source URL is admitted.
 An ambiguous standalone search still exits `0` with manual-selection metadata.
 Offline tests/fixtures are not evidence of live official verification or legal
 relevance, completeness, current precedent validity, or permission to publish.
+
+Fixture, URL reachability, policy-authorized retrieval, substantive correctness와 human/legal approval은 별도 차원입니다. 공통 robots·license·receipt·삭제 한계는 [source usage policy](../../source-usage-policy.md)를 따릅니다.
