@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Final, Any, Mapping
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -30,6 +30,10 @@ def review_case(payload: Mapping[str, Any]) -> dict[str, Any]:
 
 def main() -> int:
     return run_cli(CONTRACT, FIXTURE)
+
+
+RUNTIME_CONTRACT_ID: Final[str] = "kgov/local-ordinance-draft-review/v1"
+RUNTIME_OPERATION_IDS: Final[tuple[str, ...]] = ("kgov/local-ordinance-draft-review/review-case/v1",)
 
 
 if __name__ == "__main__":

@@ -318,5 +318,12 @@ def main() -> int:
     return 0
 
 
+RUNTIME_CONTRACT_ID: Final[str] = "kgov/patent-prior-art-evidence-pack/v1"
+RUNTIME_OPERATION_IDS: Final[tuple[str, ...]] = (
+    "kgov/patent-prior-art-evidence-pack/review-case/v1",
+    "kgov/patent-prior-art-evidence-pack/inspect-source/v1",
+)
+
+
 if __name__ == "__main__":
     raise SystemExit(main())

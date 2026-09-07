@@ -8,7 +8,7 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Final, Any, Mapping
 from urllib.parse import urlsplit
 
 
@@ -179,6 +179,10 @@ def main() -> int:
         parser.exit(2, f"ERROR {exc}\n")
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
     return 0
+
+
+RUNTIME_CONTRACT_ID: Final[str] = "kgov/administrative-document-draft-review/v1"
+RUNTIME_OPERATION_IDS: Final[tuple[str, ...]] = ("kgov/administrative-document-draft-review/review-draft/v1",)
 
 
 if __name__ == "__main__":

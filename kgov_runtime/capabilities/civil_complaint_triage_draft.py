@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Final, Any, Mapping
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -114,6 +114,10 @@ def main() -> int:
         parser.exit(2, f"ERROR {exc}\n")
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
     return 0
+
+
+RUNTIME_CONTRACT_ID: Final[str] = "kgov/civil-complaint-triage-draft/v1"
+RUNTIME_OPERATION_IDS: Final[tuple[str, ...]] = ("kgov/civil-complaint-triage-draft/admit-draft/v1",)
 
 
 if __name__ == "__main__":

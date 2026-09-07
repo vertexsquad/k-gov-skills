@@ -1909,5 +1909,9 @@ def main() -> int:
     return 0
 
 
+RUNTIME_CONTRACT_ID: Final[str] = "kgov/korean-legal-citation-verification/v1"
+RUNTIME_OPERATION_IDS: Final[tuple[str, ...]] = ("kgov/korean-legal-citation-verification/verify-citations/v1",)
+
+
 if __name__ == "__main__":
     raise SystemExit(main())
