@@ -5,6 +5,8 @@ metadata:
   kgov:
     domain: "교육"
     capability: civil-complaint-triage-draft
+    runtime_contract: "kgov/civil-complaint-triage-draft/v1"
+    operation: "kgov/civil-complaint-triage-draft/admit-draft/v1"
     role: additional
 ---
 
@@ -17,6 +19,118 @@ metadata:
 - 실행 상태: `fixture-verified` / live smoke `not-run`
 - 실행 경계: `draft-only`
 - Reference Skill: 없음
+
+## Runtime binding
+
+- Contract: `kgov/civil-complaint-triage-draft/v1`
+- Operation: `kgov/civil-complaint-triage-draft/admit-draft/v1`
+- Fixed input: `{"argv": ["--fixture"]}`
+- Output fields: `manual_review_required`, `accepted`, `permitted_output`, `basic_identifier_scan`, `input_characters`, `title_characters`, `workflow_steps`
+
+<!-- kgov-runtime-binding:start -->
+```json
+{
+  "binding": {
+    "contract_id": "kgov/civil-complaint-triage-draft/v1",
+    "fixed_input": {
+      "argv": [
+        "--fixture"
+      ]
+    },
+    "operation": "kgov/civil-complaint-triage-draft/admit-draft/v1"
+  },
+  "example_result": {
+    "accepted": true,
+    "basic_identifier_scan": "no-match-not-proof-of-redaction",
+    "input_characters": 25,
+    "manual_review_required": true,
+    "permitted_output": "draft-only",
+    "title_characters": 11,
+    "workflow_steps": [
+      "민원 요약과 요청사항 분리",
+      "관련 법령·공식 안내·소관 후보 확인",
+      "답변 초안과 불확실성 작성",
+      "담당 공무원 검토 후 발송 여부 결정"
+    ]
+  },
+  "exit_codes": {
+    "input_error": 2,
+    "policy_blocked": 3,
+    "review_blocked": 1,
+    "success": 0,
+    "upstream_error": 4
+  },
+  "fixture_argv": [
+    "--fixture"
+  ],
+  "input_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "argv": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      }
+    },
+    "required": [
+      "argv"
+    ],
+    "type": "object"
+  },
+  "module": "kgov_runtime.capabilities.civil_complaint_triage_draft",
+  "network_mode": "none",
+  "output_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "accepted": {
+        "const": true,
+        "type": "boolean"
+      },
+      "basic_identifier_scan": {
+        "const": "no-match-not-proof-of-redaction",
+        "type": "string"
+      },
+      "input_characters": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "manual_review_required": {
+        "const": true,
+        "type": "boolean"
+      },
+      "permitted_output": {
+        "const": "draft-only",
+        "type": "string"
+      },
+      "title_characters": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "workflow_steps": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      }
+    },
+    "required": [
+      "manual_review_required",
+      "accepted",
+      "permitted_output",
+      "basic_identifier_scan",
+      "input_characters",
+      "title_characters",
+      "workflow_steps"
+    ],
+    "type": "object"
+  },
+  "schema_status": "active",
+  "source_output_mode": "none",
+  "source_policy_ids": []
+}
+```
+<!-- kgov-runtime-binding:end -->
 
 ## 업무별 추가 체크
 

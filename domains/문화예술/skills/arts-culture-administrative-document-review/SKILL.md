@@ -5,6 +5,8 @@ metadata:
   kgov:
     domain: "문화예술"
     capability: administrative-document-draft-review
+    runtime_contract: "kgov/administrative-document-draft-review/v1"
+    operation: "kgov/administrative-document-draft-review/review-draft/v1"
     role: additional
 ---
 
@@ -17,6 +19,181 @@ metadata:
 - 실행 상태: `fixture-verified` / live smoke `not-run`
 - 실행 경계: `draft-only`
 - Reference Skill: 없음
+
+## Runtime binding
+
+- Contract: `kgov/administrative-document-draft-review/v1`
+- Operation: `kgov/administrative-document-draft-review/review-draft/v1`
+- Fixed input: `{"argv": ["--fixture"]}`
+- Output fields: `manual_review_required`, `accepted`, `permitted_output`, `review_checks`, `document_type`, `basic_identifier_scan`, `body_characters`, `purpose_characters`, `source_ref_count`, `title_characters`
+
+<!-- kgov-runtime-binding:start -->
+```json
+{
+  "binding": {
+    "contract_id": "kgov/administrative-document-draft-review/v1",
+    "fixed_input": {
+      "argv": [
+        "--fixture"
+      ]
+    },
+    "operation": "kgov/administrative-document-draft-review/review-draft/v1"
+  },
+  "example_result": {
+    "accepted": true,
+    "basic_identifier_scan": "no-match-not-proof-of-redaction",
+    "body_characters": 36,
+    "document_type": "report",
+    "manual_review_required": true,
+    "permitted_output": "draft-review-only",
+    "purpose_characters": 18,
+    "review_checks": {
+      "institution_template": "required",
+      "legal_authority": "required",
+      "numeric_claims": "required",
+      "privacy": "manual-confirmation-required",
+      "source_traceability": "provided-review-required"
+    },
+    "source_ref_count": 1,
+    "title_characters": 14
+  },
+  "exit_codes": {
+    "input_error": 2,
+    "policy_blocked": 3,
+    "review_blocked": 1,
+    "success": 0,
+    "upstream_error": 4
+  },
+  "fixture_argv": [
+    "--fixture"
+  ],
+  "input_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "argv": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      }
+    },
+    "required": [
+      "argv"
+    ],
+    "type": "object"
+  },
+  "module": "kgov_runtime.capabilities.administrative_document_draft_review",
+  "network_mode": "none",
+  "output_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "accepted": {
+        "const": true,
+        "type": "boolean"
+      },
+      "basic_identifier_scan": {
+        "const": "no-match-not-proof-of-redaction",
+        "type": "string"
+      },
+      "body_characters": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "document_type": {
+        "enum": [
+          "audit-response",
+          "council-agenda",
+          "education-notice",
+          "meeting-material",
+          "official-letter",
+          "press-release",
+          "report"
+        ],
+        "type": "string"
+      },
+      "manual_review_required": {
+        "const": true,
+        "type": "boolean"
+      },
+      "permitted_output": {
+        "const": "draft-review-only",
+        "type": "string"
+      },
+      "purpose_characters": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "review_checks": {
+        "additionalProperties": false,
+        "properties": {
+          "institution_template": {
+            "const": "required",
+            "type": "string"
+          },
+          "legal_authority": {
+            "enum": [
+              "required",
+              "not-detected"
+            ],
+            "type": "string"
+          },
+          "numeric_claims": {
+            "enum": [
+              "required",
+              "not-detected"
+            ],
+            "type": "string"
+          },
+          "privacy": {
+            "const": "manual-confirmation-required",
+            "type": "string"
+          },
+          "source_traceability": {
+            "enum": [
+              "provided-review-required",
+              "required"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "institution_template",
+          "legal_authority",
+          "numeric_claims",
+          "privacy",
+          "source_traceability"
+        ],
+        "type": "object"
+      },
+      "source_ref_count": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "title_characters": {
+        "minimum": 0,
+        "type": "integer"
+      }
+    },
+    "required": [
+      "manual_review_required",
+      "accepted",
+      "permitted_output",
+      "review_checks",
+      "document_type",
+      "basic_identifier_scan",
+      "body_characters",
+      "purpose_characters",
+      "source_ref_count",
+      "title_characters"
+    ],
+    "type": "object"
+  },
+  "schema_status": "active",
+  "source_output_mode": "none",
+  "source_policy_ids": []
+}
+```
+<!-- kgov-runtime-binding:end -->
 
 ## 업무별 추가 체크
 

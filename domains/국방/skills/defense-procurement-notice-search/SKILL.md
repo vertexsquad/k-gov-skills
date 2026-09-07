@@ -5,6 +5,8 @@ metadata:
   kgov:
     domain: "국방"
     capability: public-procurement-research
+    runtime_contract: "kgov/public-procurement-research/v1"
+    operation: "kgov/public-procurement-research/query-order-plans/v1"
     role: primary
 ---
 
@@ -17,6 +19,178 @@ metadata:
 - 실행 상태: `fixture-verified` / live smoke `not-run`
 - 실행 경계: `read-only`
 - Reference Skill: `d2b-notice-search`
+
+## Runtime binding
+
+- Contract: `kgov/public-procurement-research/v1`
+- Operation: `kgov/public-procurement-research/query-order-plans/v1`
+- Fixed input: `{"argv": ["--fixture"]}`
+- Output fields: `manual_review_required`, `contract_id`, `execution_mode`, `status`, `count`, `records`, `source_receipt`
+
+<!-- kgov-runtime-binding:start -->
+```json
+{
+  "binding": {
+    "contract_id": "kgov/public-procurement-research/v1",
+    "fixed_input": {
+      "argv": [
+        "--fixture"
+      ]
+    },
+    "operation": "kgov/public-procurement-research/query-order-plans/v1"
+  },
+  "example_result": {
+    "contract_id": "kgov/public-procurement-research/v1",
+    "count": 1,
+    "execution_mode": "synthetic-fixture",
+    "manual_review_required": true,
+    "records": [
+      {
+        "business_name": "합성 정보화 사업",
+        "ordering_agency": "합성기관",
+        "plan_number": "PLAN-001",
+        "planned_amount": "1000000",
+        "planned_date": "20260101"
+      }
+    ],
+    "source_receipt": {
+      "endpoint": "https://apis.data.go.kr/1230000/ao/OrderPlanSttusService",
+      "operation_id": "kgov/public-procurement-research/query-order-plans/v1",
+      "policy_id": "data-go-kr-order-plan-api"
+    },
+    "status": "fixture-validated"
+  },
+  "exit_codes": {
+    "input_error": 2,
+    "policy_blocked": 3,
+    "review_blocked": 1,
+    "success": 0,
+    "upstream_error": 4
+  },
+  "fixture_argv": [
+    "--fixture"
+  ],
+  "input_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "argv": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      }
+    },
+    "required": [
+      "argv"
+    ],
+    "type": "object"
+  },
+  "module": "kgov_runtime.capabilities.public_procurement_research",
+  "network_mode": "optional-live",
+  "output_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "contract_id": {
+        "const": "kgov/public-procurement-research/v1",
+        "type": "string"
+      },
+      "count": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "execution_mode": {
+        "enum": [
+          "synthetic-fixture",
+          "official-live"
+        ],
+        "type": "string"
+      },
+      "manual_review_required": {
+        "const": true,
+        "type": "boolean"
+      },
+      "records": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "business_name": {
+              "type": "string"
+            },
+            "ordering_agency": {
+              "type": "string"
+            },
+            "plan_number": {
+              "type": "string"
+            },
+            "planned_amount": {
+              "type": "string"
+            },
+            "planned_date": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "plan_number",
+            "business_name",
+            "ordering_agency",
+            "planned_amount",
+            "planned_date"
+          ],
+          "type": "object"
+        },
+        "maxItems": 100,
+        "type": "array"
+      },
+      "source_receipt": {
+        "additionalProperties": false,
+        "properties": {
+          "endpoint": {
+            "const": "https://apis.data.go.kr/1230000/ao/OrderPlanSttusService",
+            "type": "string"
+          },
+          "operation_id": {
+            "const": "kgov/public-procurement-research/query-order-plans/v1",
+            "type": "string"
+          },
+          "policy_id": {
+            "const": "data-go-kr-order-plan-api",
+            "type": "string"
+          }
+        },
+        "required": [
+          "operation_id",
+          "policy_id",
+          "endpoint"
+        ],
+        "type": "object"
+      },
+      "status": {
+        "enum": [
+          "fixture-validated",
+          "records-retrieved"
+        ],
+        "type": "string"
+      }
+    },
+    "required": [
+      "manual_review_required",
+      "contract_id",
+      "execution_mode",
+      "status",
+      "count",
+      "records",
+      "source_receipt"
+    ],
+    "type": "object"
+  },
+  "schema_status": "active",
+  "source_output_mode": "projected-records",
+  "source_policy_ids": [
+    "data-go-kr-order-plan-api"
+  ]
+}
+```
+<!-- kgov-runtime-binding:end -->
 
 ## 절차
 

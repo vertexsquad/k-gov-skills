@@ -35,11 +35,11 @@
 | `disaster-geospatial-brief` | `mixed` | `optional` | `read-only` | `fixture-verified` | `not-run` |
 | `welfare-health-safety-research` | `mixed` | `optional` | `read-only` | `fixture-verified` | `not-run` |
 | `land-housing-geospatial-research` | `mixed` | `optional` | `read-only` | `fixture-verified` | `not-run` |
-| `official-source-research` | `none` | `none` | `read-only` | `live-verified` | `passed` |
+| `official-source-research` | `none` | `none` | `read-only` | `fixture-verified` | `blocked` |
 | `civil-complaint-triage-draft` | `none` | `none` | `draft-only` | `fixture-verified` | `not-run` |
 | `administrative-document-draft-review` | `none` | `none` | `draft-only` | `fixture-verified` | `not-run` |
 | `public-policy-evidence-pack` | `mixed` | `optional` | `draft-only` | `fixture-verified` | `not-run` |
-| `korean-legal-citation-verification` | `mixed` | `optional` | `draft-only` | `live-verified` | `passed` |
+| `korean-legal-citation-verification` | `mixed` | `optional` | `draft-only` | `fixture-verified` | `blocked` |
 | `public-ai-governance-review` | `none` | `none` | `draft-only` | `fixture-verified` | `not-run` |
 | `public-it-project-procedure-review` | `none` | `none` | `draft-only` | `fixture-verified` | `not-run` |
 | `public-record-disclosure-redaction-review` | `none` | `none` | `draft-only` | `fixture-verified` | `not-run` |

@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Validate the domain-owned Skill topology, capability runtime, and generated docs."""
+"""Validate the domain-owned Skill topology, capability runtime, and generated docs.
+
+# noqa: SIZE_OK -- Issue #33 confines catalog validation to this existing file;
+# splitting its legacy topology tables and validator is outside the isolated lane.
+"""
 
 from __future__ import annotations
 
@@ -31,7 +35,7 @@ GROUP_ORDER = (
 )
 
 DOMAIN_REQUIRED_KEYS = {"domain", "group", "evidence", "skills"}
-SKILL_REQUIRED_KEYS = {"name", "title", "capability", "role", "reference_skills", "boundary"}
+SKILL_REQUIRED_KEYS = {"name", "title", "capability", "role", "reference_skills", "boundary", "runtime_binding"}
 CAPABILITY_REQUIRED_KEYS = {
     "slug",
     "locale",
@@ -1705,6 +1709,12 @@ _OPERATION_SHAPE: Final = (
     frozenset({"fixture_argv", "input_schema", "output_schema"}),
 )
 _BINDING_SHAPE: Final = (("contract_id", "operation", "fixed_input"), frozenset())
+_FIXTURE_INPUT_SCHEMA: Final = {
+    "type": "object",
+    "required": ["argv"],
+    "properties": {"argv": {"type": "array", "items": {"type": "string"}}},
+    "additionalProperties": False,
+}
 _EXIT_CODES_SHAPE: Final = (
     ("success", "review_blocked", "input_error", "policy_blocked", "upstream_error"),
     frozenset(),
@@ -1731,8 +1741,8 @@ _APPROVED_RUNTIME_MANIFEST: Final = (
     ("kosis-official-statistics", "retrieval", "optional-live", (("query-statistics", ("kosis-statistics-api",), "projected-records", True),)),
     ("public-procurement-research", "retrieval", "optional-live", (("query-order-plans", ("data-go-kr-order-plan-api",), "projected-records", True),)),
     ("disaster-geospatial-brief", "retrieval", "optional-live", (("query-village-forecast", ("data-go-kr-village-forecast-api",), "projected-records", True),)),
-    ("welfare-health-safety-research", "retrieval", "blocked", (("blocked-dataset-query", (), "projected-records", True),)),
-    ("land-housing-geospatial-research", "retrieval", "blocked", (("blocked-dataset-query", (), "projected-records", True),)),
+    ("welfare-health-safety-research", "retrieval", "blocked", (("blocked-dataset-query", (), "none", True),)),
+    ("land-housing-geospatial-research", "retrieval", "blocked", (("blocked-dataset-query", (), "none", True),)),
     ("official-source-research", "retrieval", "optional-live", (("inspect-page", ("gov-kr-web",), "link-only", True),)),
     ("civil-complaint-triage-draft", "admission", "none", (("admit-draft", (), "none", True),)),
     ("administrative-document-draft-review", "admission", "none", (("review-draft", (), "none", True),)),
@@ -2660,8 +2670,8 @@ _RESEARCH_V6_SHAPE: Final = (
 _CAPABILITY_V6_SHAPE: Final = (tuple(CAPABILITY_REQUIRED_KEYS), frozenset())
 _DOMAIN_V6_SHAPE: Final = (("domain", "group", "evidence", "skills"), frozenset())
 _SKILL_V6_SHAPE: Final = (
-    ("name", "title", "capability", "role", "reference_skills", "boundary"),
-    frozenset({"task_checks", "runtime_binding"}),
+    ("name", "title", "capability", "role", "reference_skills", "boundary", "runtime_binding"),
+    frozenset({"task_checks"}),
 )
 
 
@@ -2963,10 +2973,12 @@ def _validate_approved_runtime_manifest(
             operation_pointer = _pointer_child(operations_pointer, operation_index)
             expected_operation_fields = {
                 "id": f"kgov/{slug}/{operation_name}/v1",
-                "schema_status": "declared",
+                "schema_status": "active" if has_fixture else "declared",
                 "source_policy_ids": list(policy_ids),
                 "source_output_mode": output_mode,
             }
+            if has_fixture:
+                expected_operation_fields["input_schema"] = _FIXTURE_INPUT_SCHEMA
             for field, expected_value in expected_operation_fields.items():
                 if operation.get(field) != expected_value:
                     _append_error(
@@ -3113,8 +3125,12 @@ def _validate_v6_registries(
     on_date: date,
     errors: list[str],
 ) -> None:
+    start = len(errors)
     _validate_source_policies(data, on_date=on_date, errors=errors)
     _validate_runtime_contracts(data, errors=errors)
+    if len(errors) != start:
+        _sort_errors(errors, start)
+        return
     contracts = data.get("runtime_contracts")
     contracts_by_id = {
         contract["id"]: contract
@@ -3144,6 +3160,7 @@ def _validate_v6_registries(
                     ),
                     "runtime_binding",
                 )
+                before = len(errors)
                 _validate_runtime_binding(
                     skill["runtime_binding"],
                     capability_slug=capability,
@@ -3151,6 +3168,18 @@ def _validate_v6_registries(
                     pointer=pointer,
                     errors=errors,
                 )
+                if len(errors) == before:
+                    binding = skill["runtime_binding"]
+                    contract = contracts_by_id[binding["contract_id"]]
+                    operation = contract["operations"][0]
+                    if binding["operation"] != contract["default_operation_id"]:
+                        _append_error(errors, "V6_BINDING_MISMATCH", _pointer_child(pointer, "operation"))
+                    fixed_input = binding["fixed_input"]
+                    argv_pointer = _pointer_child(_pointer_child(pointer, "fixed_input"), "argv")
+                    if "argv" not in fixed_input:
+                        _append_error(errors, "V6_REQUIRED_FIELD", argv_pointer)
+                    elif fixed_input["argv"] != operation["fixture_argv"]:
+                        _append_error(errors, "V6_INVALID_VALUE", argv_pointer)
     _sort_errors(errors, 0)
 
 

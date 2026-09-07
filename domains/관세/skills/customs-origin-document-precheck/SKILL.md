@@ -5,6 +5,8 @@ metadata:
   kgov:
     domain: "관세"
     capability: regulated-trade-procedure-precheck
+    runtime_contract: "kgov/regulated-trade-procedure-precheck/v1"
+    operation: "kgov/regulated-trade-procedure-precheck/review-case/v1"
     role: additional
 ---
 
@@ -17,6 +19,194 @@ metadata:
 - 실행 상태: `fixture-verified` / live smoke `not-run`
 - 실행 경계: `draft-only`
 - Reference Skill: 없음
+
+## Runtime binding
+
+- Contract: `kgov/regulated-trade-procedure-precheck/v1`
+- Operation: `kgov/regulated-trade-procedure-precheck/review-case/v1`
+- Fixed input: `{"argv": ["--fixture"]}`
+- Output fields: `manual_review_required`, `fact_count`, `source_ref_count`, `review_type`, `receipt_assurance`, `source_output_mode`, `basic_identifier_scan`, `manual_review_reasons`, `prohibited_decisions`, `required_checks`, `source_assurance_levels`, `accepted`, `status`, `permitted_output`
+
+<!-- kgov-runtime-binding:start -->
+```json
+{
+  "binding": {
+    "contract_id": "kgov/regulated-trade-procedure-precheck/v1",
+    "fixed_input": {
+      "argv": [
+        "--fixture"
+      ]
+    },
+    "operation": "kgov/regulated-trade-procedure-precheck/review-case/v1"
+  },
+  "example_result": {
+    "accepted": true,
+    "basic_identifier_scan": "no-match-not-proof-of-redaction",
+    "fact_count": 1,
+    "manual_review_reasons": [
+      "caller-declared-source",
+      "license-unverified",
+      "redistribution-link-only"
+    ],
+    "manual_review_required": true,
+    "permitted_output": "regulated-trade-review-draft-only",
+    "prohibited_decisions": [
+      "origin-determination",
+      "customs-declaration-or-submission",
+      "clearance-or-enforcement-action"
+    ],
+    "receipt_assurance": "caller-declared-not-live-retrieval-proof",
+    "required_checks": [
+      "goods-and-origin-criteria-ledger",
+      "official-document-and-validity-review",
+      "manual-customs-decision-route"
+    ],
+    "review_type": "customs-origin-document-precheck",
+    "source_assurance_levels": [
+      "caller-declared"
+    ],
+    "source_output_mode": "link-only",
+    "source_ref_count": 1,
+    "status": "admitted-pending-human-review"
+  },
+  "exit_codes": {
+    "input_error": 2,
+    "policy_blocked": 3,
+    "review_blocked": 1,
+    "success": 0,
+    "upstream_error": 4
+  },
+  "fixture_argv": [
+    "--fixture"
+  ],
+  "input_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "argv": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      }
+    },
+    "required": [
+      "argv"
+    ],
+    "type": "object"
+  },
+  "module": "kgov_runtime.capabilities.regulated_trade_procedure_precheck",
+  "network_mode": "none",
+  "output_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "accepted": {
+        "const": true,
+        "type": "boolean"
+      },
+      "basic_identifier_scan": {
+        "const": "no-match-not-proof-of-redaction",
+        "type": "string"
+      },
+      "fact_count": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "manual_review_reasons": {
+        "items": {
+          "enum": [
+            "caller-declared-source",
+            "policy-outcome-manual-review",
+            "license-unverified",
+            "redistribution-link-only"
+          ],
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "manual_review_required": {
+        "const": true,
+        "type": "boolean"
+      },
+      "permitted_output": {
+        "const": "regulated-trade-review-draft-only",
+        "type": "string"
+      },
+      "prohibited_decisions": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "receipt_assurance": {
+        "enum": [
+          "policy-matched-not-cryptographic-authenticity-proof",
+          "caller-declared-not-live-retrieval-proof"
+        ],
+        "type": "string"
+      },
+      "required_checks": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "review_type": {
+        "enum": [
+          "customs-origin-document-precheck",
+          "trade-procedure-document-precheck"
+        ],
+        "type": "string"
+      },
+      "source_assurance_levels": {
+        "items": {
+          "enum": [
+            "caller-declared",
+            "policy-verified-not-authenticity-proof"
+          ],
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "source_output_mode": {
+        "enum": [
+          "projected-records",
+          "link-only"
+        ],
+        "type": "string"
+      },
+      "source_ref_count": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "status": {
+        "const": "admitted-pending-human-review",
+        "type": "string"
+      }
+    },
+    "required": [
+      "manual_review_required",
+      "fact_count",
+      "source_ref_count",
+      "review_type",
+      "receipt_assurance",
+      "source_output_mode",
+      "basic_identifier_scan",
+      "manual_review_reasons",
+      "prohibited_decisions",
+      "required_checks",
+      "source_assurance_levels",
+      "accepted",
+      "status",
+      "permitted_output"
+    ],
+    "type": "object"
+  },
+  "schema_status": "active",
+  "source_output_mode": "none",
+  "source_policy_ids": []
+}
+```
+<!-- kgov-runtime-binding:end -->
 
 ## 업무별 추가 체크
 

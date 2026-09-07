@@ -110,8 +110,6 @@ class ContractSemanticsTest(unittest.TestCase):
                 self.assertEqual(0, receipt.returncode, receipt.stderr)
                 self.assertEqual("", receipt.stderr)
                 output = strict_json_loads(receipt.stdout.encode())
-                self.assertIsInstance(output, dict)
-                operation.input_schema.validate(list(operation.fixture_argv))
                 contract.validate_output(operation.id, output)
 
     def test_help_when_network_is_disabled(self) -> None:
@@ -209,9 +207,11 @@ class ContractSemanticsTest(unittest.TestCase):
                 output = deepcopy(self.outputs[operation.id])
                 contract.validate_output(operation.id, output)
                 for field, schema in operation.output_schema.properties:
-                    missing = dict(output)
-                    del missing[field]
-                    mutations = [("missing", missing)]
+                    mutations = []
+                    if field in (operation.output_schema.required or ()):
+                        missing = dict(output)
+                        del missing[field]
+                        mutations.append(("missing", missing))
                     if schema.const_json is not None:
                         value = output[field]
                         wrong = not value if type(value) is bool else "wrong-const"

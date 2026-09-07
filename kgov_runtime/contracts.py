@@ -1,19 +1,21 @@
-"""Frozen catalog contracts; schemas describe CLI argv and successful JSON output.
+"""Frozen catalog contracts for Skill inputs and successful JSON output.
 
-Catalog operations remain declared, not activated Skill bindings. Output schemas
-specify minimum guarantees, allow safe extensions, and never infer keys from a
-fixture or a runtime result. Existing parsers own domain-input validation.
+Active schemas come from the catalog and remain closed; declared operations use
+the predecessor's minimum fallback until a reviewed binding activates them.
+Existing capability parsers retain business-input validation.
 
-# noqa: SIZE_OK -- Issue #32 permits exactly one contract implementation file;
-# the frozen schema templates stay with their catalog parser rather than adding
-# an out-of-scope schema module or moving schema logic into capability exports.
+# noqa: SIZE_OK -- Issues #32/#33 keep frozen schemas and their parser together
+# instead of adding another registry module or moving contract logic into the
+# 22 capability exports.
 """
 
 from __future__ import annotations
 
 import json
 import math
+import re
 from dataclasses import asdict, dataclass, replace
+from datetime import date, datetime
 from enum import StrEnum
 from importlib import import_module
 from pathlib import Path
@@ -30,6 +32,7 @@ from kgov_runtime.source_policy import (
     _parse_operations,
     _schema_value_matches,
     _text,
+    _https_url,
 )
 from kgov_runtime.source_policy import (
     _Operation as CatalogOperation,
@@ -39,6 +42,7 @@ type JSONDocument = dict[str, JSONValue]
 type SchemaType = Literal[
     "object", "array", "string", "integer", "number", "boolean", "null"
 ]
+type SchemaFormat = Literal["date", "date-time", "https-url", "sha256"]
 ContractId = NewType("ContractId", str)
 OperationId = NewType("OperationId", str)
 PolicyId = NewType("PolicyId", str)
@@ -71,7 +75,7 @@ class ContractError(ValueError):
 
 @dataclass(frozen=True, slots=True)
 class Schema:
-    """Immutable standard JSON-Schema subset; all declared properties are required."""
+    """Immutable standard JSON-Schema subset."""
 
     kind: SchemaType
     properties: tuple[tuple[str, Schema], ...] = ()
@@ -79,6 +83,15 @@ class Schema:
     const_json: str | None = None
     nullable: bool = False
     enum: tuple[str, ...] = ()
+    additional_properties: bool = True
+    required: tuple[str, ...] | None = None
+    min_length: int | None = None
+    max_length: int | None = None
+    min_items: int | None = None
+    max_items: int | None = None
+    minimum: int | float | None = None
+    maximum: int | float | None = None
+    format: SchemaFormat | None = None
 
     def document(self) -> JSONDocument:
         result: JSONDocument = {
@@ -94,8 +107,12 @@ class Schema:
                     properties={
                         key: child.document() for key, child in self.properties
                     },
-                    required=[key for key, _ in self.properties],
-                    additionalProperties=True,
+                    required=list(
+                        self.required
+                        if self.required is not None
+                        else (key for key, _ in self.properties)
+                    ),
+                    additionalProperties=self.additional_properties,
                 )
             case "array":
                 result["items"] = (
@@ -105,6 +122,17 @@ class Schema:
                 pass
             case unreachable:
                 assert_never(unreachable)
+        for key, value in (
+            ("minLength", self.min_length),
+            ("maxLength", self.max_length),
+            ("minItems", self.min_items),
+            ("maxItems", self.max_items),
+            ("minimum", self.minimum),
+            ("maximum", self.maximum),
+            ("format", self.format),
+        ):
+            if value is not None:
+                result[key] = value
         return result
 
     def validate(self, value: JSONValue, location: str = "") -> None:
@@ -119,15 +147,53 @@ class Schema:
             raise ContractError("schema-enum", location)
         match value:
             case dict():
+                if not self.additional_properties:
+                    declared = {key for key, _ in self.properties}
+                    unknown = next((key for key in value if key not in declared), None)
+                    if unknown is not None:
+                        raise ContractError(
+                            "schema-additional-property", f"{location}/{unknown}"
+                        )
+                required = (
+                    self.required
+                    if self.required is not None
+                    else tuple(key for key, _ in self.properties)
+                )
                 for key, child in self.properties:
-                    if key not in value:
+                    if key in required and key not in value:
                         raise ContractError("schema-required", f"{location}/{key}")
-                    child.validate(value[key], f"{location}/{key}")
+                    if key in value:
+                        child.validate(value[key], f"{location}/{key}")
             case list():
+                if (
+                    self.min_items is not None
+                    and len(value) < self.min_items
+                    or self.max_items is not None
+                    and len(value) > self.max_items
+                ):
+                    raise ContractError("schema-length", location)
                 if self.items is not None:
                     for index, child in enumerate(value):
                         self.items.validate(child, f"{location}/{index}")
-            case str() | int() | float() | bool() | None:
+            case str():
+                if (
+                    self.min_length is not None
+                    and len(value) < self.min_length
+                    or self.max_length is not None
+                    and len(value) > self.max_length
+                ):
+                    raise ContractError("schema-length", location)
+                if self.format is not None and not _matches_format(self.format, value):
+                    raise ContractError("schema-format", location)
+            case int() | float():
+                if (
+                    self.minimum is not None
+                    and value < self.minimum
+                    or self.maximum is not None
+                    and value > self.maximum
+                ):
+                    raise ContractError("schema-range", location)
+            case bool() | None:
                 pass
             case unreachable:
                 assert_never(unreachable)
@@ -151,6 +217,135 @@ STRING: Final = Schema("string")
 INTEGER: Final = Schema("integer")
 STRINGS: Final = Schema("array", items=STRING)
 RECORDS: Final = Schema("array", items=Schema("object"))
+_DATE_TIME: Final = re.compile(
+    r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}"
+    r"(?:\.[0-9]+)?(?:Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])$"
+)
+
+
+def _matches_format(name: SchemaFormat, value: str) -> bool:
+    match name:
+        case "date":
+            try:
+                return date.fromisoformat(value).isoformat() == value
+            except ValueError:
+                return False
+        case "date-time":
+            if _DATE_TIME.fullmatch(value) is None:
+                return False
+            try:
+                datetime.fromisoformat(value.replace("Z", "+00:00"))
+            except ValueError:
+                return False
+            return True
+        case "https-url":
+            try:
+                _https_url(value, "/format")
+            except ValueError:
+                return False
+            return True
+        case "sha256":
+            return re.fullmatch(r"[0-9a-f]{64}", value) is not None
+        case unreachable:
+            assert_never(unreachable)
+
+
+def _schema_format(value: JSONValue, location: str) -> SchemaFormat | None:
+    if value is None:
+        return None
+    if value == "date":
+        return "date"
+    if value == "date-time":
+        return "date-time"
+    if value == "https-url":
+        return "https-url"
+    if value == "sha256":
+        return "sha256"
+    raise ContractError("schema-format", location)
+
+
+def _schema(raw: JSONValue, location: str) -> Schema:
+    node = _node(raw, location)
+    declared = node.get("type")
+    nullable = False
+    if isinstance(declared, list):
+        if (
+            len(declared) != 2
+            or not isinstance(declared[0], str)
+            or declared[1] != "null"
+        ):
+            raise ContractError("schema-type", f"{location}/type")
+        declared, nullable = declared[0], True
+    if not isinstance(declared, str) or declared not in {
+        "object",
+        "array",
+        "string",
+        "integer",
+        "number",
+        "boolean",
+        "null",
+    }:
+        raise ContractError("schema-type", f"{location}/type")
+    properties: tuple[tuple[str, Schema], ...] = ()
+    items = None
+    additional = True
+    match declared:
+        case "object":
+            raw_properties = _node(node.get("properties"), f"{location}/properties")
+            required = tuple(
+                _text(value, f"{location}/required")
+                for value in _list(node.get("required"), f"{location}/required")
+            )
+            if any(key not in raw_properties for key in required):
+                raise ContractError("schema-required", f"{location}/required")
+            properties = tuple(
+                (key, _schema(value, f"{location}/properties/{key}"))
+                for key, value in raw_properties.items()
+            )
+            if type(node.get("additionalProperties")) is not bool:
+                raise ContractError(
+                    "schema-additional-properties",
+                    f"{location}/additionalProperties",
+                )
+            additional = node["additionalProperties"]
+        case "array":
+            items = _schema(node.get("items"), f"{location}/items")
+        case "string" | "integer" | "number" | "boolean" | "null":
+            pass
+        case unreachable:
+            assert_never(unreachable)
+    raw_enum = node.get("enum", [])
+    enum = tuple(
+        _text(value, f"{location}/enum")
+        for value in _list(raw_enum, f"{location}/enum")
+    )
+    return Schema(
+        kind=declared,
+        properties=properties,
+        items=items,
+        const_json=json.dumps(node["const"], sort_keys=True)
+        if "const" in node
+        else None,
+        nullable=nullable,
+        enum=enum,
+        additional_properties=additional,
+        required=required if declared == "object" else None,
+        min_length=node.get("minLength")
+        if type(node.get("minLength")) is int
+        else None,
+        max_length=node.get("maxLength")
+        if type(node.get("maxLength")) is int
+        else None,
+        min_items=node.get("minItems") if type(node.get("minItems")) is int else None,
+        max_items=node.get("maxItems") if type(node.get("maxItems")) is int else None,
+        minimum=node.get("minimum")
+        if type(node.get("minimum")) in {int, float}
+        else None,
+        maximum=node.get("maximum")
+        if type(node.get("maximum")) in {int, float}
+        else None,
+        format=_schema_format(node.get("format"), f"{location}/format"),
+    )
 
 
 @dataclass(frozen=True, slots=True)
@@ -167,7 +362,7 @@ class ExitCodes:
 @dataclass(frozen=True, slots=True)
 class OperationContract:
     id: OperationId
-    schema_status: Literal["declared"]
+    schema_status: Literal["declared", "active"]
     source_policy_ids: tuple[PolicyId, ...]
     source_output_mode: OutputMode
     fixture_argv: tuple[str, ...] | None
@@ -183,6 +378,9 @@ class OperationContract:
         }
         if self.fixture_argv is not None:
             result["fixture_argv"] = list(self.fixture_argv)
+        if self.schema_status == "active":
+            result["input_schema"] = self.input_schema.document()
+            result["output_schema"] = self.output_schema.document()
         return result
 
 
@@ -465,13 +663,22 @@ def parse_contracts(catalog: Mapping[str, JSONValue]) -> tuple[RuntimeContract, 
         operations: list[OperationContract] = []
         for item in _list(raw["operations"], "/operations"):
             operation = _node(item, "/operations")
-            if operation["schema_status"] != "declared":
-                raise ContractError("unsupported-active-binding", "/schema_status")
             parsed = next(parsed_operations)
+            status = _text(operation["schema_status"], "/schema_status")
+            if status not in {"declared", "active"}:
+                raise ContractError("schema-status", "/schema_status")
+            if status == "declared":
+                input_schema = STRINGS
+                output_schema = _output_schema(raw, parsed)
+            else:
+                input_schema = _schema(operation.get("input_schema"), "/input_schema")
+                output_schema = _schema(
+                    operation.get("output_schema"), "/output_schema"
+                )
             operations.append(
                 OperationContract(
                     OperationId(parsed.id),
-                    "declared",
+                    status,
                     tuple(PolicyId(value) for value in parsed.policy_ids),
                     parsed.output_mode,
                     tuple(
@@ -480,8 +687,8 @@ def parse_contracts(catalog: Mapping[str, JSONValue]) -> tuple[RuntimeContract, 
                     )
                     if "fixture_argv" in operation
                     else None,
-                    STRINGS,
-                    _output_schema(raw, parsed),
+                    input_schema,
+                    output_schema,
                 )
             )
         exits = _node(raw["exit_codes"], "/exit_codes")
