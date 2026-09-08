@@ -192,6 +192,9 @@ class AdapterTest(unittest.TestCase):
             stderr = io.StringIO()
             with (
                 patch.object(adapter, "CATALOG", catalog_path),
+                patch.object(
+                    adapter, "date", **{"today.return_value": date(2026, 9, 7)}
+                ),
                 patch.dict(
                     os.environ,
                     {"KGOV_POLICY_STATE_PATH": f"/dev/null/{marker}/state.sqlite3"},
