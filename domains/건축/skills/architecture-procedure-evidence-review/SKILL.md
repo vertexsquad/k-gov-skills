@@ -2,12 +2,11 @@
 name: architecture-procedure-evidence-review
 description: "건축 업무의 건축 절차·근거 검토 절차. 내부 building-permit-document-precheck capability를 사용하며 draft-only 경계를 지킵니다."
 metadata:
-  kgov:
-    domain: "건축"
-    capability: building-permit-document-precheck
-    runtime_contract: "kgov/building-permit-document-precheck/v1"
-    operation: "kgov/building-permit-document-precheck/review-case/v1"
-    role: additional
+  domain: "건축"
+  capability: "building-permit-document-precheck"
+  runtime_contract: "kgov/building-permit-document-precheck/v1"
+  operation: "kgov/building-permit-document-precheck/review-case/v1"
+  role: "additional"
 ---
 
 <!-- generated from catalog/domain-skills.json; do not edit -->
@@ -216,11 +215,12 @@ metadata:
 
 ## 절차
 
-1. 저장소 루트에서 `docs/capabilities/building-permit-document-precheck/procedure.md`와 `docs/capabilities/building-permit-document-precheck/runtime-contract.md`를 먼저 읽습니다.
-2. `python3 -m kgov_runtime.capabilities.building_permit_document_precheck --fixture`로 합성 fixture 계약을 검증합니다.
-3. live 실행은 capability manifest의 credential·proxy·허용 host 경계를 충족할 때만 수행합니다.
-4. 허가 대상, 법정 요건, 도면 적합성과 실제 신청·제출은 건축사와 허가권자가 확인
-5. fixture 성공, URL 도달, live 검증을 서로 다른 증거로 보고합니다.
+1. 전체 저장소 checkout이 필요합니다. Skill 디렉터리만 복사해서 실행하지 않습니다. 클라이언트와 모든 명령은 `kgov_runtime/`, `docs/`, `tests/`가 있는 저장소 루트에서 실행하고, 루트 기준 `docs/capabilities/building-permit-document-precheck/procedure.md`와 `docs/capabilities/building-permit-document-precheck/runtime-contract.md`를 먼저 읽습니다.
+2. `python3 -m kgov_runtime.capabilities.building_permit_document_precheck --fixture`로 합성 fixture 계약을 검증합니다. 이는 사용자가 제공한 파일을 읽거나 검증한 결과가 아닙니다.
+3. 제공된 로컬 입력은 procedure의 실제 입력 절차와 제한에 따라 별도로 검사합니다. 파일이 없거나 읽을 수 없으면 차단 상태를 보고하고 fixture로 대신 검증했다고 주장하지 않습니다.
+4. live 실행은 capability manifest의 credential·proxy·허용 host 경계를 충족할 때만 수행합니다.
+5. 허가 대상, 법정 요건, 도면 적합성과 실제 신청·제출은 건축사와 허가권자가 확인
+6. fixture 성공, 로컬 입력 검사, URL 도달, live 검증을 서로 다른 증거로 보고합니다.
 
 ## 금지
 

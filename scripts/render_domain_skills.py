@@ -101,12 +101,11 @@ def render_domain_skill(
         f"name: {name}",
         f"description: {json.dumps(description, ensure_ascii=False)}",
         "metadata:",
-        "  kgov:",
-        f"    domain: {json.dumps(domain['domain'], ensure_ascii=False)}",
-        f"    capability: {capability_slug}",
-        f"    runtime_contract: {json.dumps(contract.id)}",
-        f"    operation: {json.dumps(operation.id)}",
-        f"    role: {skill['role']}",
+        f"  domain: {json.dumps(domain['domain'], ensure_ascii=False)}",
+        f"  capability: {json.dumps(capability_slug)}",
+        f"  runtime_contract: {json.dumps(contract.id)}",
+        f"  operation: {json.dumps(operation.id)}",
+        f"  role: {json.dumps(skill['role'])}",
         "---",
         "",
         GENERATED_MARKER,
@@ -146,12 +145,29 @@ def render_domain_skill(
         [
             "## 절차",
             "",
-            f"1. 저장소 루트에서 `{procedure_path}`와 `{contract_path}`를 먼저 읽습니다.",
-            f"2. `{command}`로 합성 fixture 계약을 검증합니다.",
-            "3. live 실행은 capability manifest의 credential·proxy·허용 host 경계를 충족할 때만 수행합니다.",
-            f"4. {capability['manual_handoff_gate']}",
-            "5. fixture 성공, URL 도달, live 검증을 서로 다른 증거로 보고합니다.",
+            f"1. 전체 저장소 checkout이 필요합니다. Skill 디렉터리만 복사해서 실행하지 않습니다. 클라이언트와 모든 명령은 `kgov_runtime/`, `docs/`, `tests/`가 있는 저장소 루트에서 실행하고, 루트 기준 `{procedure_path}`와 `{contract_path}`를 먼저 읽습니다.",
+            f"2. `{command}`로 합성 fixture 계약을 검증합니다. 이는 사용자가 제공한 파일을 읽거나 검증한 결과가 아닙니다.",
+            "3. 제공된 로컬 입력은 procedure의 실제 입력 절차와 제한에 따라 별도로 검사합니다. 파일이 없거나 읽을 수 없으면 차단 상태를 보고하고 fixture로 대신 검증했다고 주장하지 않습니다.",
+            "4. live 실행은 capability manifest의 credential·proxy·허용 host 경계를 충족할 때만 수행합니다.",
+            f"5. {capability['manual_handoff_gate']}",
+            "6. fixture 성공, 로컬 입력 검사, URL 도달, live 검증을 서로 다른 증거로 보고합니다.",
             "",
+        ]
+    )
+    if capability_slug in {
+        "public-document-hwpx", "administrative-document-draft-review"
+    }:
+        lines.extend(
+            [
+                "## 실제 로컬 입력",
+                "",
+                f"저장소 루트에서 `python3 -m {contract.module} PATH`를 실행합니다. `PATH`는 사용자가 제공하고 읽기를 승인한 로컬 파일 경로로 바꾸고, 공백이 있으면 따옴표로 감쌉니다. `--fixture`와 함께 쓰지 않습니다. 입력 형식과 제한은 위 procedure를 따릅니다.",
+                "위 Runtime binding의 `fixed_input`과 예시는 합성 fixture 전용 계약이며, 실제 파일 검사 결과가 아닙니다.",
+                "",
+            ]
+        )
+    lines.extend(
+        [
             "## 금지",
             "",
             "- 이 Skill을 근거로 원본 변경·제출·결재·발송을 자동 수행하지 않습니다.",

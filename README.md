@@ -52,7 +52,7 @@ python3 -m kgov_runtime.capabilities.korean_legal_citation_verification --fixtur
 
 `--fixture`는 **입출력 계약이 맞는지**만 확인합니다. fixture 성공은 공식 원문 검증 성공을 뜻하지 않습니다. 이 둘은 저장소 전체에서 끝까지 구분해 표기합니다.
 
-Agent(Claude 등)에게는 Skill 이름으로 직접 요청합니다.
+Claude Code와 Codex의 등록·호출 방법은 **[클라이언트 빠른 시작](docs/client-quickstart.md)** 을 따르세요. 전체 checkout 루트에서 실행하며, 등록이 확인된 뒤 Skill 이름으로 요청합니다. native Skill 탐색이 없는 클라이언트의 수동 파일 로딩 대안도 안내합니다.
 
 > `public-administration-legal-citation-verification` Skill로 이 초안의 법령·판례 인용만 검증해 줘. 개인정보는 입력하지 말고, 불일치는 자동 보완하지 말고 차단 상태로 알려 줘.
 
@@ -230,6 +230,8 @@ AGENTS.md                                      # cross-runtime thin adapter
 `SKILL.md`와 `docs/domain-skill-candidates.md`는 **생성물이므로 직접 편집하지 않습니다.** catalog를 고치고 renderer를 돌립니다.
 
 ## 개발·검증
+
+Python 요구사항과 격리된 개발 도구 설치는 [개발·검증 환경](docs/development.md)을 따릅니다. 클라이언트 버전 요구사항과는 별개입니다.
 
 ```bash
 # 네트워크·credential 없이 전체 검증
