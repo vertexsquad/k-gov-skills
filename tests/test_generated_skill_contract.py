@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import os
 import re
 import subprocess
 import sys
@@ -135,13 +134,12 @@ class GeneratedSkillContractTest(unittest.TestCase):
         self.assertEqual(22, len(commands))
         for module, argv, operation_id in commands:
             receipt = subprocess.run(
-                [sys.executable, "-m", module, *argv],
+                [sys.executable, "-m", "scripts.offline_fixture", module, *argv],
                 cwd=ROOT,
                 check=False,
                 capture_output=True,
                 text=True,
                 timeout=30,
-                env=os.environ | {"KGOV_NETWORK_DISABLED": "1"},
             )
 
             # Then it emits one schema-valid JSON object and quiet stderr.

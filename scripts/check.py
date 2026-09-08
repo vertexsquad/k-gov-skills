@@ -115,7 +115,7 @@ def main() -> int:
         slug = capability["slug"]
         module = slug.replace("-", "_")
         run([python, "-m", "unittest", f"tests.capabilities.test_{module}", "-v"])
-        run([python, "-m", f"kgov_runtime.capabilities.{module}", "--fixture"], quiet=True)
+        run([python, "-m", "scripts.offline_fixture", f"kgov_runtime.capabilities.{module}", "--fixture"], quiet=True)
         capability_suites += 1
 
     run([python, "-m", "compileall", "-q", "kgov_runtime", "scripts", "tests"])

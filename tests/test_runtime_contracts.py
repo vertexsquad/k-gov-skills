@@ -44,13 +44,13 @@ class RuntimeContractsTest(unittest.TestCase):
 
 def cli(module: str, argv: tuple[str, ...]) -> CompletedProcess[str]:
     return run(
-        [sys.executable, "-m", module, *argv],
+        [sys.executable, "-m", "scripts.offline_fixture", module, *argv],
         cwd=ROOT,
         check=False,
         capture_output=True,
         text=True,
         timeout=30,
-        env={"KGOV_NETWORK_DISABLED": "1", "PYTHONIOENCODING": "utf-8"},
+        env={"PYTHONIOENCODING": "utf-8"},
     )
 
 

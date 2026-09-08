@@ -44,12 +44,12 @@ def fixture_receipt(
     module: str, argv: tuple[str, ...]
 ) -> subprocess.CompletedProcess[bytes]:
     return subprocess.run(
-        [sys.executable, "-m", module, *argv],
+        [sys.executable, "-m", "scripts.offline_fixture", module, *argv],
         cwd=ROOT,
         check=False,
         capture_output=True,
         timeout=30,
-        env=os.environ | {"KGOV_NETWORK_DISABLED": "1", "PYTHONIOENCODING": "utf-8"},
+        env=os.environ | {"PYTHONIOENCODING": "utf-8"},
     )
 
 
