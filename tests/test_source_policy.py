@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import importlib
 import json
 import unittest
@@ -14,6 +15,10 @@ from dataclasses import FrozenInstanceError
 from datetime import date
 from pathlib import Path
 from typing import TypeAlias
+from unittest.mock import Mock
+
+from kgov_runtime.http import HttpPolicyEnforcer, HttpTransport, ReadOnlyHttpError, SourceRequest
+from tests.test_read_only_http import FakeState, Response
 
 JSONValue: TypeAlias = "None | bool | int | float | str | list[JSONValue] | dict[str, JSONValue]"
 
@@ -65,6 +70,21 @@ def reviewed_catalog() -> dict[str, JSONValue]:
                   "runtime_contract_id": "kgov/example/v1"}
     return {"schema_version": 6, "source_policies": [policy], "runtime_contracts": [contract],
             "shared_capabilities": [capability]}
+
+
+def overlapping_catalog() -> dict[str, JSONValue]:
+    catalog = reviewed_catalog()
+    parent = catalog["source_policies"][0]
+    parent["scope"]["path_rules"] = [{"match": "prefix", "path": "/"}]
+    parent["robots"] = {"status": "required"}
+    child = copy.deepcopy(parent)
+    child["id"] = "private-api"
+    child["scope"]["path_rules"] = [{"match": "prefix", "path": "/private"}]
+    child["terms"]["status"] = "prohibited"
+    catalog["source_policies"].append(child)
+    catalog["runtime_contracts"][0]["operations"][0]["source_policy_ids"].append(child["id"])
+    catalog["shared_capabilities"][0]["source_policy_ids"].append(child["id"])
+    return catalog
 
 
 class SourcePolicyTest(unittest.TestCase):
@@ -216,6 +236,165 @@ class SourcePolicyTest(unittest.TestCase):
                                    "kgov/example/query/v1")
 
         self.assertEqual(source_policy.AccessDecision(False, "missing-policy", None, None), child)
+
+    def test_unreserved_escape_cannot_bypass_more_specific_prohibition(self) -> None:
+        registry = self.registry(overlapping_catalog())
+
+        decision = registry.authorize("https://api.example.go.kr/%70rivate",
+                                      "kgov/example/query/v1")
+
+        self.assertEqual(source_policy.AccessDecision(
+            False, "terms-prohibited", "private-api", registry.policies[1].digest), decision)
+
+    def test_unreserved_rule_and_request_spellings_share_path_boundaries(self) -> None:
+        path = "/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~"
+        spellings = (path, "/" + "".join(f"%{ord(c):02x}" for c in path[1:]),
+                     "/" + "".join(f"%{ord(c):02X}" for c in path[1:]))
+        for kind in ("exact", "prefix"):
+            for rule in spellings:
+                catalog = overlapping_catalog()
+                catalog["source_policies"][1]["scope"]["path_rules"] = [{"match": kind, "path": rule}]
+                registry = self.registry(catalog)
+                for request in spellings:
+                    for suffix in ("", "/child", "sibling"):
+                        with self.subTest(kind=kind, rule=rule, request=request, suffix=suffix):
+                            decision = registry.authorize(
+                                f"https://api.example.go.kr{request}{suffix}?q=%70ublic",
+                                "kgov/example/query/v1")
+                            blocked = not suffix or (kind == "prefix" and suffix == "/child")
+                            self.assertEqual((not blocked, "private-api" if blocked else "example-api"),
+                                             (decision.allowed, decision.policy_id))
+
+    def test_equivalent_rules_have_equal_specificity_and_are_ambiguous(self) -> None:
+        for kind in ("exact", "prefix"):
+            for paths in (("/private", "/%70%72ivate"), ("/%70%72ivate", "/private")):
+                catalog = overlapping_catalog()
+                for policy, path in zip(catalog["source_policies"], paths, strict=True):
+                    policy["scope"]["path_rules"] = [{"match": kind, "path": path}]
+                registry = self.registry(catalog)
+                for request in paths:
+                    with self.subTest(kind=kind, paths=paths, request=request):
+                        self.assertEqual(source_policy.AccessDecision(False, "ambiguous-policy", None, None),
+                                         registry.authorize(f"https://api.example.go.kr{request}",
+                                                            "kgov/example/query/v1"))
+
+    def test_equivalent_rules_in_one_policy_are_rejected(self) -> None:
+        for kind in ("exact", "prefix"):
+            catalog = reviewed_catalog()
+            catalog["source_policies"][0]["scope"]["path_rules"] = [
+                {"match": "prefix", "path": "/private"},
+                {"match": kind, "path": "/%70rivate"}]
+            with self.subTest(kind=kind), self.assertRaises(source_policy.SourcePolicyError) as caught:
+                self.registry(catalog)
+            self.assertEqual(("invalid-policy", "/scope/path_rules"),
+                             (caught.exception.code, caught.exception.location))
+
+    def test_normalized_rule_preserves_raw_catalog_and_digest(self) -> None:
+        catalog = overlapping_catalog()
+        literal_digest = self.registry(catalog).policies[1].digest
+        raw = catalog["source_policies"][1]
+        raw["scope"]["path_rules"][0]["path"] = "/%70rivate"
+        original = copy.deepcopy(catalog)
+        expected = hashlib.sha256(json.dumps(
+            raw, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
+
+        policy = self.registry(catalog).policies[1]
+
+        self.assertEqual((("prefix", "/%70rivate"),), policy.scope.path_rules)
+        self.assertEqual(expected, policy.digest)
+        self.assertNotEqual(literal_digest, policy.digest)
+        self.assertEqual(original, catalog)
+
+    def test_reserved_and_non_ascii_escapes_are_not_normalized(self) -> None:
+        for literal, encoded in (("a:b", "a%3Ab"), ("a;b", "a%3Bb"),
+                                 ("a@b", "a%40b"), ("a+b", "a%2Bb"),
+                                 ("a\u00e9b", "a%C3%A9b")):
+            for rule, other in ((literal, encoded), (encoded, literal)):
+                with self.subTest(rule=rule, other=other):
+                    catalog = reviewed_catalog()
+                    catalog["source_policies"][0]["scope"]["path_rules"] = [
+                        {"match": "exact", "path": f"/{rule}"}]
+                    registry = self.registry(catalog)
+                    self.assertEqual((("exact", f"/{rule}"),), registry.policies[0].scope.path_rules)
+                    self.assertTrue(registry.authorize(f"https://api.example.go.kr/{rule}",
+                                                       "kgov/example/query/v1").allowed)
+                    self.assertEqual("missing-policy", registry.authorize(
+                        f"https://api.example.go.kr/{other}", "kgov/example/query/v1").code)
+
+    def test_unsafe_paths_remain_rejected_for_requests_and_rules(self) -> None:
+        for path in ("/%70rivate%2fchild", "/%70rivate%2Fchild", "/%70rivate%5Cchild",
+                     "/%70rivate%00child", "/%70rivate/%2e", "/%70rivate/.%2E/child",
+                     "/%70rivate/%252e%252e/child", "/%70rivate/%"):
+            with self.subTest(path=path):
+                registry = self.registry(overlapping_catalog())
+                self.assertEqual(source_policy.AccessDecision(False, "invalid-url", None, None),
+                                 registry.authorize(f"https://api.example.go.kr{path}",
+                                                    "kgov/example/query/v1"))
+                catalog = overlapping_catalog()
+                catalog["source_policies"][1]["scope"]["path_rules"][0]["path"] = path
+                with self.assertRaises(source_policy.SourcePolicyError) as caught:
+                    self.registry(catalog)
+                self.assertEqual(("invalid-policy", "/scope/path_rules/path"),
+                                 (caught.exception.code, caught.exception.location))
+
+    def test_encoded_prohibition_blocks_enforcer_before_state_dns_and_opener(self) -> None:
+        for rule in ("/private", "/%70rivate"):
+            catalog = overlapping_catalog()
+            catalog["source_policies"][1]["scope"]["path_rules"][0]["path"] = rule
+            registry = self.registry(catalog)
+            for path in ("/private", "/%70rivate", "/p%72ivate/child"):
+                for policy in registry.policies:
+                    with self.subTest(rule=rule, path=path, policy=policy.id):
+                        state = FakeState()
+                        opener, resolver, projector = Mock(), Mock(), Mock()
+                        enforcer = HttpPolicyEnforcer(registry, state, HttpTransport(opener, resolver))
+                        request = SourceRequest(f"https://api.example.go.kr{path}",
+                                                "kgov/example/query/v1", policy)
+
+                        with self.assertRaises(ReadOnlyHttpError) as caught:
+                            enforcer.fetch_json(request, projector)
+
+                        self.assertEqual("terms-unverified", caught.exception.status)
+                        self.assertEqual(0, state.opens)
+                        opener.assert_not_called()
+                        resolver.assert_not_called()
+                        projector.assert_not_called()
+
+    def test_equivalent_allowed_paths_reach_enforcer_transport(self) -> None:
+        registry = self.registry(overlapping_catalog())
+        for path in ("/public", "/%70ublic"):
+            with self.subTest(path=path):
+                state = FakeState()
+                opener = Mock(side_effect=[Response(b"User-agent: *\nAllow: /\n", media_type="text/plain"),
+                                           Response(b'{"count": 1}', media_type="application/json")])
+                enforcer = HttpPolicyEnforcer(
+                    registry, state, HttpTransport(opener, lambda _host: ["1.1.1.1"]))
+                url = f"https://api.example.go.kr{path}"
+
+                result = enforcer.fetch_json(SourceRequest(url, "kgov/example/query/v1", registry.policies[0]),
+                                             lambda payload: {"count": payload["count"]})
+
+                self.assertEqual({"count": 1}, result.value)
+                self.assertEqual("example-api", result.source_receipt.policy_id)
+                self.assertEqual(2, state.opens)
+                self.assertEqual(["https://api.example.go.kr/robots.txt", url],
+                                 [call.args[0].full_url for call in opener.call_args_list])
+
+    def test_encoded_exact_rule_retains_existing_api_exemption(self) -> None:
+        catalog = reviewed_catalog()
+        catalog["source_policies"][0]["scope"]["path_rules"] = [
+            {"match": "exact", "path": "/%70ublic"}]
+        registry = self.registry(catalog)
+        opener = Mock(return_value=Response(b'{"count": 1}', media_type="application/json"))
+        enforcer = HttpPolicyEnforcer(
+            registry, FakeState(), HttpTransport(opener, lambda _host: ["1.1.1.1"]))
+
+        result = enforcer.fetch_json(
+            SourceRequest("https://api.example.go.kr/%70ublic", "kgov/example/query/v1", registry.policies[0]),
+            lambda payload: {"count": payload["count"]})
+
+        self.assertEqual({"count": 1}, result.value)
+        opener.assert_called_once()
 
     def test_missing_duplicate_and_ambiguous_policy_fail_closed(self) -> None:
         self.assertEqual("missing-policy", self.registry().authorize(

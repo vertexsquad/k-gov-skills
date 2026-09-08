@@ -267,6 +267,15 @@ def _policy_path(value: JSONValue, match: PathMatch, location: str) -> str:
     return path
 
 
+def _normalize_unreserved_path(path: str) -> str:
+    """Normalize only unreserved escapes after the path passes safety checks."""
+    def decode(escape: re.Match[str]) -> str:
+        character = chr(int(escape[0][1:], 16))
+        return character if character in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~" else escape[0]
+
+    return re.sub(r"%[0-9A-Fa-f]{2}", decode, path)
+
+
 def _unsafe_characters(value: str) -> bool:
     return any(character.isspace() or ord(character) < 32 or ord(character) == 127
                or 0xD800 <= ord(character) <= 0xDFFF for character in value)
@@ -323,7 +332,8 @@ def _parse_scope(raw: JSONValue) -> SourceScope:
                     assert_never(unreachable)
         except AssertionError as exc:
             raise _error("/scope/path_rules/match") from exc
-        if any(previous_path == path for _, previous_path in rules):
+        normalized_path = _normalize_unreserved_path(path)
+        if any(_normalize_unreserved_path(previous_path) == normalized_path for _, previous_path in rules):
             raise _error("/scope/path_rules")
         rules.append((kind, path))
     if not rules:
@@ -640,11 +650,12 @@ def _request_target(url: str) -> tuple[str, str] | None:
             or parsed.netloc.lower() != authority or parsed.username is not None
             or parsed.password is not None or port not in (None, 443) or _unsafe_path(parsed.path)):
         return None
-    return f"https://{host.lower()}", parsed.path or "/"
+    return f"https://{host.lower()}", _normalize_unreserved_path(parsed.path or "/")
 
 
 def _path_specificity(rules: tuple[tuple[PathMatch, str], ...], path: str) -> int | None:
-    lengths = [len(rule) for kind, rule in rules if (kind == "exact" and path == rule) or (kind == "prefix" and (rule == "/" or path == rule or path.startswith(f"{rule}/")))]
+    normalized_rules = ((kind, _normalize_unreserved_path(rule)) for kind, rule in rules)
+    lengths = [len(rule) for kind, rule in normalized_rules if (kind == "exact" and path == rule) or (kind == "prefix" and (rule == "/" or path == rule or path.startswith(f"{rule}/")))]
     return max(lengths) if lengths else None
 
 
