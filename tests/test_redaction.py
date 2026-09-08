@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import json
+import subprocess
 import sys
+import tempfile
 import unicodedata
 import unittest
 from datetime import date
+from pathlib import Path
 
 from kgov_runtime.redaction import (
     contains_direct_identifier,
@@ -23,6 +27,47 @@ class RedactionTest(unittest.TestCase):
         for sample in samples:
             with self.subTest(sample=sample):
                 self.assertTrue(contains_direct_identifier(sample))
+
+    def test_detects_email_before_sentence_final_period(self) -> None:
+        samples = (
+            "회신 synthetic@example.org",
+            "회신 synthetic@example.org.",
+            "회신 (synthetic@example.org)",
+            "회신 (synthetic@example.org.)",
+            "회신 synthetic@example.org. 확인 바랍니다.",
+            "회신 synthetic @ example . org .",
+            "회신 ｓｙｎｔｈｅｔｉｃ＠ｅｘａｍｐｌｅ．ｏｒｇ．",
+            "회신 synthetic@example.org!",
+            "회신 synthetic@example.org?",
+        )
+        for sample in samples:
+            with self.subTest(sample=sample):
+                self.assertEqual(("email",), find_direct_identifiers(sample))
+
+    def test_civil_complaint_cli_rejects_email_without_reflecting_input(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        adapter = root / "kgov_runtime/capabilities/civil_complaint_triage_draft.py"
+        fixture = root / "tests/fixtures/capabilities/civil-complaint-triage-draft.json"
+        payload = json.loads(fixture.read_text(encoding="utf-8"))
+        samples = ((payload["body"], 0), ("회신 synthetic@example.org.", 2))
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "input.json"
+            for body, expected_code in samples:
+                with self.subTest(expected_code=expected_code):
+                    path.write_text(json.dumps(dict(payload, body=body)), encoding="utf-8")
+                    result = subprocess.run(
+                        [sys.executable, str(adapter), str(path)],
+                        capture_output=True, text=True, check=False, timeout=10,
+                    )
+                    self.assertEqual(expected_code, result.returncode, result.stderr)
+                    if expected_code == 0:
+                        self.assertTrue(json.loads(result.stdout)["accepted"])
+                        self.assertEqual("", result.stderr)
+                    else:
+                        self.assertEqual("", result.stdout)
+                        self.assertTrue(result.stderr.startswith("ERROR "))
+                    self.assertNotIn(body, result.stdout + result.stderr)
+                    self.assertNotIn("synthetic@example.org", result.stdout + result.stderr)
 
     def test_detects_nfkc_and_unicode_dash_variants(self) -> None:
         samples = (
@@ -125,6 +170,12 @@ class RedactionTest(unittest.TestCase):
             "회신 synthetic@example.org-",
             "회신 synthetic@example.org_",
             "회신 synthetic@example.org..invalid",
+            "회신 synthetic@example.org.123",
+            "회신 synthetic@example.org._invalid",
+            "회신 synthetic@example.org.-invalid",
+            "회신 synthetic@example.org.a",
+            "회신 synthetic@example.org1",
+            "회신 (synthetic@example.org..invalid)",
         )
         for sample in samples:
             with self.subTest(sample=sample):
@@ -134,22 +185,26 @@ class RedactionTest(unittest.TestCase):
         local_at_limit = "a" * 64
         label_at_limit = "b" * 63
         overlong_domain = ".".join(("c" * 63,) * 4) + ".org"
+        email_at_limit = f"{local_at_limit}@" + ".".join(("b" * 63, "c" * 63, "d" * 61))
         samples = (
             (f"{local_at_limit}@example.org", ("email",)),
             (f"synthetic@{label_at_limit}.org", ("email",)),
             (f"a{local_at_limit}@example.org", ()),
             (f"synthetic@b{label_at_limit}.org", ()),
             (f"synthetic@{overlong_domain}", ()),
+            (email_at_limit, ("email",)),
+            (email_at_limit + "d", ()),
         )
         for sample, expected in samples:
-            with self.subTest(expected=expected):
-                self.assertEqual(expected, find_direct_identifiers(sample))
+            for suffix in ("", "."):
+                with self.subTest(length=len(sample), suffix=suffix, expected=expected):
+                    self.assertEqual(expected, find_direct_identifiers(sample + suffix))
 
     def test_recursive_scan_returns_only_paths_and_categories(self) -> None:
         value = {
             "summary": "안전한 행정 검토 문구",
             "claims": [
-                {"contact": "synthetic @ example . org"},
+                {"contact": "synthetic @ example . org."},
                 "등록번호 900101—5123456",
             ],
         }
@@ -175,7 +230,7 @@ class RedactionTest(unittest.TestCase):
     ) -> None:
         value = {
             "safe": "안전한 값",
-            "synthetic@example.org": "안전한 값",
+            "synthetic@example.org.": "안전한 값",
             "010-1234-5678": "안전한 값",
             "dotted.key": "회신 other@example.org",
         }
