@@ -185,8 +185,28 @@ class PolicyState:
         return Reservation(wait_seconds)
 
     def open(self, policy: RatePolicy, opener: Callable[[], Result]) -> Result:
-        """Reserve policy budget and invoke an opener exactly once."""
-        self.reserve(policy)
+        """Reserve once and recheck shared cooldown/digest after each bounded wait."""
+        waited = self.reserve(policy).wait_seconds
+        while True:
+            with self._connection() as connection:
+                connection.execute("BEGIN IMMEDIATE")
+                now = self._number(self._clock())
+                self._require_digest(connection, policy.key)
+                row = connection.execute(
+                    "SELECT blocked_until FROM rate_state WHERE policy_id = ?", (policy.key.policy_id,)
+                ).fetchone()
+                wait = self._number(max(0.0, self._number(row[0]) - now)) if row else 0.0
+                if wait > 0:
+                    required = self._number(waited + wait)
+                    if required > policy.max_wait_seconds:
+                        raise WaitLimitExceededError(required, policy.max_wait_seconds)
+                    if required <= waited:
+                        raise sqlite3.DataError
+                    waited = required
+                connection.commit()
+            if wait <= 0:
+                break
+            self._sleeper(wait)
         return opener()
 
     def record_retry_after(self, policy: RatePolicy, value: str) -> float:
