@@ -168,12 +168,13 @@ def _safety_text(value: str) -> str:
 def _ensure_safe_output(value: Any, operation: JsonOperation) -> None:
     credential = os.environ.get(operation.credential_env, "")
     encoded = (credential, quote(credential, safe=""), quote_plus(credential)) if credential else ()
-    secrets = tuple(_safety_text(item) for item in encoded) + tuple(_safety_text(re.sub(r"%[0-9A-Fa-f]{2}", lambda match: match.group().lower(), item)) for item in encoded)
+    secrets = tuple(re.sub(r"%[0-9A-Fa-f]{2}", lambda match: match.group().lower(), _safety_text(item)) for item in encoded)
 
     def unsafe_text(text: str) -> None:
         normalized = _safety_text(text)
         if contains_direct_identifier(normalized):
             raise JsonContractError("output contains a direct identifier")
+        normalized = re.sub(r"%[0-9A-Fa-f]{2}", lambda match: match.group().lower(), normalized)
         if any(secret and (secret in normalized or "".join(secret.split()) in "".join(normalized.split())) for secret in secrets):
             raise JsonContractError("output contains reflected credential material")
 
