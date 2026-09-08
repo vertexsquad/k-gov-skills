@@ -7,13 +7,17 @@ import threading
 import unittest
 from collections.abc import Callable
 from contextlib import closing
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from email.utils import format_datetime
 from pathlib import Path
 from typing import Protocol
 from unittest.mock import patch
+from urllib.request import Request
 
+from kgov_runtime.http import HttpPolicyEnforcer, HttpTransport, ReadOnlyHttpError, SourceRequest
 from kgov_runtime.policy_state import (PolicyDigest, PolicyDigestMismatchError, PolicyConfigurationError, PolicyId, PolicyKey, PolicyState, PolicyStateUnavailableError, RatePolicy, RetryAfterError, RobotsEntry, WaitLimitExceededError)
+from kgov_runtime.source_policy import SourcePolicyRegistry
+from tests.test_read_only_http import OPERATION, Response, reviewed_catalog
 
 
 class FakeTime:
@@ -71,6 +75,204 @@ class PolicyStateContractTest(unittest.TestCase):
         second = self.state.reserve(policy)
         # Then: the second call waits exactly one 30-second emission interval
         self.assertEqual(((0.0, 30.0), [30.0]), ((first.wait_seconds, second.wait_seconds), self.time.waits))
+
+    def test_open_rechecks_cooldown_committed_during_reservation_sleep(self) -> None:
+        # Given: two real state instances share a consumed budget and clock.
+        policy = rate_policy()
+        self.state.reserve(policy)
+
+        def sleep(seconds: float) -> None:
+            if not self.time.waits:
+                self.state.record_retry_after(policy, "90")
+            self.time.sleep(seconds)
+
+        contender = PolicyState(self.path, clock=self.time.clock, sleeper=sleep)
+        # When: another connection commits a cooldown during the reserved wait.
+        opened_at = contender.open(policy, self.time.clock)
+        # Then: transmission waits for 190, without consuming a second slot.
+        with closing(sqlite3.connect(self.path)) as connection:
+            self.assertEqual((160.0, 190.0), connection.execute(
+                "SELECT theoretical_arrival, blocked_until FROM rate_state"
+            ).fetchone())
+        self.assertEqual(190.0, opened_at)
+        self.assertEqual([30.0, 60.0], self.time.waits)
+
+    def test_open_counts_repeated_cooldowns_against_one_cumulative_cap(self) -> None:
+        for maximum in (90.0, 89.0, 60.0):
+            with self.subTest(maximum=maximum):
+                # Given: each of the first two waits receives a later cooldown.
+                self.state.purge()
+                self.time.now, self.time.waits = 100.0, []
+                policy = rate_policy(maximum=maximum)
+                self.state.reserve(policy)
+                opened: list[float] = []
+
+                def sleep(seconds: float) -> None:
+                    if len(self.time.waits) < 2:
+                        self.state.record_retry_after(policy, "60")
+                    self.time.sleep(seconds)
+
+                contender = PolicyState(self.path, clock=self.time.clock, sleeper=sleep)
+                # When: one open encounters multiple shared-state extensions.
+                if maximum == 90.0:
+                    contender.open(policy, lambda: opened.append(self.time.now))
+                    self.assertEqual(([190.0], [30.0, 30.0, 30.0]), (opened, self.time.waits))
+                else:
+                    with self.assertRaises(WaitLimitExceededError) as raised:
+                        contender.open(policy, lambda: opened.append(self.time.now))
+                    self.assertEqual((90.0, maximum), (raised.exception.required_seconds, raised.exception.maximum_seconds))
+                    self.assertEqual(([], [30.0, 30.0]), (opened, self.time.waits))
+                # Then: both success and rejection retain exactly one reservation.
+                with closing(sqlite3.connect(self.path)) as connection:
+                    self.assertEqual((160.0, 190.0), connection.execute(
+                        "SELECT theoretical_arrival, blocked_until FROM rate_state"
+                    ).fetchone())
+
+    def test_open_rechecks_both_digests_after_each_wait(self) -> None:
+        for table in ("rate_state", "robots_state"):
+            for replacement_wait in (0, 1):
+                with self.subTest(table=table, replacement_wait=replacement_wait):
+                    # Given: a second instance changes authority during a wait.
+                    self.state.purge()
+                    self.time.now, self.time.waits = 100.0, []
+                    policy = rate_policy()
+                    self.state.reserve(policy)
+
+                    def sleep(seconds: float) -> None:
+                        if len(self.time.waits) == replacement_wait:
+                            self.state.purge(POLICY_ID)
+                            if table == "rate_state":
+                                self.state.reserve(rate_policy(digest=OTHER_DIGEST))
+                            else:
+                                self.state.store_robots(PolicyKey(POLICY_ID, OTHER_DIGEST), RobotsEntry(True, 300.0))
+                        else:
+                            self.state.record_retry_after(policy, "60")
+                        self.time.sleep(seconds)
+
+                    contender = PolicyState(self.path, clock=self.time.clock, sleeper=sleep)
+                    # When / Then: stale authority cannot reach the opener.
+                    with self.assertRaises(PolicyDigestMismatchError):
+                        contender.open(policy, lambda: self.fail("opener called"))
+                    self.assertEqual([30.0] * (replacement_wait + 1), self.time.waits)
+
+    def test_open_without_cooldown_does_not_rereserve_or_hold_opener_lock(self) -> None:
+        # Given: a pre-existing slot and a second connection used by the opener.
+        policy = rate_policy()
+        self.state.reserve(policy)
+        contender = PolicyState(self.path, clock=self.time.clock, sleeper=self.time.sleep)
+        opened: list[float] = []
+
+        def opener() -> list[float]:
+            self.state.record_retry_after(policy, "0")
+            opened.append(self.time.now)
+            return opened
+
+        # When: the existing reservation wait completes without an extension.
+        returned = contender.open(policy, opener)
+        # Then: one opener preserves its result, and can write through SQLite.
+        self.assertIs(opened, returned)
+        self.assertEqual(([130.0], [30.0]), (opened, self.time.waits))
+        with closing(sqlite3.connect(self.path)) as connection:
+            self.assertEqual((160.0,), connection.execute("SELECT theoretical_arrival FROM rate_state").fetchone())
+
+    def test_open_recheck_fails_closed_on_invalid_shared_cooldown(self) -> None:
+        for value in ("invalid", float("inf")):
+            with self.subTest(value=value):
+                # Given: persisted cooldown corruption during the initial wait.
+                self.state.purge()
+                self.time.now, self.time.waits = 100.0, []
+                policy = rate_policy()
+                self.state.reserve(policy)
+
+                def sleep(seconds: float) -> None:
+                    with closing(sqlite3.connect(self.path)) as connection:
+                        connection.execute("UPDATE rate_state SET blocked_until = ?", (value,))
+                        connection.commit()
+                    self.time.sleep(seconds)
+
+                contender = PolicyState(self.path, clock=self.time.clock, sleeper=sleep)
+                # When / Then: the post-sleep read cannot dispatch corrupt state.
+                with self.assertRaises(PolicyStateUnavailableError):
+                    contender.open(policy, lambda: self.fail("opener called"))
+
+    def test_open_nonadvancing_sleeper_exhausts_cumulative_cap(self) -> None:
+        # Given: a sleeper that returns without advancing the controlled clock.
+        policy = rate_policy(maximum=60.0)
+        self.state.record_retry_after(policy, "30")
+        contender = PolicyState(self.path, clock=self.time.clock, sleeper=self.time.waits.append)
+        # When / Then: repeated waits terminate at the cap, without an opener.
+        with self.assertRaises(WaitLimitExceededError) as raised:
+            contender.open(policy, lambda: self.fail("opener called"))
+        self.assertEqual(90.0, raised.exception.required_seconds)
+        self.assertEqual([30.0, 30.0], self.time.waits)
+
+    def test_open_unrepresentable_wait_increment_fails_closed(self) -> None:
+        # Given: a clock reset makes an extra wait too small to add to the total.
+        policy = rate_policy(maximum=1e17)
+        self.state.record_retry_after(policy, "10000000000000000")
+
+        def sleep(seconds: float) -> None:
+            self.time.waits.append(seconds)
+            self.time.now = 0.0
+            self.state.purge()
+            self.state.record_retry_after(policy, "1")
+
+        contender = PolicyState(self.path, clock=self.time.clock, sleeper=sleep)
+        # When / Then: numerical loss cannot permit an unbounded recheck loop.
+        with self.assertRaises(PolicyStateUnavailableError):
+            contender.open(policy, lambda: self.fail("opener called"))
+        self.assertEqual([1e16], self.time.waits)
+
+    def test_http_rechecks_shared_state_before_robots_and_page_openers(self) -> None:
+        for robots in ("required", "documented-api-exemption"):
+            for maximum, replace_digest in ((90, False), (89, False), (90, True)):
+                with self.subTest(robots=robots, maximum=maximum, replace_digest=replace_digest):
+                    # Given: real registry, enforcer and SQLite; only transport/time are synthetic.
+                    self.state.purge()
+                    self.time.now, self.time.waits = 100.0, []
+                    catalog = reviewed_catalog(robots=robots)
+                    catalog["source_policies"][0]["rate_limit"].update(
+                        requests=2, per_seconds=60, burst=1, max_wait_seconds=maximum
+                    )
+                    registry = SourcePolicyRegistry.from_catalog(catalog, on_date=date(2026, 9, 6))
+                    selected = registry.policies[0]
+                    policy = RatePolicy(PolicyKey(PolicyId(selected.id), PolicyDigest(selected.digest)), 2, 60.0, 1, maximum)
+                    self.state.reserve(policy)
+                    opened: list[tuple[str, float]] = []
+
+                    def sleep(seconds: float) -> None:
+                        if not self.time.waits:
+                            if replace_digest:
+                                self.state.purge(policy.key.policy_id)
+                                self.state.store_robots(PolicyKey(policy.key.policy_id, OTHER_DIGEST), RobotsEntry(True, 300.0))
+                            else:
+                                self.state.record_retry_after(policy, "90")
+                        self.time.sleep(seconds)
+
+                    def opener(request: Request, timeout: float) -> Response:
+                        opened.append((request.full_url, self.time.now))
+                        self.state.record_retry_after(policy, "0")
+                        if request.full_url.endswith("/robots.txt"):
+                            return Response(b"User-agent: *\nAllow: /", media_type="text/plain")
+                        return Response(b"<title>Example</title>")
+
+                    contender = PolicyState(self.path, clock=self.time.clock, sleeper=sleep)
+                    enforcer = HttpPolicyEnforcer(registry, contender, HttpTransport(opener, lambda _host: ["1.1.1.1"]))
+                    request = SourceRequest("https://www.example.go.kr/page", OPERATION, selected)
+                    # When / Then: public HTTP API succeeds only after the block, or denies without transport.
+                    if maximum == 90 and not replace_digest:
+                        result = enforcer.fetch_text(request, lambda document: document.content_length)
+                        self.assertEqual(22, result.value)
+                        self.assertEqual(selected.digest, result.source_receipt.policy_digest)
+                        paths = ["/robots.txt", "/page"] if robots == "required" else ["/page"]
+                        self.assertEqual([("https://www.example.go.kr" + path, 190.0) for path in paths], opened)
+                        self.assertEqual([30.0, 60.0], self.time.waits)
+                    else:
+                        with self.assertRaises(ReadOnlyHttpError) as raised:
+                            enforcer.fetch_text(request, lambda document: document.content_length)
+                        self.assertEqual("budget-exhausted", raised.exception.status)
+                        self.assertEqual([], opened)
+                        self.assertEqual([30.0], self.time.waits)
 
     def test_clock_rollback_does_not_create_budget(self) -> None:
         # Given: one reservation at timestamp 100
