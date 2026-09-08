@@ -22,6 +22,7 @@ from unittest.mock import patch
 
 from kgov_runtime.http import HttpPolicyEnforcer, HttpTransport, ReadOnlyHttpError
 from kgov_runtime.policy_state import PolicyState
+from kgov_runtime.source_policy import canonical_policy_digest
 from tests.capabilities.test_korean_legal_citation_verification import reviewed_registry
 from tests.test_read_only_http import Response
 
@@ -67,6 +68,37 @@ class AdapterTest(ReviewAdmissionContractMixin, unittest.TestCase):
         cls.adapter = adapter
         cls.adapter_path = ADAPTER_PATH
         cls.valid = json.loads(FIXTURE_PATH.read_text(encoding="utf-8"))
+
+    def test_current_kipo_attribution_requires_a_fresh_receipt(self) -> None:
+        catalog = json.loads(adapter.CATALOG.read_text(encoding="utf-8"))
+        policy = next(item for item in catalog["source_policies"] if item["id"] == "kipo-web")
+        current = dict(policy, institution="지식재산처", revision=2)
+        payload = deepcopy(self.valid)
+        source = next(item for item in payload["source_refs"] if item["policy_receipt"]["policy_id"] == "kipo-web")
+        source["institution"] = current["institution"]
+        source["policy_receipt"].update(
+            policy_revision=current["revision"],
+            policy_digest=canonical_policy_digest(current),
+        )
+
+        result = adapter.review_case(payload)
+        self.assertTrue(result["accepted"])
+        self.assertEqual("policy-matched-not-cryptographic-authenticity-proof", result["receipt_assurance"])
+        self.assertEqual(self.valid, payload)
+        self.assertEqual({"www.kipris.or.kr", "www.kipo.go.kr"}, adapter.CONTRACT.allowed_hosts)
+
+        legacy = dict(current, institution="특허청", revision=1)
+        for stale_fields in (
+            {"policy_revision": legacy["revision"]},
+            {"policy_digest": canonical_policy_digest(legacy)},
+            {"policy_revision": legacy["revision"], "policy_digest": canonical_policy_digest(legacy)},
+        ):
+            with self.subTest(stale_fields=stale_fields):
+                stale = deepcopy(payload)
+                stale_source = next(item for item in stale["source_refs"] if item["policy_receipt"]["policy_id"] == "kipo-web")
+                stale_source["policy_receipt"].update(stale_fields)
+                with self.assertRaises(ValueError):
+                    adapter.review_case(stale)
 
     def test_lookup_receipt_uses_exact_operation_when_each_host_is_reviewed(
         self,

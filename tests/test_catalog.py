@@ -1243,7 +1243,7 @@ class CatalogContractTest(unittest.TestCase):
                     "patent-prior-art-evidence-pack",
                     (
                         "출원번호·공개번호·등록번호·청구항 버전·청구항 요소·인용 문헌번호·인용 위치를 분리",
-                        "KIPRIS·특허청 공식 URL·공개일·조회일·공개 또는 등록 상태와 미확인·복수 후보를 보존",
+                        "KIPRIS·지식재산처 공식 URL·공개일·조회일·공개 또는 등록 상태와 미확인·복수 후보를 보존",
                         "신규성·진보성·침해·유효성·출원전략 판단은 변리사와 특허 담당자 검토로 이관",
                     ),
                 ),
@@ -1253,7 +1253,7 @@ class CatalogContractTest(unittest.TestCase):
                     "public-policy-evidence-pack",
                     (
                         "권리유형·정책 또는 사업·기준기간·출원인 범주·지역·건수·분모·단위를 분리",
-                        "공식 자료로 입력된 특허청·KIPRIS URL·보고서 또는 통계표 식별자·공표일·조회일·개정 상태와 결측을 구분",
+                        "공식 자료로 입력된 지식재산처·KIPRIS URL·보고서 또는 통계표 식별자·공표일·조회일·개정 상태와 결측을 구분",
                         "인과관계·정책효과·산업경쟁력·지원 또는 규제 우선순위 판단은 지식재산 담당자 검토로 이관",
                     ),
                 ),
@@ -2190,12 +2190,12 @@ class SourcePolicyV6Test(unittest.TestCase):
             ),
             ("gov-kr-web", "정부24", "web", "https://www.gov.kr", (("prefix", "/"),)),
             ("kipris-web", "KIPRIS", "web", "https://www.kipris.or.kr", (("prefix", "/"),)),
-            ("kipo-web", "특허청", "web", "https://www.kipo.go.kr", (("prefix", "/"),)),
+            ("kipo-web", "지식재산처", "web", "https://www.kipo.go.kr", (("prefix", "/"),)),
         )
         policies = [
             {
                 "id": policy_id,
-                "revision": 1,
+                "revision": 2 if policy_id == "kipo-web" else 1,
                 "enabled": False,
                 "institution": institution,
                 "channel": channel,
@@ -2275,7 +2275,7 @@ class SourcePolicyV6Test(unittest.TestCase):
             ("data-go-kr-village-forecast-api", "기상청", "api", "https://apis.data.go.kr", (("exact", "/1360000/VilageFcstInfoService_2.0/getVilageFcst"),)),
             ("gov-kr-web", "정부24", "web", "https://www.gov.kr", (("prefix", "/"),)),
             ("kipris-web", "KIPRIS", "web", "https://www.kipris.or.kr", (("prefix", "/"),)),
-            ("kipo-web", "특허청", "web", "https://www.kipo.go.kr", (("prefix", "/"),)),
+            ("kipo-web", "지식재산처", "web", "https://www.kipo.go.kr", (("prefix", "/"),)),
         )
         actual_policies = tuple(
             (

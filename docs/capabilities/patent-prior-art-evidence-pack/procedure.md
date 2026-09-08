@@ -2,7 +2,7 @@
 
 ## 사용 범위
 - 기본 binding인 `review-case`는 사용자가 제공한 합성·비식별 근거 입력의 로컬 admission이며 네트워크·정책 state를 사용하지 않는다.
-- 별도 `inspect-source`는 승인된 KIPRIS/KIPO URL 한 페이지의 bounded GET 메타데이터 확인이다. 현재 `kipris-web`·`kipo-web` 정책 비활성으로 네트워크·state 생성 전에 차단된다.
+- 별도 `inspect-source`는 승인된 KIPRIS 또는 지식재산처의 legacy KIPO URL 한 페이지의 bounded GET 메타데이터 확인이다. 현재 `kipris-web`·`kipo-web` 정책 비활성으로 네트워크·state 생성 전에 차단된다.
 - 어느 경로도 특허 검색 엔진이 아니며 문헌·청구항·선행기술의 실질 검증이나 근거표 자동 작성을 제공하지 않는다.
 
 ## 절차
@@ -23,3 +23,9 @@
 - local input: `python3 -m kgov_runtime.capabilities.patent_prior_art_evidence_pack <redacted.json>`
 - 별도 URL lookup (현재 정책 차단, exit `3`): `python3 -m kgov_runtime.capabilities.patent_prior_art_evidence_pack --lookup-url <KIPRIS-or-KIPO-HTTPS-URL>`
 - fixture PASS는 URL 도달이나 live workflow 성공을 의미하지 않습니다.
+
+## 출처 정체성
+
+- 현행 기관 표기는 지식재산처이며 `kipo-web`은 기존 `www.kipo.go.kr` origin을 식별하는 안정된 policy ID입니다. 기관명 정정으로 `www.moip.go.kr`이나 특허로를 새로 허용하지 않습니다.
+- KIPRIS는 서비스 명칭을 유지합니다. 공식 약관은 제공기관을 특허정보원으로 명시하며 지식재산처와의 권리·이용관계도 설명합니다.
+- 기관명·policy revision·합성 receipt의 정합성은 출처 정책 활성화나 실제 조회 증거가 아닙니다. 경로별 관측과 이용조건은 `runtime-contract.md`의 2026-09-08 검토 기록을 따릅니다.
