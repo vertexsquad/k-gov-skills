@@ -2,14 +2,29 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
+import sys
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
 from decimal import Decimal
+from io import StringIO
 from types import MappingProxyType
 from dataclasses import replace
 from unittest.mock import patch
 
 from kgov_runtime.capabilities import korean_law_bill_research as adapter
-from kgov_runtime.json_adapter import _result, query_json
+from kgov_runtime.json_adapter import JsonContractError, _ensure_safe_output, _result, query_json
+
+
+SYNTHETIC_CREDENTIAL = "Fixture/ÿ+ Key"
+ESCAPED_CREDENTIALS = (
+    "Fixture%2F%C3%BF%2B%20Key",
+    "Fixture%2f%c3%bf%2b%20Key",
+    "Fixture%2f%c3%Bf%2B%20Key",
+    "Fixture%2F%C3%BF%2B+Key",
+    "Fixture%2f%c3%bf%2b+Key",
+    "Fixture%2f%c3%Bf%2B+Key",
+)
 
 
 class Response:
@@ -133,6 +148,84 @@ class AdapterTest(unittest.TestCase):
                     message = str(caught.exception)
                     self.assertNotIn("person", message)
                     self.assertNotIn("fixture", message)
+
+    def test_registered_projector_rejects_mixed_percent_credential(self) -> None:
+        response = payload({"법령명한글": "Fixture%2fA%2BB", "법령ID": "000001", "시행일자": "20260101"})
+        with patch.dict(os.environ, {"LAW_OC": "Fixture/A+B"}, clear=False):
+            with self.assertRaises(ValueError) as caught:
+                adapter.query(
+                    params={"query": "법"},
+                    opener=lambda *_a, **_k: Response(encoded(response)),
+                    resolver=lambda _: ["1.1.1.1"],
+                )
+        self.assertNotIn("Fixture", str(caught.exception))
+
+    def test_percent_escape_variants_are_blocked_in_nested_output_and_registered_cli(self) -> None:
+        with patch.dict(os.environ, {"LAW_OC": SYNTHETIC_CREDENTIAL}, clear=False):
+            for reflection in (SYNTHETIC_CREDENTIAL, *ESCAPED_CREDENTIALS):
+                for output in ({"nested": [{"safe": reflection}]}, {"nested": [{reflection: "safe"}]}):
+                    with self.subTest(reflection=reflection, output=output):
+                        with self.assertRaises(JsonContractError) as caught:
+                            _ensure_safe_output(output, adapter.OPERATION)
+                        self.assertNotIn("Fixture", str(caught.exception))
+                response = payload({"법령명한글": reflection, "법령ID": "000001", "시행일자": "20260101"})
+                stdout, stderr = StringIO(), StringIO()
+                with (
+                    self.subTest(cli_reflection=reflection),
+                    patch("sys.argv", ["law-search", "--param", "query=법"]),
+                    patch("kgov_runtime.json_adapter.safe_urlopen", return_value=Response(encoded(response))) as opener,
+                    redirect_stdout(stdout), redirect_stderr(stderr),
+                    self.assertRaises(SystemExit) as caught,
+                ):
+                    adapter.main()
+                self.assertEqual(1, opener.call_count)
+                self.assertEqual(2, caught.exception.code)
+                self.assertEqual("", stdout.getvalue())
+                self.assertTrue(stderr.getvalue())
+                self.assertNotIn("Fixture", stderr.getvalue())
+
+    def test_percent_comparison_preserves_case_unrelated_values_and_nested_boundaries(self) -> None:
+        controls = (
+            *((SYNTHETIC_CREDENTIAL, value.replace("Fixture", "fixture")) for value in ESCAPED_CREDENTIALS),
+            *((SYNTHETIC_CREDENTIAL, value.replace("Key", "KEY")) for value in ESCAPED_CREDENTIALS),
+            *((SYNTHETIC_CREDENTIAL, value.replace("Fixture", "Unrelated")) for value in ESCAPED_CREDENTIALS),
+            (SYNTHETIC_CREDENTIAL, "Fixture%252F%25C3%25BF%252B%2520Key"),
+            (SYNTHETIC_CREDENTIAL, "Fixture%252f%25c3%25Bf%252B%2520Key"),
+            (SYNTHETIC_CREDENTIAL, "Fixture%2G%c3%Bf%2B%20Key"),
+            ("Fixture%2FPart", "Fixture%252fPart"),
+            ("", ESCAPED_CREDENTIALS[2]),
+        )
+        for credential, value in controls:
+            with self.subTest(credential=credential, value=value), patch.dict(os.environ, {"LAW_OC": credential}):
+                output = {"nested": [{value: value}]}
+                _ensure_safe_output(output, adapter.OPERATION)
+                self.assertEqual({"nested": [{value: value}]}, output)
+                response = payload({"법령명한글": value, "법령ID": "000001", "시행일자": "20260101"})
+                result = _result(adapter.OPERATION, response, "synthetic-fixture", adapter.OPERATION.default_params)
+                self.assertEqual(value, result["records"][0]["law_name"])
+        with patch.dict(os.environ, {"LAW_OC": "Fixture%2FPart"}):
+            for reflection in ("Fixture%2FPart", "Fixture%2fPart", "Fixture%252FPart"):
+                with self.subTest(nested_reflection=reflection), self.assertRaises(JsonContractError):
+                    _ensure_safe_output({"safe": reflection}, adapter.OPERATION)
+
+    def test_actual_cli_keeps_escaped_inputs_out_of_fixture_and_rejection_output(self) -> None:
+        command = [sys.executable, "-m", "kgov_runtime.capabilities.korean_law_bill_research"]
+        for reflection in ESCAPED_CREDENTIALS:
+            for flags in ([], ["--fixture"], ["--unknown=" + reflection]):
+                with self.subTest(reflection=reflection, flags=flags):
+                    result = subprocess.run(
+                        [*command, "--param", "query=" + reflection, *flags],
+                        cwd=adapter.ROOT, env={"LAW_OC": SYNTHETIC_CREDENTIAL},
+                        capture_output=True, text=True, timeout=10, check=False,
+                    )
+                    self.assertNotIn("Fixture", result.stdout + result.stderr)
+                    self.assertEqual(0 if flags == ["--fixture"] else 2, result.returncode)
+                    if result.returncode == 0:
+                        self.assertEqual("", result.stderr)
+                        self.assertEqual("synthetic-fixture", json.loads(result.stdout)["execution_mode"])
+                    else:
+                        self.assertEqual("", result.stdout)
+                        self.assertTrue(result.stderr)
 
     def test_arbitrary_legacy_config_and_raw_param_are_rejected_before_network(self) -> None:
         from kgov_runtime.json_adapter import JsonAdapterConfig
