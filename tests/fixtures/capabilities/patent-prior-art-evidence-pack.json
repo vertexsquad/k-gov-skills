@@ -29,18 +29,18 @@
       "url": "https://www.kipo.go.kr/",
       "retrieved_on": "2026-07-25",
       "published_or_effective_on": "2026-07-24",
-      "institution": "특허청",
-      "title": "합성 특허청 공개자료",
+      "institution": "지식재산처",
+      "title": "합성 지식재산처 공개자료",
       "license_status": "unreviewed",
       "terms_url": null,
       "redistribution": "link-only",
-      "attribution": "특허청 원문 링크",
+      "attribution": "지식재산처 원문 링크",
       "policy_receipt": {
         "source_url": "https://www.kipo.go.kr/",
         "retrieved_on": "2026-07-25",
         "policy_id": "kipo-web",
-        "policy_revision": 1,
-        "policy_digest": "424e4d98089c0be69fc819c1331ff037dd5c0eb58ef1e07b636d42f1c18a9848",
+        "policy_revision": 2,
+        "policy_digest": "e8f03657a01756782accca996e9a88e6bd4fadd6cd52fb585a1db71e677d61b1",
         "outcome": "manual-review"
       }
     }
