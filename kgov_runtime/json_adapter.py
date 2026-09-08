@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import json
 import math
 import os
@@ -16,6 +15,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote, quote_plus, urlsplit
 from urllib.request import Request
 
+from .cli import SafeArgumentParser
 from .http import DEFAULT_MAX_BYTES, DEFAULT_TIMEOUT, USER_AGENT, _default_resolver as default_resolver, build_url, safe_urlopen, validate_public_https_url
 from .redaction import contains_direct_identifier
 
@@ -285,7 +285,7 @@ def query_json(
 
 
 def run_json_cli(operation: JsonOperation, fixture_path: Path) -> int:
-    parser = argparse.ArgumentParser(description=f"Read-only operation: {operation.id}")
+    parser = SafeArgumentParser(description=f"Read-only operation: {operation.id}")
     parser.add_argument("--param", action="append", default=[], help="repeatable allowlisted key=value parameter")
     parser.add_argument("--fixture", action="store_true", help="use the repository fixture; no network or credential")
     args = parser.parse_args()

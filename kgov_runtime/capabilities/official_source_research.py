@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 import os
@@ -20,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from kgov_runtime.cli import SafeArgumentParser  # noqa: E402
 from kgov_runtime.http import (  # noqa: E402
     HttpPolicyEnforcer,
     ReadOnlyHttpError,
@@ -121,7 +121,7 @@ def _live(url: str) -> OfficialSourceResult:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
+    parser = SafeArgumentParser(
         description="Read-only Korean official-source inspector"
     )
     parser.add_argument("url", nargs="?")

@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import argparse
 import json
 import sys
 from datetime import datetime
@@ -15,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from kgov_runtime.cli import SafeArgumentParser  # noqa: E402
 from kgov_runtime.redaction import contains_direct_identifier  # noqa: E402
 
 FIXTURE = ROOT / "tests" / "fixtures" / "capabilities" / "civil-complaint-triage-draft.json"
@@ -47,7 +47,7 @@ def admit_request(payload: Mapping[str, Any]) -> dict[str, Any]:
     unknown = sorted(set(payload) - REQUIRED_FIELDS)
     missing = sorted(REQUIRED_FIELDS - set(payload))
     if unknown:
-        raise ValueError(f"unknown fields: {', '.join(unknown)}")
+        raise ValueError("unknown fields are forbidden")
     if missing:
         raise ValueError(f"missing fields: {', '.join(missing)}")
 
@@ -99,7 +99,7 @@ def _load_payload(path: Path) -> Mapping[str, Any]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Validate redacted civil-complaint draft input")
+    parser = SafeArgumentParser(description="Validate redacted civil-complaint draft input")
     parser.add_argument("path", nargs="?", type=Path)
     parser.add_argument("--fixture", action="store_true", help="use the synthetic repository fixture")
     args = parser.parse_args()
@@ -110,7 +110,9 @@ def main() -> int:
     try:
         payload = _load_payload(FIXTURE if args.fixture else args.path)
         result = admit_request(payload)
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
+    except OSError:
+        parser.exit(2, "ERROR input file cannot be read\n")
+    except (ValueError, json.JSONDecodeError) as exc:
         parser.exit(2, f"ERROR {exc}\n")
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
     return 0

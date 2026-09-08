@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import argparse
 import json
 import re
 import sys
@@ -16,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from kgov_runtime.cli import SafeArgumentParser  # noqa: E402
 from kgov_runtime.redaction import contains_direct_identifier  # noqa: E402
 
 FIXTURE = ROOT / "tests" / "fixtures" / "capabilities" / "administrative-document-draft-review.json"
@@ -100,7 +100,7 @@ def review_document(payload: Mapping[str, Any]) -> dict[str, Any]:
     unknown = sorted(set(payload) - REQUIRED_FIELDS)
     missing = sorted(REQUIRED_FIELDS - set(payload))
     if unknown:
-        raise ValueError(f"unknown fields: {', '.join(unknown)}")
+        raise ValueError("unknown fields are forbidden")
     if missing:
         raise ValueError(f"missing fields: {', '.join(missing)}")
 
@@ -111,7 +111,7 @@ def review_document(payload: Mapping[str, Any]) -> dict[str, Any]:
     redaction_status = _required_string(payload, "redaction_status")
 
     if document_type not in SUPPORTED_DOCUMENT_TYPES:
-        raise ValueError(f"unsupported document_type: {document_type}")
+        raise ValueError("unsupported document_type")
     if len(title) > MAX_TITLE_CHARACTERS:
         raise ValueError(f"title exceeds {MAX_TITLE_CHARACTERS} characters")
     if len(body) > MAX_BODY_CHARACTERS:
@@ -158,7 +158,7 @@ def _load_payload(path: Path) -> Mapping[str, Any]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
+    parser = SafeArgumentParser(
         description="Validate a redacted administrative document draft for human review"
     )
     parser.add_argument("path", nargs="?", type=Path)

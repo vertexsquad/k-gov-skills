@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import argparse
 import json
 import sys
 from pathlib import Path
@@ -13,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from kgov_runtime.cli import SafeArgumentParser  # noqa: E402
 from kgov_runtime.json_adapter import BlockedOperationError  # noqa: E402
 
 CONTRACT_ID = "kgov/land-housing-geospatial-research/v1"
@@ -38,7 +38,7 @@ def fixture_result() -> dict[str, Any]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=f"Blocked read-only operation: {OPERATION_ID}")
+    parser = SafeArgumentParser(description=f"Blocked read-only operation: {OPERATION_ID}")
     parser.add_argument("--fixture", action="store_true")
     args = parser.parse_args()
     if not args.fixture:
