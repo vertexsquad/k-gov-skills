@@ -1,6 +1,6 @@
 ---
 name: assembly-bill-vote-lookup
-description: "입법 업무의 국회 의안·표결 조회 절차. 내부 korean-law-bill-research capability를 사용하며 read-only 경계를 지킵니다."
+description: "입법 업무의 입법 참고용 법령 검색 결과 확인 절차. 내부 korean-law-bill-research capability를 사용하며 read-only 경계를 지킵니다."
 metadata:
   domain: "입법"
   capability: "korean-law-bill-research"
@@ -11,7 +11,7 @@ metadata:
 
 <!-- generated from catalog/domain-skills.json; do not edit -->
 
-# 국회 의안·표결 조회
+# 입법 참고용 법령 검색 결과 확인
 
 - Domain: **입법**
 - 내부 capability: `korean-law-bill-research`
@@ -180,6 +180,12 @@ metadata:
 }
 ```
 <!-- kgov-runtime-binding:end -->
+
+## 업무별 추가 체크
+
+- search-laws는 법령명·법령 ID·시행일만 투영하며 국회 의안·표결·개정 이력·조문 원문을 검증하지 않음
+- LAW_OC·고정 endpoint·출처 정책 경계를 유지하며 현재 차단된 기본 live 경로를 fixture나 시험용 opener로 대체해 조회 성공을 주장하지 않음
+- 의안·표결·연혁·원문과 기준일의 효력은 담당자가 공식 출처에서 별도로 확인
 
 ## 절차
 

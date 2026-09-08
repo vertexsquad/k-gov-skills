@@ -1,6 +1,6 @@
 ---
 name: welfare-pension-support-search
-description: "사회복지 업무의 복지·연금·지원정보 조회 절차. 내부 welfare-health-safety-research capability를 사용하며 read-only 경계를 지킵니다."
+description: "사회복지 업무의 복지·연금·지원정보 조회 차단 안내 절차. 내부 welfare-health-safety-research capability를 사용하며 read-only 경계를 지킵니다."
 metadata:
   domain: "사회복지"
   capability: "welfare-health-safety-research"
@@ -11,7 +11,7 @@ metadata:
 
 <!-- generated from catalog/domain-skills.json; do not edit -->
 
-# 복지·연금·지원정보 조회
+# 복지·연금·지원정보 조회 차단 안내
 
 - Domain: **사회복지**
 - 내부 capability: `welfare-health-safety-research`
@@ -150,6 +150,11 @@ metadata:
 }
 ```
 <!-- kgov-runtime-binding:end -->
+
+## 업무별 추가 체크
+
+- exact dataset profile 미선언으로 복지·연금·지원정보 조회는 차단되며 빈 fixture records는 실제 검색 0건이 아님
+- 지원조건·최신 안내와 수급자격 판단은 담당기관 수동 확인으로 이관
 
 ## 절차
 

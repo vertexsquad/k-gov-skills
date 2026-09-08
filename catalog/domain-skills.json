@@ -691,14 +691,19 @@
         {
           "name": "business-tax-status-lookup",
           "runtime_binding": {"contract_id": "kgov/official-source-research/v1", "operation": "kgov/official-source-research/inspect-page/v1", "fixed_input": {"argv": ["--fixture"]}},
-          "title": "사업자·체납 상태조회",
+          "title": "사업자·체납 안내 페이지 메타데이터 확인",
           "capability": "official-source-research",
           "role": "primary",
           "reference_skills": [
             "nts-business-registration",
             "nts-tax-delinquency"
           ],
-          "boundary": "read-only"
+          "boundary": "read-only",
+          "task_checks": [
+            "inspect-page는 승인된 정부24 URL의 제목·메타데이터만 확인하며 사업자 상태·체납 조회 API가 아님",
+            "현재 gov-kr-web 정책은 비활성·미검토 상태로 네트워크 전에 차단되며 fixture는 실제 조회 근거가 아님",
+            "사업자 상태·체납 사실 확인과 로그인·민감업무는 담당기관 수동 확인으로 이관"
+          ]
         },
         {
           "name": "tax-law-bill-research",
@@ -721,11 +726,15 @@
         {
           "name": "property-tax-land-housing-research",
           "runtime_binding": {"contract_id": "kgov/land-housing-geospatial-research/v1", "operation": "kgov/land-housing-geospatial-research/blocked-dataset-query/v1", "fixed_input": {"argv": ["--fixture"]}},
-          "title": "재산세 토지·주택 기초조사",
+          "title": "재산세 토지·주택 조회 차단 안내",
           "capability": "land-housing-geospatial-research",
           "role": "additional",
           "reference_skills": [],
-          "boundary": "read-only"
+          "boundary": "read-only",
+          "task_checks": [
+            "exact dataset profile 미선언으로 토지·주택 자료 조회는 차단되며 빈 fixture records는 실제 검색 0건이 아님",
+            "재산세 기초자료·공시값·권리관계는 담당기관 수동 확인으로 이관하고 등기발급·청약·계약·감정평가를 자동 수행하지 않음"
+          ]
         },
         {
           "name": "hometax-official-guidance-search",
@@ -1305,13 +1314,18 @@
         {
           "name": "assembly-bill-vote-lookup",
           "runtime_binding": {"contract_id": "kgov/korean-law-bill-research/v1", "operation": "kgov/korean-law-bill-research/search-laws/v1", "fixed_input": {"argv": ["--fixture"]}},
-          "title": "국회 의안·표결 조회",
+          "title": "입법 참고용 법령 검색 결과 확인",
           "capability": "korean-law-bill-research",
           "role": "primary",
           "reference_skills": [
             "assembly-bill-vote-search"
           ],
-          "boundary": "read-only"
+          "boundary": "read-only",
+          "task_checks": [
+            "search-laws는 법령명·법령 ID·시행일만 투영하며 국회 의안·표결·개정 이력·조문 원문을 검증하지 않음",
+            "LAW_OC·고정 endpoint·출처 정책 경계를 유지하며 현재 차단된 기본 live 경로를 fixture나 시험용 opener로 대체해 조회 성공을 주장하지 않음",
+            "의안·표결·연혁·원문과 기준일의 효력은 담당자가 공식 출처에서 별도로 확인"
+          ]
         },
         {
           "name": "bill-comparison-impact-brief",
@@ -2415,7 +2429,7 @@
         {
           "name": "welfare-pension-support-search",
           "runtime_binding": {"contract_id": "kgov/welfare-health-safety-research/v1", "operation": "kgov/welfare-health-safety-research/blocked-dataset-query/v1", "fixed_input": {"argv": ["--fixture"]}},
-          "title": "복지·연금·지원정보 조회",
+          "title": "복지·연금·지원정보 조회 차단 안내",
           "capability": "welfare-health-safety-research",
           "role": "primary",
           "reference_skills": [
@@ -2423,7 +2437,11 @@
             "donation-place-search",
             "korean-scholarship-search"
           ],
-          "boundary": "read-only"
+          "boundary": "read-only",
+          "task_checks": [
+            "exact dataset profile 미선언으로 복지·연금·지원정보 조회는 차단되며 빈 fixture records는 실제 검색 0건이 아님",
+            "지원조건·최신 안내와 수급자격 판단은 담당기관 수동 확인으로 이관"
+          ]
         },
         {
           "name": "welfare-civil-complaint-triage-draft",
@@ -2567,14 +2585,18 @@
         {
           "name": "healthcare-facility-search",
           "runtime_binding": {"contract_id": "kgov/welfare-health-safety-research/v1", "operation": "kgov/welfare-health-safety-research/blocked-dataset-query/v1", "fixed_input": {"argv": ["--fixture"]}},
-          "title": "응급실·검진·장기요양기관 조회",
+          "title": "응급실·검진·장기요양기관 조회 차단 안내",
           "capability": "welfare-health-safety-research",
           "role": "primary",
           "reference_skills": [
             "emergency-room-beds",
             "nhis-care-checkup-search"
           ],
-          "boundary": "read-only"
+          "boundary": "read-only",
+          "task_checks": [
+            "exact dataset profile 미선언으로 의료기관 정보 조회는 차단되며 빈 fixture records는 실제 검색 0건이나 가용 병상 정보가 아님",
+            "기관 운영·이용 가능 여부는 담당기관에 수동 확인하고 진단·복약은 의료진, 긴급 상황은 공식 긴급전화로 이관"
+          ]
         },
         {
           "name": "healthcare-policy-statistics-brief",
@@ -3849,7 +3871,7 @@
         {
           "name": "korean-patent-lookup",
           "runtime_binding": {"contract_id": "kgov/patent-prior-art-evidence-pack/v1", "operation": "kgov/patent-prior-art-evidence-pack/review-case/v1", "fixed_input": {"argv": ["--fixture"]}},
-          "title": "KIPRIS 특허 조회",
+          "title": "특허 선행기술 근거 입력 검토 접수",
           "capability": "patent-prior-art-evidence-pack",
           "role": "primary",
           "reference_skills": [
@@ -3857,8 +3879,9 @@
           ],
           "boundary": "read-only",
           "task_checks": [
-            "KIPRIS 검색 결과와 공개번호·공개일을 보존",
-            "청구항 요소별 관련 문헌·인용 위치를 구조화",
+            "review-case는 사용자가 제공한 비식별 근거 입력의 로컬 admission이며 특허 검색·문헌 조회가 아님",
+            "공개번호·공개일·청구항별 인용 위치·문헌 누락은 반환된 required_checks에 따라 담당자가 별도 검토",
+            "별도 inspect-source도 URL 페이지 메타데이터 확인일 뿐 검색 엔진이 아니며 현재 KIPRIS/KIPO 정책 비활성으로 차단됨",
             "신규성·진보성·침해 판단은 변리사 검토로 이관"
           ]
         },
