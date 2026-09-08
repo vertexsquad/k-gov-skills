@@ -9,7 +9,7 @@
 > - 한다: 공식 출처 조회, 인용·문서의 구조적 대조, 초안·근거표 정리
 > - 하지 않는다: 법적 판단, 결재·제출·발송, 원본 변경
 >
-> 모든 Skill은 `read-only` 또는 `draft-only` 경계 안에서만 동작합니다. 최종 판단과 결재는 담당자 몫입니다.
+> 모든 Skill은 `read-only`, `draft-only` 또는 `manual-review-only` 경계 안에서만 동작합니다. 최종 판단과 결재는 담당자 몫입니다.
 
 ## 목차
 
@@ -89,8 +89,10 @@ Agent(Claude 등)에게는 Skill 이름으로 직접 요청합니다.
 | 값 | 의미 |
 |---|---|
 | `read-only` | 조회만 |
-| `document-read` | 로컬 문서 읽기 |
 | `draft-only` | 초안·검토 결과만 생성, 원본 변경·제출 없음 |
+| `manual-review-only` | 공개정보 기반 담당자 수동 검토만 지원 |
+
+Capability의 `side_effect_class`는 Skill 경계와 별도입니다. `document-read`는 로컬 문서 읽기를 뜻하는 capability 분류이며 Skill 경계 값이 아닙니다.
 
 **4. Evidence (근거 강도)** — domain의 `direct`/`adjacent`/`new`/`sensitive`는 **완성도가 아니라 근거 강도와 도입 경계**입니다. 현재 direct 35 · adjacent 16 · new 8 · sensitive 1.
 

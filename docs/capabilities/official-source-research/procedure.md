@@ -26,5 +26,5 @@
 ## 실행 도구
 
 - fixture 검증: `python3 -m kgov_runtime.capabilities.official_source_research --fixture`
-- 상세 입력·권한·중단 조건은 `references/runtime-contract.md`를 따릅니다.
+- 상세 입력·권한·중단 조건은 `runtime-contract.md`를 따릅니다.
 - fixture 통과는 live endpoint 또는 실제 문서 검증을 의미하지 않습니다.
