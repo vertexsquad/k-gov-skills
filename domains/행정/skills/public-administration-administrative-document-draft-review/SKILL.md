@@ -2,12 +2,11 @@
 name: public-administration-administrative-document-draft-review
 description: "행정 업무의 행정문서 초안·검토 절차. 내부 administrative-document-draft-review capability를 사용하며 draft-only 경계를 지킵니다."
 metadata:
-  kgov:
-    domain: "행정"
-    capability: administrative-document-draft-review
-    runtime_contract: "kgov/administrative-document-draft-review/v1"
-    operation: "kgov/administrative-document-draft-review/review-draft/v1"
-    role: additional
+  domain: "행정"
+  capability: "administrative-document-draft-review"
+  runtime_contract: "kgov/administrative-document-draft-review/v1"
+  operation: "kgov/administrative-document-draft-review/review-draft/v1"
+  role: "additional"
 ---
 
 <!-- generated from catalog/domain-skills.json; do not edit -->
@@ -197,11 +196,17 @@ metadata:
 
 ## 절차
 
-1. 저장소 루트에서 `docs/capabilities/administrative-document-draft-review/procedure.md`와 `docs/capabilities/administrative-document-draft-review/runtime-contract.md`를 먼저 읽습니다.
-2. `python3 -m kgov_runtime.capabilities.administrative_document_draft_review --fixture`로 합성 fixture 계약을 검증합니다.
-3. live 실행은 capability manifest의 credential·proxy·허용 host 경계를 충족할 때만 수행합니다.
-4. 기관 서식·근거 확정·결재·발송은 담당 공무원 승인
-5. fixture 성공, URL 도달, live 검증을 서로 다른 증거로 보고합니다.
+1. 전체 저장소 checkout이 필요합니다. Skill 디렉터리만 복사해서 실행하지 않습니다. 클라이언트와 모든 명령은 `kgov_runtime/`, `docs/`, `tests/`가 있는 저장소 루트에서 실행하고, 루트 기준 `docs/capabilities/administrative-document-draft-review/procedure.md`와 `docs/capabilities/administrative-document-draft-review/runtime-contract.md`를 먼저 읽습니다.
+2. `python3 -m kgov_runtime.capabilities.administrative_document_draft_review --fixture`로 합성 fixture 계약을 검증합니다. 이는 사용자가 제공한 파일을 읽거나 검증한 결과가 아닙니다.
+3. 제공된 로컬 입력은 procedure의 실제 입력 절차와 제한에 따라 별도로 검사합니다. 파일이 없거나 읽을 수 없으면 차단 상태를 보고하고 fixture로 대신 검증했다고 주장하지 않습니다.
+4. live 실행은 capability manifest의 credential·proxy·허용 host 경계를 충족할 때만 수행합니다.
+5. 기관 서식·근거 확정·결재·발송은 담당 공무원 승인
+6. fixture 성공, 로컬 입력 검사, URL 도달, live 검증을 서로 다른 증거로 보고합니다.
+
+## 실제 로컬 입력
+
+저장소 루트에서 `python3 -m kgov_runtime.capabilities.administrative_document_draft_review PATH`를 실행합니다. `PATH`는 사용자가 제공하고 읽기를 승인한 로컬 파일 경로로 바꾸고, 공백이 있으면 따옴표로 감쌉니다. `--fixture`와 함께 쓰지 않습니다. 입력 형식과 제한은 위 procedure를 따릅니다.
+위 Runtime binding의 `fixed_input`과 예시는 합성 fixture 전용 계약이며, 실제 파일 검사 결과가 아닙니다.
 
 ## 금지
 

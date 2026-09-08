@@ -25,9 +25,22 @@
 
 ## 실행
 
+전체 저장소를 checkout하고 `kgov_runtime/`, `docs/`, `tests/`가 있는 루트에서 실행합니다. Skill 디렉터리만 복사해서 실행하지 않습니다.
+
+합성 fixture는 입출력 계약 확인용이며 사용자 파일을 읽지 않습니다.
+
 ```bash
 python3 -m kgov_runtime.capabilities.administrative_document_draft_review --fixture
-python3 -m kgov_runtime.capabilities.administrative_document_draft_review redacted-document.json
 ```
 
-출력은 `draft-review-only`이며 항상 담당자 최종 검토가 필요합니다.
+실제 로컬 입력은 사용자가 읽기를 승인한 비식별 JSON 파일의 경로를 전달합니다. `--fixture`와 함께 쓰지 않습니다.
+
+```bash
+python3 -m kgov_runtime.capabilities.administrative_document_draft_review "/absolute/path/redacted-document.json"
+```
+
+파일은 UTF-8 JSON 객체이며 정확히 `document_type`, `title`, `body`, `purpose`, `source_refs`, `redaction_status`를 포함해야 합니다. `redaction_status`는 `redacted`여야 합니다. 길이·출처 URL 제한은 [runtime contract](runtime-contract.md)를 따릅니다. HWP/HWPX/PDF 파일을 직접 받거나 변환하지 않습니다.
+
+경로가 없거나 입력이 거부되면 차단 상태를 보고하고 fixture로 대체하지 않습니다. Skill의 `fixed_input`, `fixture_argv`, 예시 결과는 합성 fixture 전용 계약으로 유지하며 실제 로컬 입력 검사 결과와 구분합니다.
+
+출력은 원문이나 완성된 초안이 아니라 문자 수·검토 플래그와 `draft-review-only` 상태입니다. 공식 출처의 live 검증이나 비식별 완료 증명이 아니며 항상 담당자 최종 검토가 필요합니다.

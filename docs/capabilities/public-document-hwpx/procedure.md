@@ -15,6 +15,8 @@
 
 ## 절차
 
+전체 저장소를 checkout하고 `kgov_runtime/`, `docs/`, `tests/`가 있는 루트에서 실행한다. Skill 디렉터리만 복사한 환경은 지원하지 않는다.
+
 1. 실제 개인정보가 없는 합성 fixture로 `python3 -m kgov_runtime.capabilities.public_document_hwpx --fixture`를 실행한다.
 2. fixture 결과가 section 수, 최대 100개 section metadata, 전체 추출 문자 수, 식별자 scan 상태, `text_emitted=false`, `manual_review_required=true`만 포함하는지 확인한다.
 3. 승인된 로컬 문서만 `python3 -m kgov_runtime.capabilities.public_document_hwpx <path.hwpx>`로 검사한다.
@@ -28,6 +30,17 @@
 - 공개 금지: text/body/raw 필드, section entry 이름, raw XML, archive bytes, 입력 경로, 일치 식별자 값
 - 원본 변경/제출: 수행하지 않음
 - 최종 판단: 수동 검토 필수
+
+## 실제 로컬 파일 실행
+
+```bash
+# 저장소 루트에서, 사용자가 읽기를 승인한 HWPX의 실제 경로로 바꾼다.
+python3 -m kgov_runtime.capabilities.public_document_hwpx "/absolute/path/document.hwpx"
+```
+
+`PATH` 위치에는 로컬 HWPX 파일 경로를 전달하며 `--fixture`를 붙이지 않는다. HWP/PDF 변환이나 원문 출력 기능은 아니다. 경로가 없거나 파일을 읽을 수 없으면 실패를 보고하고 합성 fixture 결과로 대체하지 않는다.
+
+Skill의 `fixed_input`, `fixture_argv`, 예시 결과는 합성 fixture 전용 계약이다. 실제 파일 실행 결과는 별도의 로컬 입력 검사 증거이며, fixture 통과·공식 원문 live 조회·비식별 완료와 구분한다.
 
 ## 실행 도구
 

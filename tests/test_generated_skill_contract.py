@@ -61,6 +61,24 @@ class GeneratedSkillContractTest(unittest.TestCase):
             )
         )
 
+    def test_metadata_is_a_flat_map_of_json_quoted_strings(self) -> None:
+        for domain in self.catalog["domains"]:
+            for skill in domain["skills"]:
+                path = (
+                    ROOT
+                    / "domains"
+                    / domain["domain"]
+                    / "skills"
+                    / skill["name"]
+                    / "SKILL.md"
+                )
+                frontmatter = path.read_text().split("---\n", 2)[1]
+                metadata = frontmatter.split("metadata:\n", 1)[1].splitlines()
+                self.assertEqual(5, len(metadata), path)
+                for line in metadata:
+                    self.assertRegex(line, r'^  [a-z_]+: ".*"$', path)
+                    self.assertIsInstance(json.loads(line.split(": ", 1)[1]), str)
+
     def test_rendered_machine_blocks_match_all_catalog_bindings(self) -> None:
         # Given catalog bindings and generated Skill entrypoints.
         contracts = {
@@ -95,16 +113,20 @@ class GeneratedSkillContractTest(unittest.TestCase):
                 self.assertEqual(operation["output_schema"], document["output_schema"])
                 self.assertEqual(
                     {
+                        "domain": domain["domain"],
+                        "capability": skill["capability"],
                         "runtime_contract": binding["contract_id"],
                         "operation": binding["operation"],
+                        "role": skill["role"],
                     },
-                    dict(
-                        re.findall(
-                            r'^    (runtime_contract|operation): "([^"]+)"$',
-                            text,
+                    {
+                        key: json.loads(value)
+                        for key, value in re.findall(
+                            r'^  ([a-z_]+): (".*")$',
+                            text.split("---\n", 2)[1],
                             re.MULTILINE,
                         )
-                    ),
+                    },
                 )
                 documents.append(document)
 
