@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 import re
@@ -13,6 +12,7 @@ from pathlib import Path
 from typing import Any, Mapping
 from urllib.parse import urlsplit
 
+from kgov_runtime.cli import SafeArgumentParser
 from kgov_runtime.redaction import contains_direct_identifier
 
 TOP_LEVEL_FIELDS = frozenset({"case_id", "review_type", "summary", "facts", "source_refs", "as_of_date", "redaction_status"})
@@ -196,9 +196,9 @@ def admit_review(payload: Mapping[str, Any], contract: ReviewContract) -> dict[s
             raise AdmissionError("potential personal identifier remains in source_ref metadata")
         license_status = item.get("license_status")
         redistribution = item.get("redistribution")
-        if license_status not in LICENSE_STATUSES:
+        if not isinstance(license_status, str) or license_status not in LICENSE_STATUSES:
             raise AdmissionError("source_ref.license_status is unsupported")
-        if redistribution not in REDISTRIBUTION_MODES:
+        if not isinstance(redistribution, str) or redistribution not in REDISTRIBUTION_MODES:
             raise AdmissionError("source_ref.redistribution is unsupported")
         terms_url = item.get("terms_url")
         if terms_url is not None:
@@ -260,7 +260,7 @@ def load_payload(path: Path) -> Mapping[str, Any]:
 
 
 def run_cli(contract: ReviewContract, fixture: Path) -> int:
-    parser = argparse.ArgumentParser(description=f"Validate a redacted {contract.slug} review draft")
+    parser = SafeArgumentParser(description=f"Validate a redacted {contract.slug} review draft")
     parser.add_argument("path", nargs="?", type=Path)
     parser.add_argument("--fixture", action="store_true", help="use the synthetic repository fixture")
     args = parser.parse_args()

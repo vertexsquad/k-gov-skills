@@ -1,6 +1,7 @@
 """Offline machine-contract parity for every catalog capability."""
 
 import importlib
+import io
 import json
 import sys
 import unittest
@@ -12,7 +13,10 @@ from tempfile import TemporaryDirectory
 from typing import Final
 from unittest.mock import patch
 
-from kgov_runtime.json_adapter import strict_json_loads
+from kgov_runtime.capabilities import official_source_research
+from kgov_runtime.http import ReadOnlyHttpError
+from kgov_runtime.json_adapter import JsonOperation, strict_json_loads
+from kgov_runtime.review_admission import ReviewContract
 from kgov_runtime.source_policy import JSONValue
 from tests.capabilities import test_patent_prior_art_evidence_pack as patent
 
@@ -123,14 +127,98 @@ class ContractSemanticsTest(unittest.TestCase):
                 self.assertTrue(receipt.stdout)
 
     def test_invalid_arguments_when_using_real_clis(self) -> None:
-        # Given an absent flag. When parsing it offline.
+        # Given rejected option names, values and excess paths.
+        marker = "synthetic-argv-marker"
+        arguments = (
+            (f"--{marker}",),
+            (f"--{marker}=synthetic-value-marker",),
+            ("--fixture=synthetic-value-marker",),
+            ("--fixture", "synthetic-path-marker", "synthetic-path-marker"),
+        )
         for contract in self.contracts:
-            with self.subTest(module=contract.module):
-                receipt = cli(contract.module, ("--unknown-contract-option",))
-                # Then rejection retains exit 2 and no successful JSON.
-                self.assertEqual(contract.exit_codes.input_error, receipt.returncode)
-                self.assertEqual("", receipt.stdout)
-                self.assertTrue(receipt.stderr)
+            for argv in arguments:
+                with self.subTest(module=contract.module, argv=argv):
+                    # When parsing offline. Then no rejected data is reflected.
+                    receipt = cli(contract.module, argv)
+                    self.assertEqual(contract.exit_codes.input_error, receipt.returncode)
+                    self.assertEqual("", receipt.stdout)
+                    self.assertTrue(receipt.stderr)
+                    for rejected in (marker, "synthetic-value-marker", "synthetic-path-marker", "Traceback"):
+                        self.assertNotIn(rejected, receipt.stderr)
+
+    def test_source_enums_when_arrays_or_objects_are_supplied(self) -> None:
+        # Given every caller of shared admission, including the patent CLI.
+        marker = "synthetic-enum-marker"
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "synthetic-path-marker.json"
+            for contract in self.contracts:
+                adapter = importlib.import_module(contract.module)
+                if not isinstance(getattr(adapter, "CONTRACT", None), ReviewContract):
+                    continue
+                for field in ("license_status", "redistribution"):
+                    for value in ([], {}, [marker], {marker: marker}, None, True, 1, marker):
+                        candidate = json.loads(adapter.FIXTURE.read_bytes())
+                        candidate["source_refs"][0][field] = value
+                        path.write_text(json.dumps(candidate), encoding="utf-8")
+                        with self.subTest(module=contract.module, field=field, value=value):
+                            # When the real CLI admits it. Then rejection is controlled.
+                            receipt = cli(contract.module, (str(path),))
+                            self.assertEqual(2, receipt.returncode, receipt.stderr)
+                            self.assertEqual("", receipt.stdout)
+                            for rejected in (marker, path.name, "Traceback"):
+                                self.assertNotIn(rejected, receipt.stderr)
+
+    def test_input_errors_when_keys_values_or_paths_are_private(self) -> None:
+        # Given synthetic private data at file and parameter boundaries.
+        marker = "synthetic-private-marker"
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / f"{marker}.json"
+            for contract in self.contracts:
+                adapter = importlib.import_module(contract.module)
+                cases = [((str(path / marker),), None)]
+                if contract.kind in ("admission", "hybrid"):
+                    valid = json.loads(adapter.FIXTURE.read_bytes())
+                    cases.extend((
+                        ((str(path),), valid | {marker: marker}),
+                        ((str(path),), valid | {"redaction_status": marker}),
+                    ))
+                    if "document_type" in valid:
+                        cases.append(((str(path),), valid | {"document_type": marker}))
+                operation = getattr(adapter, "OPERATION", None)
+                if isinstance(operation, JsonOperation):
+                    cases.extend((
+                        (("--param", f"{marker}={marker}"), None),
+                        (("--param", marker), None),
+                        (("--param", f"{marker}=1", "--param", f"{marker}=2"), None),
+                    ))
+                for argv, payload in cases:
+                    if payload is not None:
+                        path.write_text(json.dumps(payload), encoding="utf-8")
+                    with self.subTest(module=contract.module, argv=argv, payload=payload):
+                        # When rejecting input. Then neither values nor paths escape.
+                        receipt = cli(contract.module, argv)
+                        self.assertEqual(2, receipt.returncode, receipt.stderr)
+                        self.assertEqual("", receipt.stdout)
+                        self.assertNotIn(marker, receipt.stderr)
+                        self.assertNotIn("Traceback", receipt.stderr)
+
+    def test_official_source_exit_codes_when_retrieval_fails(self) -> None:
+        # Given deterministic failures at the retrieval boundary; no live I/O.
+        for status, code in (("invalid-request", 2), ("policy-disabled", 3), ("upstream-unavailable", 4)):
+            stdout, stderr = io.StringIO(), io.StringIO()
+            with (
+                self.subTest(status=status),
+                patch.object(sys, "argv", ["official-source", "https://www.gov.kr/"]),
+                patch.object(sys, "stdout", stdout),
+                patch.object(sys, "stderr", stderr),
+                patch.object(official_source_research, "_live", side_effect=ReadOnlyHttpError(status)),
+                self.assertRaises(SystemExit) as raised,
+            ):
+                # When the real parser and handler run. Then exit semantics survive.
+                official_source_research.main()
+            self.assertEqual(code, raised.exception.code)
+            self.assertEqual("", stdout.getvalue())
+            self.assertIn(status, stderr.getvalue())
 
     def test_rejects_metadata_when_catalog_fields_are_mutated(self) -> None:
         # Given distinct mutations at each contract boundary.

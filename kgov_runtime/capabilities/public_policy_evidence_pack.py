@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import argparse
 import json
 import re
 import sys
@@ -17,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from kgov_runtime.cli import SafeArgumentParser  # noqa: E402
 from kgov_runtime.redaction import contains_direct_identifier  # noqa: E402
 
 FIXTURE = ROOT / "tests" / "fixtures" / "capabilities" / "public-policy-evidence-pack.json"
@@ -227,7 +227,7 @@ def _load_payload(path: Path) -> Mapping[str, Any]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
+    parser = SafeArgumentParser(
         description="Validate a redacted public-policy evidence ledger for human review"
     )
     parser.add_argument("path", nargs="?", type=Path)
@@ -240,7 +240,9 @@ def main() -> int:
     try:
         payload = _load_payload(FIXTURE if args.fixture else args.path)
         result = build_evidence_pack(payload)
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
+    except OSError:
+        parser.exit(2, "ERROR input file cannot be read\n")
+    except (ValueError, json.JSONDecodeError) as exc:
         parser.exit(2, f"ERROR {exc}\n")
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
     return 0
