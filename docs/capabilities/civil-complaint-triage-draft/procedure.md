@@ -28,5 +28,5 @@
 ## 실행 도구
 - fixture 검증: `python3 -m kgov_runtime.capabilities.civil_complaint_triage_draft --fixture`
 - 로컬 입력 검사: `python3 -m kgov_runtime.capabilities.civil_complaint_triage_draft <redacted-input.json>`
-- 입력 계약과 중단 조건은 `references/runtime-contract.md`를 따른다.
+- 입력 계약과 중단 조건은 `runtime-contract.md`를 따른다.
 - fixture 통과는 실제 민원 처리나 개인정보 검증 완료를 의미하지 않는다.

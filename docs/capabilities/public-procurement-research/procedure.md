@@ -28,5 +28,5 @@
 ## 실행 도구
 
 - fixture 검증: `python3 -m kgov_runtime.capabilities.public_procurement_research --fixture`
-- live 조회: `references/runtime-contract.md`의 credential·endpoint 조건을 확인한 뒤 실행합니다.
+- live 조회: `runtime-contract.md`의 credential·endpoint 조건을 확인한 뒤 실행합니다.
 - fixture 통과는 live endpoint 검증을 의미하지 않습니다.
