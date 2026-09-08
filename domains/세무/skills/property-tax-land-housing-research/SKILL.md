@@ -1,6 +1,6 @@
 ---
 name: property-tax-land-housing-research
-description: "세무 업무의 재산세 토지·주택 기초조사 절차. 내부 land-housing-geospatial-research capability를 사용하며 read-only 경계를 지킵니다."
+description: "세무 업무의 재산세 토지·주택 조회 차단 안내 절차. 내부 land-housing-geospatial-research capability를 사용하며 read-only 경계를 지킵니다."
 metadata:
   domain: "세무"
   capability: "land-housing-geospatial-research"
@@ -11,7 +11,7 @@ metadata:
 
 <!-- generated from catalog/domain-skills.json; do not edit -->
 
-# 재산세 토지·주택 기초조사
+# 재산세 토지·주택 조회 차단 안내
 
 - Domain: **세무**
 - 내부 capability: `land-housing-geospatial-research`
@@ -150,6 +150,11 @@ metadata:
 }
 ```
 <!-- kgov-runtime-binding:end -->
+
+## 업무별 추가 체크
+
+- exact dataset profile 미선언으로 토지·주택 자료 조회는 차단되며 빈 fixture records는 실제 검색 0건이 아님
+- 재산세 기초자료·공시값·권리관계는 담당기관 수동 확인으로 이관하고 등기발급·청약·계약·감정평가를 자동 수행하지 않음
 
 ## 절차
 

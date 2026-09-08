@@ -1,6 +1,6 @@
 ---
 name: healthcare-facility-search
-description: "보건의료 업무의 응급실·검진·장기요양기관 조회 절차. 내부 welfare-health-safety-research capability를 사용하며 read-only 경계를 지킵니다."
+description: "보건의료 업무의 응급실·검진·장기요양기관 조회 차단 안내 절차. 내부 welfare-health-safety-research capability를 사용하며 read-only 경계를 지킵니다."
 metadata:
   domain: "보건의료"
   capability: "welfare-health-safety-research"
@@ -11,7 +11,7 @@ metadata:
 
 <!-- generated from catalog/domain-skills.json; do not edit -->
 
-# 응급실·검진·장기요양기관 조회
+# 응급실·검진·장기요양기관 조회 차단 안내
 
 - Domain: **보건의료**
 - 내부 capability: `welfare-health-safety-research`
@@ -150,6 +150,11 @@ metadata:
 }
 ```
 <!-- kgov-runtime-binding:end -->
+
+## 업무별 추가 체크
+
+- exact dataset profile 미선언으로 의료기관 정보 조회는 차단되며 빈 fixture records는 실제 검색 0건이나 가용 병상 정보가 아님
+- 기관 운영·이용 가능 여부는 담당기관에 수동 확인하고 진단·복약은 의료진, 긴급 상황은 공식 긴급전화로 이관
 
 ## 절차
 

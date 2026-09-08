@@ -1,6 +1,6 @@
 ---
 name: business-tax-status-lookup
-description: "세무 업무의 사업자·체납 상태조회 절차. 내부 official-source-research capability를 사용하며 read-only 경계를 지킵니다."
+description: "세무 업무의 사업자·체납 안내 페이지 메타데이터 확인 절차. 내부 official-source-research capability를 사용하며 read-only 경계를 지킵니다."
 metadata:
   domain: "세무"
   capability: "official-source-research"
@@ -11,7 +11,7 @@ metadata:
 
 <!-- generated from catalog/domain-skills.json; do not edit -->
 
-# 사업자·체납 상태조회
+# 사업자·체납 안내 페이지 메타데이터 확인
 
 - Domain: **세무**
 - 내부 capability: `official-source-research`
@@ -171,6 +171,12 @@ metadata:
 }
 ```
 <!-- kgov-runtime-binding:end -->
+
+## 업무별 추가 체크
+
+- inspect-page는 승인된 정부24 URL의 제목·메타데이터만 확인하며 사업자 상태·체납 조회 API가 아님
+- 현재 gov-kr-web 정책은 비활성·미검토 상태로 네트워크 전에 차단되며 fixture는 실제 조회 근거가 아님
+- 사업자 상태·체납 사실 확인과 로그인·민감업무는 담당기관 수동 확인으로 이관
 
 ## 절차
 

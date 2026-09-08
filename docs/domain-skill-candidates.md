@@ -68,10 +68,10 @@
 | 재정 | `adjacent` | `additional` | 국고보조사업 근거 검토 | `national-subsidy-project-evidence-review` | `public-policy-evidence-pack` | — | `draft-only` |
 | 재정 | `adjacent` | `additional` | 재정법령 인용 근거 검토 | `fiscal-law-citation-evidence-review` | `korean-legal-citation-verification` | — | `draft-only` |
 | 재정 | `adjacent` | `additional` | 재정 집행 근거 팩 | `fiscal-budget-execution-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
-| 세무 | `direct` | `primary` | 사업자·체납 상태조회 | `business-tax-status-lookup` | `official-source-research` | `nts-business-registration`, `nts-tax-delinquency` | `read-only` |
+| 세무 | `direct` | `primary` | 사업자·체납 안내 페이지 메타데이터 확인 | `business-tax-status-lookup` | `official-source-research` | `nts-business-registration`, `nts-tax-delinquency` | `read-only` |
 | 세무 | `direct` | `additional` | 세법령·개정 의안 조사 | `tax-law-bill-research` | `korean-law-bill-research` | — | `read-only` |
 | 세무 | `direct` | `additional` | 국세통계 조회 | `national-tax-statistics-lookup` | `kosis-official-statistics` | — | `read-only` |
-| 세무 | `direct` | `additional` | 재산세 토지·주택 기초조사 | `property-tax-land-housing-research` | `land-housing-geospatial-research` | — | `read-only` |
+| 세무 | `direct` | `additional` | 재산세 토지·주택 조회 차단 안내 | `property-tax-land-housing-research` | `land-housing-geospatial-research` | — | `read-only` |
 | 세무 | `direct` | `additional` | 국세청·홈택스 공식안내·유권해석 검색 | `hometax-official-guidance-search` | `official-source-research` | — | `read-only` |
 | 세무 | `direct` | `additional` | 지방세 조례·세율 검색 | `local-tax-ordinance-search` | `korean-law-bill-research` | — | `read-only` |
 | 세무 | `direct` | `additional` | 세무 민원 분류·답변 초안 | `tax-civil-complaint-triage-draft` | `civil-complaint-triage-draft` | — | `draft-only` |
@@ -113,7 +113,7 @@
 | 선거관리 | `direct` | `additional` | 선거결과 통계 근거 브리프 | `election-result-statistics-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 선거관리 | `direct` | `additional` | 선거법령 인용 검증 | `election-law-citation-verification` | `korean-legal-citation-verification` | — | `draft-only` |
 | 선거관리 | `direct` | `additional` | 선거기록 정보공개·마스킹 검토 | `election-records-disclosure-redaction-review` | `public-record-disclosure-redaction-review` | — | `draft-only` |
-| 입법 | `direct` | `primary` | 국회 의안·표결 조회 | `assembly-bill-vote-lookup` | `korean-law-bill-research` | `assembly-bill-vote-search` | `read-only` |
+| 입법 | `direct` | `primary` | 입법 참고용 법령 검색 결과 확인 | `assembly-bill-vote-lookup` | `korean-law-bill-research` | `assembly-bill-vote-search` | `read-only` |
 | 입법 | `direct` | `additional` | 법안 비교·영향 근거 브리프 | `bill-comparison-impact-brief` | `korean-law-bill-research` | — | `draft-only` |
 | 입법 | `direct` | `additional` | 상임위원회 회의록 근거 팩 | `committee-minutes-evidence-pack` | `korean-law-bill-research` | — | `draft-only` |
 | 입법 | `direct` | `additional` | 입법기록 정보공개·마스킹 검토 | `legislative-records-disclosure-redaction-review` | `public-record-disclosure-redaction-review` | — | `draft-only` |
@@ -203,7 +203,7 @@
 | 교육행정 | `direct` | `additional` | 학교시설 안전계획 검토 | `school-facility-safety-plan-review` | `administrative-document-draft-review` | — | `draft-only` |
 | 교육행정 | `direct` | `additional` | 교육기록 정보공개·마스킹 검토 | `education-records-disclosure-redaction-review` | `public-record-disclosure-redaction-review` | — | `draft-only` |
 | 교육행정 | `direct` | `additional` | 교육기록 생애주기 검토 | `education-records-lifecycle-review` | `public-records-lifecycle-review` | — | `draft-only` |
-| 사회복지 | `direct` | `primary` | 복지·연금·지원정보 조회 | `welfare-pension-support-search` | `welfare-health-safety-research` | `national-pension-workplace`, `donation-place-search`, `korean-scholarship-search` | `read-only` |
+| 사회복지 | `direct` | `primary` | 복지·연금·지원정보 조회 차단 안내 | `welfare-pension-support-search` | `welfare-health-safety-research` | `national-pension-workplace`, `donation-place-search`, `korean-scholarship-search` | `read-only` |
 | 사회복지 | `direct` | `additional` | 복지 민원 분류·답변 초안 | `welfare-civil-complaint-triage-draft` | `civil-complaint-triage-draft` | — | `draft-only` |
 | 사회복지 | `direct` | `additional` | 복지 자격요건 근거 사전점검 | `welfare-eligibility-evidence-check` | `public-policy-evidence-pack` | — | `draft-only` |
 | 사회복지 | `direct` | `additional` | 복지정책 통계 근거 브리프 | `welfare-policy-statistics-brief` | `kosis-official-statistics` | — | `draft-only` |
@@ -213,7 +213,7 @@
 | 고용노동 | `direct` | `additional` | 산업재해 통계 근거 브리프 | `industrial-accident-statistics-brief` | `kosis-official-statistics` | — | `draft-only` |
 | 고용노동 | `direct` | `additional` | 노동법 인용 근거 검토 | `labor-law-citation-evidence-review` | `korean-legal-citation-verification` | — | `draft-only` |
 | 고용노동 | `direct` | `additional` | 사업장 안전정책 근거 팩 | `workplace-safety-policy-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
-| 보건의료 | `direct` | `primary` | 응급실·검진·장기요양기관 조회 | `healthcare-facility-search` | `welfare-health-safety-research` | `emergency-room-beds`, `nhis-care-checkup-search` | `read-only` |
+| 보건의료 | `direct` | `primary` | 응급실·검진·장기요양기관 조회 차단 안내 | `healthcare-facility-search` | `welfare-health-safety-research` | `emergency-room-beds`, `nhis-care-checkup-search` | `read-only` |
 | 보건의료 | `direct` | `additional` | 보건의료 정책통계 브리프 | `healthcare-policy-statistics-brief` | `kosis-official-statistics` | — | `draft-only` |
 | 보건의료 | `direct` | `additional` | 급여기준 근거 팩 | `medical-benefit-criteria-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
 | 보건의료 | `direct` | `additional` | 보건의료 민원 분류·답변 초안 | `healthcare-civil-complaint-triage-draft` | `civil-complaint-triage-draft` | — | `draft-only` |
@@ -313,7 +313,7 @@
 | 과학기술 | `adjacent` | `additional` | 과학기술 영향 근거 팩 | `technology-impact-evidence-pack` | `public-policy-evidence-pack` | — | `draft-only` |
 | 과학기술 | `adjacent` | `additional` | 과학기술 절차·근거 검토 | `science-technology-procedure-evidence-review` | `administrative-document-draft-review` | — | `draft-only` |
 | 과학기술 | `adjacent` | `additional` | 과학기술 통계·성과 브리프 | `science-technology-statistics-evidence-brief` | `kosis-official-statistics` | — | `draft-only` |
-| 특허 | `direct` | `primary` | KIPRIS 특허 조회 | `korean-patent-lookup` | `patent-prior-art-evidence-pack` | `korean-patent-search` | `read-only` |
+| 특허 | `direct` | `primary` | 특허 선행기술 근거 입력 검토 접수 | `korean-patent-lookup` | `patent-prior-art-evidence-pack` | `korean-patent-search` | `read-only` |
 | 특허 | `direct` | `additional` | 특허 청구항 인용 근거 검토 | `patent-claim-citation-evidence-review` | `patent-prior-art-evidence-pack` | — | `draft-only` |
 | 특허 | `direct` | `additional` | 지식재산 정책통계 근거 브리프 | `ip-policy-statistics-evidence-brief` | `public-policy-evidence-pack` | — | `draft-only` |
 | 특허 | `direct` | `additional` | 특허 절차·근거 검토 | `patent-procedure-evidence-review` | `patent-prior-art-evidence-pack` | — | `draft-only` |

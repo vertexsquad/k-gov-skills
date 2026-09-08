@@ -1,6 +1,6 @@
 ---
 name: korean-patent-lookup
-description: "특허 업무의 KIPRIS 특허 조회 절차. 내부 patent-prior-art-evidence-pack capability를 사용하며 read-only 경계를 지킵니다."
+description: "특허 업무의 특허 선행기술 근거 입력 검토 접수 절차. 내부 patent-prior-art-evidence-pack capability를 사용하며 read-only 경계를 지킵니다."
 metadata:
   domain: "특허"
   capability: "patent-prior-art-evidence-pack"
@@ -11,7 +11,7 @@ metadata:
 
 <!-- generated from catalog/domain-skills.json; do not edit -->
 
-# KIPRIS 특허 조회
+# 특허 선행기술 근거 입력 검토 접수
 
 - Domain: **특허**
 - 내부 capability: `patent-prior-art-evidence-pack`
@@ -209,8 +209,9 @@ metadata:
 
 ## 업무별 추가 체크
 
-- KIPRIS 검색 결과와 공개번호·공개일을 보존
-- 청구항 요소별 관련 문헌·인용 위치를 구조화
+- review-case는 사용자가 제공한 비식별 근거 입력의 로컬 admission이며 특허 검색·문헌 조회가 아님
+- 공개번호·공개일·청구항별 인용 위치·문헌 누락은 반환된 required_checks에 따라 담당자가 별도 검토
+- 별도 inspect-source도 URL 페이지 메타데이터 확인일 뿐 검색 엔진이 아니며 현재 KIPRIS/KIPO 정책 비활성으로 차단됨
 - 신규성·진보성·침해 판단은 변리사 검토로 이관
 
 ## 절차
