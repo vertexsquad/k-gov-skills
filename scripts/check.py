@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import stat
 import subprocess
 import sys
 from pathlib import Path
@@ -69,16 +70,30 @@ def check_diff_whitespace() -> None:
     print("WARN git diff --check unavailable on iCloud index; direct modified-file check passed", file=sys.stderr)
 
 def scan_secrets() -> None:
+    def walk_error(error: OSError) -> None:
+        relative = Path(error.filename or ROOT).relative_to(ROOT)
+        raise SystemExit(f"secret scan incomplete: {relative}") from None
+
     hits: list[str] = []
-    for path in ROOT.rglob("*"):
-        if not path.is_file() or any(part in {".git", ".ruff_cache", "__pycache__"} for part in path.parts):
-            continue
-        try:
-            body = path.read_bytes()
-        except OSError:
-            continue
-        if any(pattern.search(body) for pattern in SECRET_PATTERNS):
-            hits.append(str(path.relative_to(ROOT)))
+    excluded = {".git", ".ruff_cache", "__pycache__"}
+    for directory, dirs, files in os.walk(ROOT, onerror=walk_error, followlinks=False):
+        dirs[:] = [name for name in dirs if name not in excluded]
+        for name in sorted(dirs + files):
+            if name in excluded:
+                continue
+            path = Path(directory) / name
+            relative = path.relative_to(ROOT)
+            try:
+                mode = path.lstat().st_mode
+                if stat.S_ISDIR(mode):
+                    continue
+                if not stat.S_ISREG(mode):
+                    raise SystemExit(f"secret scan incomplete: {relative}")
+                body = path.read_bytes()
+            except OSError:
+                raise SystemExit(f"secret scan incomplete: {relative}") from None
+            if any(pattern.search(body) for pattern in SECRET_PATTERNS):
+                hits.append(str(relative))
     if hits:
         raise SystemExit(f"secret pattern hits: {', '.join(sorted(hits))}")
 

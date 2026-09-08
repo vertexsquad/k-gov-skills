@@ -18,10 +18,12 @@ import unittest
 from collections import Counter
 from datetime import date
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from scripts import check  # noqa: E402
 from scripts.render_catalog import render_catalog  # noqa: E402
 from scripts.render_domain_skills import expected_domain_skills  # noqa: E402
 from scripts.validate_catalog import validate  # noqa: E402
@@ -35,6 +37,199 @@ STRICT_CLI_OWNED_PATHS = (
 )
 
 
+def copy_repository_inputs(destination: Path) -> None:
+    """Copy indexed input paths using working-tree bytes, never ambient files."""
+    listed = subprocess.run(
+        ["git", "ls-files", "-z", "--", "AGENTS.md", "CLAUDE.md", "README.md",
+         "catalog", "docs", "domains", "kgov_runtime", "scripts", "tests"],
+        cwd=ROOT, check=True, capture_output=True,
+    )
+    for raw in listed.stdout.split(b"\0")[:-1]:
+        relative = Path(os.fsdecode(raw))
+        source = ROOT / relative
+        if any((ROOT / part).is_symlink() for part in (relative, *relative.parents)):
+            raise ValueError(f"symlink repository input: {relative}")
+        if not source.is_file():
+            raise ValueError(f"non-regular repository input: {relative}")
+        target = destination / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
+
+
+class RepositoryCheckTest(unittest.TestCase):
+    def test_scan_detects_patterns_but_prunes_existing_exclusions(self) -> None:
+        patterns = (
+            b"ghp_" + b"A" * 20, b"github_pat_" + b"B" * 20,
+            b"AKIA" + b"C" * 16, b"-----BEGIN " + b"PRIVATE KEY-----",
+        )
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            for name in (".git", ".ruff_cache", "__pycache__"):
+                directory = root / name
+                directory.mkdir()
+                (directory / "ignored").write_bytes(patterns[0])
+                (directory / "dangling").symlink_to("missing")
+            with patch.object(check, "ROOT", root):
+                self.assertIsNone(check.scan_secrets())
+                for body in patterns:
+                    with self.subTest(body=body[:4]):
+                        (root / "input").write_bytes(body)
+                        with self.assertRaises(SystemExit) as caught:
+                            check.scan_secrets()
+                        self.assertIn("input", str(caught.exception))
+                        self.assertNotIn(body.decode(), str(caught.exception))
+                        self.assertNotIn(str(root), str(caught.exception))
+
+    def test_scan_rejects_nonregular_files_without_reading(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            os.mkfifo(root / "pipe")
+            with patch.object(check, "ROOT", root), patch.object(Path, "read_bytes") as read:
+                with self.assertRaises(SystemExit):
+                    check.scan_secrets()
+                read.assert_not_called()
+
+    def test_scan_read_failure_is_not_a_clean_scan(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            path = root / "nested/input.txt"
+            path.parent.mkdir()
+            path.write_bytes(b"clean")
+            with patch.object(check, "ROOT", root):
+                self.assertIsNone(check.scan_secrets())
+                with patch.object(
+                    Path, "read_bytes",
+                    side_effect=PermissionError(13, "PRIVATE_ERROR_DETAIL", str(path)),
+                ) as read:
+                    with self.assertRaises(SystemExit) as caught:
+                        check.scan_secrets()
+                read.assert_called_once()
+                self.assertIn("nested/input.txt", str(caught.exception))
+                self.assertNotIn(str(root), str(caught.exception))
+                self.assertNotIn("PRIVATE_ERROR_DETAIL", str(caught.exception))
+
+    def test_scan_rejects_symlinks_without_reading_targets(self) -> None:
+        for target in ("inside.txt", "../outside.txt", "../outside", "../missing", "link"):
+            with self.subTest(target=target), tempfile.TemporaryDirectory() as temp:
+                parent = Path(temp)
+                root = parent / "repo"
+                root.mkdir()
+                (root / "inside.txt").write_bytes(b"clean")
+                (parent / "outside.txt").write_bytes(b"outside")
+                (parent / "outside").mkdir()
+                (root / "link").symlink_to(target)
+                read_bytes = Path.read_bytes
+
+                def guarded_read(path: Path) -> bytes:
+                    self.assertFalse(path.is_symlink(), "symlink target was read")
+                    self.assertTrue(path.is_relative_to(root))
+                    return read_bytes(path)
+
+                with patch.object(check, "ROOT", root), patch.object(Path, "read_bytes", guarded_read):
+                    with self.assertRaises(SystemExit) as caught:
+                        check.scan_secrets()
+                self.assertIn("link", str(caught.exception))
+                self.assertNotIn(str(parent), str(caught.exception))
+                self.assertNotIn("outside", str(caught.exception))
+
+    def test_scan_directory_read_failure_is_not_a_clean_scan(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            blocked = root / "nested"
+            blocked.mkdir()
+            scandir = os.scandir
+
+            def guarded_scandir(path):
+                if Path(path) == blocked:
+                    raise PermissionError(13, "PRIVATE_ERROR_DETAIL", str(path))
+                return scandir(path)
+
+            with patch.object(check, "ROOT", root), patch.object(os, "scandir", guarded_scandir):
+                with self.assertRaises(SystemExit) as caught:
+                    check.scan_secrets()
+            self.assertIn("nested", str(caught.exception))
+            self.assertNotIn(str(root), str(caught.exception))
+            self.assertNotIn("PRIVATE_ERROR_DETAIL", str(caught.exception))
+
+
+class RepositoryCopyTest(unittest.TestCase):
+    def setUp(self) -> None:
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        self.root = Path(temp.name) / "source"
+        self.root.mkdir()
+        self.source = self.root / "docs/owned.md"
+        self.source.parent.mkdir()
+        self.source.write_bytes(b"indexed bytes")
+        subprocess.run(["git", "init", "-q", str(self.root)], check=True, capture_output=True)
+        subprocess.run(["git", "add", "docs/owned.md"], cwd=self.root, check=True, capture_output=True)
+        self.helper = CatalogContractTest()
+        self.addCleanup(self.helper.doCleanups)
+        self.enterContext(patch(__name__ + ".ROOT", self.root))
+
+    def test_copy_uses_current_input_bytes_and_excludes_ambient_files(self) -> None:
+        current = b"working tree\r\n\xff\x00"
+        self.source.write_bytes(current)
+        for name in (".env", "docs/ambient.md", ".omo/evidence.md", "tests/fixtures/ambient.json"):
+            path = self.root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b"ambient")
+        subprocess.run(
+            ["git", "add", ".env", ".omo/evidence.md"],
+            cwd=self.root, check=True, capture_output=True,
+        )
+        temp = self.helper.copied_repo()
+        self.addCleanup(temp.cleanup)
+        destination = Path(temp.name) / "repo"
+        self.assertEqual(current, (destination / "docs/owned.md").read_bytes())
+        self.assertEqual(
+            ["docs/owned.md"],
+            sorted(path.relative_to(destination).as_posix() for path in destination.rglob("*") if path.is_file()),
+        )
+
+    def test_copy_excludes_ambient_symlinks(self) -> None:
+        outside = self.root.parent / "outside"
+        outside.mkdir()
+        (outside / "input").write_bytes(b"outside")
+        for target in ("docs/owned.md", "../outside", "../outside/input", "../missing"):
+            with self.subTest(target=target):
+                link = self.root / "ambient"
+                link.symlink_to(target)
+                try:
+                    temp = self.helper.copied_repo()
+                    self.addCleanup(temp.cleanup)
+                    self.assertFalse(os.path.lexists(Path(temp.name) / "repo/ambient"))
+                finally:
+                    link.unlink()
+
+    def test_copy_rejects_selected_symlinks_and_symlink_parents(self) -> None:
+        outside = self.root.parent / "outside"
+        outside.mkdir()
+        (outside / "owned.md").write_bytes(b"outside")
+        (self.root / "inside.md").write_bytes(b"inside")
+        self.source.unlink()
+        for target in ("../inside.md", "../../outside/owned.md", "missing", "owned.md"):
+            with self.subTest(target=target):
+                self.source.symlink_to(target)
+                try:
+                    with self.assertRaises(ValueError):
+                        self.helper.copied_repo()
+                finally:
+                    self.source.unlink()
+        self.source.parent.rmdir()
+        self.source.parent.symlink_to(outside, target_is_directory=True)
+        with self.assertRaises(ValueError):
+            self.helper.copied_repo()
+
+    def test_copy_rejects_missing_or_nonregular_selected_inputs(self) -> None:
+        self.source.unlink()
+        with self.assertRaises(ValueError):
+            self.helper.copied_repo()
+        os.mkfifo(self.source)
+        with self.assertRaises(ValueError):
+            self.helper.copied_repo()
+
+
 class CatalogContractTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -42,21 +237,8 @@ class CatalogContractTest(unittest.TestCase):
 
     def copied_repo(self) -> tempfile.TemporaryDirectory[str]:
         temp = tempfile.TemporaryDirectory()
-        shutil.copytree(
-            ROOT,
-            Path(temp.name) / "repo",
-            ignore=shutil.ignore_patterns(
-                ".git",
-                ".ruff_cache",
-                ".pytest_cache",
-                "__pycache__",
-                "*.pyc",
-                "landing-page*.png",
-                "landing-page*.html",
-                "landing-page*.md",
-            ),
-            dirs_exist_ok=True,
-        )
+        self.addCleanup(temp.cleanup)
+        copy_repository_inputs(Path(temp.name) / "repo")
         return temp
 
     def assert_cross_domain_move_errors(
@@ -4529,7 +4711,7 @@ class CatalogV6IntegrationTest(unittest.TestCase):
                 temp = tempfile.TemporaryDirectory()
                 self.addCleanup(temp.cleanup)
                 root = Path(temp.name) / "repo"
-                shutil.copytree(ROOT, root)
+                copy_repository_inputs(root)
                 mutate(root)
                 errors = validate(self.data, root, on_date=date(2026, 9, 5))
                 self.assertEqual(expected, errors)
@@ -4563,7 +4745,7 @@ class CatalogV6IntegrationTest(unittest.TestCase):
             with self.subTest(name=name):
                 with tempfile.TemporaryDirectory() as temp:
                     root = Path(temp) / "repo"
-                    shutil.copytree(ROOT, root)
+                    copy_repository_inputs(root)
                     path = root / relative
                     self.assertTrue(path.is_file())
                     self.assertFalse(path.is_symlink())
