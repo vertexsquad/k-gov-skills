@@ -925,6 +925,10 @@ def _as_record_list(value: Any, label: str) -> list[dict[str, Any]]:
 
 
 def _positive_int(value: Any, label: str) -> int:
+    if type(value) not in (int, str) or (
+        isinstance(value, str) and re.fullmatch(r"[0-9]+", value) is None
+    ):
+        raise ValueError(f"official {label} schema is invalid")
     try:
         parsed = int(value)
     except (TypeError, ValueError) as exc:
