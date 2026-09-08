@@ -16,7 +16,7 @@ import ssl
 import unicodedata
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
-from http.client import HTTPSConnection
+from http.client import HTTPException, HTTPSConnection
 from typing import Any, Final, Generic, Literal, Protocol, TypeVar
 from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
@@ -719,7 +719,13 @@ class HttpPolicyEnforcer:
                 allowed = _robots_allowed(
                     _read(response, _MAX_ROBOTS_BYTES), request.url
                 )
-            except (UnicodeDecodeError, ValueError, ResponseTooLargeError) as exc:
+            except (
+                UnicodeDecodeError,
+                ValueError,
+                ResponseTooLargeError,
+                HTTPException,
+                OSError,
+            ) as exc:
                 raise ReadOnlyHttpError("robots-denied") from exc
         if not allowed:
             raise ReadOnlyHttpError("robots-denied")
@@ -762,6 +768,8 @@ class HttpPolicyEnforcer:
                 body = _read(response, expected.max_bytes)
             except ResponseTooLargeError as exc:
                 raise ReadOnlyHttpError("response-invalid") from exc
+            except (HTTPException, OSError) as exc:
+                raise ReadOnlyHttpError("upstream-unavailable") from exc
         if b"captcha" in body.lower() or b"recaptcha" in body.lower():
             raise ReadOnlyHttpError("upstream-403-manual")
         return body, status, media

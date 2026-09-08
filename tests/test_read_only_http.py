@@ -11,13 +11,16 @@ import os
 import socket
 import ssl
 import unittest
+from collections.abc import Iterator
+from contextlib import contextmanager
 from dataclasses import replace
 from datetime import date
+from http.client import HTTPResponse, IncompleteRead
 from typing import Any, TypedDict
 from urllib.error import URLError
 from urllib.request import ProxyHandler, Request
 
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import kgov_runtime
 from kgov_runtime.json_adapter import JsonAdapterConfig, query_json
@@ -26,6 +29,7 @@ from kgov_runtime.http import (
     HttpTransport,
     ReadOnlyHttpError,
     RejectRedirectHandler,
+    SourceReceipt,
     SourceRequest,
     UnsafeEndpointError,
     _policy_urlopen,
@@ -160,6 +164,21 @@ class Response:
         return self.body if limit < 0 else self.body[:limit]
 
 
+@contextmanager
+def wire_response(payload: bytes, *, timeout: bool = False) -> Iterator[HTTPResponse]:
+    """Feed real HTTP parsing through local sockets; optionally withhold body EOF."""
+    reader, writer = socket.socketpair()
+    with reader, writer:
+        reader.settimeout(0.01 if timeout else 1.0)
+        writer.settimeout(1.0)
+        writer.sendall(payload)
+        if not timeout:
+            writer.shutdown(socket.SHUT_WR)
+        with HTTPResponse(reader) as response:
+            response.begin()
+            yield response
+
+
 class FakeState:
     def __init__(self) -> None:
         self.opens = 0
@@ -261,6 +280,161 @@ class ReadOnlyHttpTest(unittest.TestCase):
                 result.source_receipt.outcome,
             ),
         )
+
+    def test_body_read_failures_stop_before_projection_or_receipt(self) -> None:
+        for method in ("fetch_text", "fetch_json"):
+            for robots in (True, False):
+                for timeout in (False, True):
+                    registry, state, opened = (
+                        self.registry(media_type="application/json"),
+                        FakeState(),
+                        [],
+                    )
+                    media = "text/plain" if robots else "application/json"
+                    body = b"User-agent: *\nAllow: /\n" if robots else b'{"title":"ok"}'
+                    payload = (
+                        (
+                            f"HTTP/1.1 200 OK\r\nContent-Type: {media}\r\n"
+                            f"Transfer-Encoding: chunked\r\n\r\n{len(body):x}\r\n"
+                        ).encode()
+                        + body
+                        + b"\r\n20\r\nsynthetic-body-marker"
+                    )
+                    projector, results = Mock(), []
+                    with (
+                        self.subTest(method=method, robots=robots, timeout=timeout),
+                        wire_response(payload, timeout=timeout) as response,
+                        patch(
+                            "kgov_runtime.http.SourceReceipt", wraps=SourceReceipt
+                        ) as receipt,
+                    ):
+                        responses = (
+                            []
+                            if robots
+                            else [
+                                Response(
+                                    b"User-agent: *\nAllow: /\n",
+                                    media_type="text/plain",
+                                )
+                            ]
+                        )
+                        responses.append(response)
+                        enforcer = self.enforcer(registry, responses, state, opened)
+                        with self.assertRaises(ReadOnlyHttpError) as raised:
+                            results.append(
+                                getattr(enforcer, method)(
+                                    SourceRequest(
+                                        "https://www.example.go.kr/page",
+                                        OPERATION,
+                                        registry.policies[0],
+                                    ),
+                                    projector,
+                                )
+                            )
+                        expected = "robots-denied" if robots else "upstream-unavailable"
+                        self.assertEqual(
+                            (expected, expected),
+                            (raised.exception.status, str(raised.exception)),
+                        )
+                        self.assertIsInstance(
+                            raised.exception.__cause__,
+                            TimeoutError if timeout else IncompleteRead,
+                        )
+                        self.assertTrue(response.isclosed())
+                        projector.assert_not_called()
+                        receipt.assert_not_called()
+                        self.assertEqual([], results)
+                        expected_urls = ["https://www.example.go.kr/robots.txt"]
+                        if not robots:
+                            expected_urls.append("https://www.example.go.kr/page")
+                        self.assertEqual(
+                            (len(expected_urls), expected_urls), (state.opens, opened)
+                        )
+
+    def test_complete_chunked_responses_still_project_and_return_receipt(self) -> None:
+        for method in ("fetch_text", "fetch_json"):
+            registry, state = self.registry(media_type="application/json"), FakeState()
+            with (
+                self.subTest(method=method),
+                wire_response(
+                    b"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n"
+                    b"Transfer-Encoding: chunked\r\n\r\n17\r\n"
+                    b"User-agent: *\nAllow: /\n\r\n0\r\n\r\n"
+                ) as robots,
+                wire_response(
+                    b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n"
+                    b"Transfer-Encoding: chunked\r\n\r\ne\r\n"
+                    b'{"title":"ok"}\r\n0\r\n\r\n'
+                ) as target,
+            ):
+                enforcer = self.enforcer(registry, [robots, target], state)
+                projector = Mock(
+                    side_effect=(
+                        (lambda document: json.loads(document.text))
+                        if method == "fetch_text"
+                        else (lambda value: value)
+                    )
+                )
+                result = getattr(enforcer, method)(
+                    SourceRequest(
+                        "https://www.example.go.kr/page",
+                        OPERATION,
+                        registry.policies[0],
+                    ),
+                    projector,
+                )
+                self.assertEqual({"title": "ok"}, result.value)
+                self.assertEqual(
+                    (OPERATION, "allowed", 2),
+                    (
+                        result.source_receipt.operation_id,
+                        result.source_receipt.outcome,
+                        state.opens,
+                    ),
+                )
+                projector.assert_called_once()
+                self.assertTrue(robots.isclosed() and target.isclosed())
+
+    def test_opener_errors_keep_policy_and_upstream_statuses(self) -> None:
+        for robots in (True, False):
+            for error_type in (URLError, TimeoutError):
+                registry, state = self.registry(), FakeState()
+                responses = (
+                    []
+                    if robots
+                    else [
+                        Response(b"User-agent: *\nAllow: /\n", media_type="text/plain")
+                    ]
+                )
+                responses.append(error_type("synthetic-upstream-marker"))
+                opener, projector = Mock(side_effect=responses), Mock()
+                enforcer = HttpPolicyEnforcer(
+                    registry, state, HttpTransport(opener, lambda _host: ["1.1.1.1"])
+                )
+                with (
+                    self.subTest(robots=robots, error=error_type.__name__),
+                    patch(
+                        "kgov_runtime.http.SourceReceipt", wraps=SourceReceipt
+                    ) as receipt,
+                    self.assertRaises(ReadOnlyHttpError) as raised,
+                ):
+                    enforcer.fetch_text(
+                        SourceRequest(
+                            "https://www.example.go.kr/page",
+                            OPERATION,
+                            registry.policies[0],
+                        ),
+                        projector,
+                    )
+                expected = "robots-denied" if robots else "upstream-unavailable"
+                self.assertEqual(
+                    (expected, expected),
+                    (raised.exception.status, str(raised.exception)),
+                )
+                self.assertEqual(1 if robots else 2, state.opens)
+                self.assertEqual(state.opens, opener.call_count)
+                projector.assert_not_called()
+                receipt.assert_not_called()
 
     def test_robots_uses_longest_rule_with_allow_winning_equal_length(self) -> None:
         rules = b"User-agent: *\nDisallow: /private\nAllow: /private/public\nDisallow: /equal\nAllow: /equal\n"

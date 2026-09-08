@@ -16,7 +16,7 @@ from kgov_runtime.capabilities import official_source_research as adapter
 from kgov_runtime.http import HttpPolicyEnforcer, HttpTransport, ReadOnlyHttpError
 from kgov_runtime.policy_state import PolicyState
 from kgov_runtime.source_policy import SourcePolicyRegistry
-from tests.test_read_only_http import Response, reviewed_catalog
+from tests.test_read_only_http import Response, reviewed_catalog, wire_response
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = (
@@ -131,6 +131,100 @@ class AdapterTest(unittest.TestCase):
                 result["source_receipt"]["outcome"],
             ),
         )
+
+    def test_main_handles_real_target_body_failures_and_complete_control(self) -> None:
+        catalog = reviewed_catalog()
+        catalog["source_policies"][0]["id"] = "gov-kr-web"
+        contract = catalog["runtime_contracts"][0]
+        contract.update(
+            id="kgov/official-source-research/v1",
+            capability_slug="official-source-research",
+            module="kgov_runtime.capabilities.official_source_research",
+            default_operation_id=adapter.OPERATION_ID,
+        )
+        contract["operations"][0].update(
+            id=adapter.OPERATION_ID, source_policy_ids=["gov-kr-web"]
+        )
+        catalog["shared_capabilities"][0].update(
+            slug="official-source-research",
+            source_policy_ids=["gov-kr-web"],
+            runtime_contract_id="kgov/official-source-research/v1",
+        )
+        body = b"<title>Synthetic</title>"
+        for complete, timeout in ((False, False), (False, True), (True, False)):
+            payload = (
+                (
+                    f"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n"
+                    f"Transfer-Encoding: chunked\r\n\r\n{len(body):x}\r\n"
+                ).encode()
+                + body
+                + b"\r\n"
+            )
+            payload += b"0\r\n\r\n" if complete else b"20\r\nsynthetic-body-marker"
+            stdout, stderr = io.StringIO(), io.StringIO()
+            with (
+                self.subTest(complete=complete, timeout=timeout),
+                tempfile.TemporaryDirectory() as directory,
+                wire_response(
+                    b"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n"
+                    b"Content-Length: 23\r\n\r\nUser-agent: *\nAllow: /\n"
+                ) as robots,
+                wire_response(payload, timeout=timeout) as target,
+            ):
+                catalog_path = Path(directory) / "catalog.json"
+                catalog_path.write_text(json.dumps(catalog), encoding="utf-8")
+                with (
+                    patch.object(adapter, "CATALOG", catalog_path),
+                    patch.object(
+                        adapter, "date", **{"today.return_value": date(2026, 9, 7)}
+                    ),
+                    patch.dict(
+                        os.environ,
+                        {
+                            "KGOV_POLICY_STATE_PATH": str(
+                                Path(directory) / "state.sqlite3"
+                            )
+                        },
+                    ),
+                    patch(
+                        "kgov_runtime.http._network_resolver", return_value=["1.1.1.1"]
+                    ),
+                    patch(
+                        "kgov_runtime.http._policy_urlopen",
+                        side_effect=[robots, target],
+                    ) as opener,
+                    patch.object(
+                        adapter, "_project", wraps=adapter._project
+                    ) as projector,
+                    patch.object(
+                        sys,
+                        "argv",
+                        ["official-source-research", "https://www.example.go.kr/page"],
+                    ),
+                    patch.object(sys, "stdout", stdout),
+                    patch.object(sys, "stderr", stderr),
+                ):
+                    if complete:
+                        self.assertEqual(0, adapter.main())
+                        result = json.loads(stdout.getvalue())
+                        self.assertEqual("Synthetic", result["title"])
+                        self.assertEqual(
+                            hashlib.sha256(body).hexdigest(), result["sha256"]
+                        )
+                        self.assertEqual("allowed", result["source_receipt"]["outcome"])
+                        self.assertEqual("", stderr.getvalue())
+                        projector.assert_called_once()
+                    else:
+                        with self.assertRaises(SystemExit) as raised:
+                            adapter.main()
+                        self.assertEqual(4, raised.exception.code)
+                        self.assertEqual("", stdout.getvalue())
+                        self.assertEqual(
+                            ["ERROR", "upstream-unavailable"], stderr.getvalue().split()
+                        )
+                        projector.assert_not_called()
+                    self.assertEqual(2, opener.call_count)
+                    self.assertTrue(robots.isclosed() and target.isclosed())
 
     def test_cli_fixture_succeeds_and_current_live_policy_exits_three(self) -> None:
         fixture = subprocess.run(
