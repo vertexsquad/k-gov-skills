@@ -608,6 +608,93 @@ class AdapterTest(unittest.TestCase):
                     {"display": 100}, runtime=self.runtime(reflected_opener)
                 )
 
+    def test_search_cli_rejects_invalid_total_counts_before_receipts(self) -> None:
+        # Given malformed counts with coherent coerced pages, plus count mismatches.
+        cases = (
+            (True, 1), (False, 0), (1.5, 1), (2.5, 2), (1.0, 1), (0.0, 0),
+            (-0.5, 0), (-1, 0), ("-1", 0), ("+1", 1), ("-0", 0),
+            (" 1", 1), ("1 ", 1), ("١", 1), ("１", 1), ("0_1", 1),
+            ("1.0", 1), ("1e0", 1), ("", 0), (None, 0), ([], 0), ({}, 0),
+            ("SYNTHETIC_COUNT_MARKER", 0),
+            (0, 1), (2, 1), ("2", 1), (1, 0), ("1", 2),
+        )
+        for kind, envelope, key in (
+            ("law", self.law_search["LawSearch"], "law"),
+            ("precedent", self.prec_search["PrecSearch"], "prec"),
+        ):
+            records = envelope[key]
+            for value, record_count in cases:
+                with self.subTest(kind=kind, value=value, record_count=record_count):
+                    envelope.update(totalCnt=value)
+                    envelope[key] = records[:record_count]
+                    with (
+                        patch.object(sys, "argv", [str(ADAPTER_PATH), f"--search-{kind}"]),
+                        patch.object(self.adapter, "_live_runtime", return_value=self.runtime()),
+                        patch.dict(os.environ, {"LAW_OC": "fixture-secret"}),
+                        redirect_stdout(io.StringIO()) as output,
+                        redirect_stderr(io.StringIO()) as error,
+                    ):
+                        # When the actual enforcer projects the response through the CLI.
+                        exit_code = self.adapter.main()
+                    # Then no successful output, receipt or reflected count escapes.
+                    self.assertEqual(4, exit_code)
+                    self.assertEqual("", output.getvalue())
+                    self.assertEqual(
+                        {
+                            "error": "response-invalid",
+                            "source_receipts": [],
+                            "failed_call": {
+                                "call_kind": f"{kind}-search",
+                                "endpoint": "https://www.law.go.kr/DRF/lawSearch.do",
+                                "citation_id": None,
+                                "page": 1,
+                            },
+                        },
+                        json.loads(error.getvalue()),
+                    )
+
+    def test_search_cli_accepts_integer_and_ascii_decimal_total_counts(self) -> None:
+        # Given valid zero, integer and decimal-string counts, including later pages.
+        cases = (
+            (0, 1, 0), ("0", 1, 0), ("000", 1, 0),
+            (1, 1, 1), ("1", 1, 1), ("01", 1, 1),
+            (2, 1, 2), ("2", 1, 2),
+            (3, 2, 1), ("3", 2, 1), (2, 2, 0),
+        )
+        for kind, envelope, key in (
+            ("law", self.law_search["LawSearch"], "law"),
+            ("precedent", self.prec_search["PrecSearch"], "prec"),
+        ):
+            records = envelope[key]
+            for value, page, record_count in cases:
+                with self.subTest(kind=kind, value=value, page=page):
+                    envelope.update(totalCnt=value)
+                    envelope[key] = records[:record_count]
+                    with (
+                        patch.object(sys, "argv", [
+                            str(ADAPTER_PATH), f"--search-{kind}",
+                            "--param", "display=2", "--param", f"page={page}",
+                        ]),
+                        patch.object(self.adapter, "_live_runtime", return_value=self.runtime()),
+                        patch.dict(os.environ, {"LAW_OC": "fixture-secret"}),
+                        redirect_stdout(io.StringIO()) as output,
+                        redirect_stderr(io.StringIO()) as error,
+                    ):
+                        # When the real CLI retrieves a coherent page through the enforcer.
+                        exit_code = self.adapter.main()
+                    # Then valid counts retain projected records and an allowed receipt.
+                    self.assertEqual(0, exit_code, error.getvalue())
+                    self.assertEqual("", error.getvalue())
+                    result = json.loads(output.getvalue())
+                    self.assertEqual(int(value), result["total_count"])
+                    self.assertIs(type(result["total_count"]), int)
+                    self.assertEqual(record_count, result["count"])
+                    self.assertEqual(record_count, len(result["records"]))
+                    self.assertEqual(1, len(result["source_receipts"]))
+                    self.assertEqual(
+                        "allowed", result["source_receipts"][0]["source_receipt"]["outcome"]
+                    )
+
     def test_unicode_pii_and_output_controls_are_rejected(self) -> None:
         pii = copy.deepcopy(self.valid)
         pii["citations"][0]["candidate"]["law_name"] = "０１０－１２３４－５６７８"
