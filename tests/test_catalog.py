@@ -4829,7 +4829,7 @@ class ActiveCatalogOutputTest(unittest.TestCase):
                 operation = contract.operations[0]
                 # When the executable fixture operation runs through its real surface.
                 result = subprocess.run(
-                    [sys.executable, "-m", contract.module, *operation.fixture_argv],
+                    [sys.executable, "-m", "scripts.offline_fixture", contract.module, *operation.fixture_argv],
                     cwd=ROOT, capture_output=True, text=True, check=False, timeout=20,
                 )
                 # Then the actual output satisfies the catalog-owned closed schema.
@@ -4843,7 +4843,7 @@ class ActiveCatalogOutputTest(unittest.TestCase):
         contract = load_contracts()[0]
         operation = contract.operations[0]
         result = subprocess.run(
-            [sys.executable, "-m", contract.module, "--fixture"],
+            [sys.executable, "-m", "scripts.offline_fixture", contract.module, "--fixture"],
             cwd=ROOT, capture_output=True, text=True, check=True, timeout=20,
         )
         for key, code in (("unexpected", "schema-additional-property"), ("raw", "forbidden-output-key")):

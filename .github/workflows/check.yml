@@ -1,0 +1,36 @@
+name: Check
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: '3.14.6'
+      - name: Install development tools and verify
+        shell: bash
+        run: |
+          python3 --version
+          dev_dir=$(mktemp -d "${TMPDIR:-/tmp}/kgov-dev.XXXXXX")
+          python3 -m venv "$dev_dir/venv"
+          . "$dev_dir/venv/bin/activate"
+          export PIP_CACHE_DIR="$dev_dir/pip-cache"
+          export UV_CACHE_DIR="$dev_dir/uv-cache"
+          export RUFF_CACHE_DIR="$dev_dir/ruff-cache"
+          python3 -m pip install 'uv==0.12.5'
+          uv pip install --group dev
+          uv --version
+          python3 -m ruff --version
+          python3 -m ruff check .
+          python3 scripts/check.py
