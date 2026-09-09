@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import copy
-import importlib.util
 import json
 import subprocess
 import sys
 import unittest
 from pathlib import Path
+
+from kgov_runtime.capabilities import public_policy_evidence_pack as adapter
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -14,18 +15,9 @@ ADAPTER_PATH = REPO_ROOT / "kgov_runtime" / "capabilities" / "public_policy_evid
 FIXTURE_PATH = REPO_ROOT / "tests" / "fixtures" / "capabilities" / "public-policy-evidence-pack.json"
 
 
-def load_adapter():
-    spec = importlib.util.spec_from_file_location("public_policy_evidence_pack_adapter", ADAPTER_PATH)
-    if spec is None or spec.loader is None:
-        raise RuntimeError("adapter import spec is unavailable")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
 class AdapterTest(unittest.TestCase):
     def setUp(self) -> None:
-        self.adapter = load_adapter()
+        self.adapter = adapter
         self.valid = {
             "question": "공공시설 개선 검토에 필요한 공식 근거를 정리합니다.",
             "as_of_date": "2026-07-15",
