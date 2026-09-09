@@ -16,7 +16,7 @@ from kgov_runtime.capabilities import official_source_research as adapter
 from kgov_runtime.http import HttpPolicyEnforcer, HttpTransport, ReadOnlyHttpError
 from kgov_runtime.policy_state import PolicyState
 from kgov_runtime.source_policy import SourcePolicyRegistry
-from tests.test_read_only_http import Response, reviewed_catalog, wire_response
+from tests.test_read_only_http import assert_live_state_initialization, Response, reviewed_catalog, wire_response
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = (
@@ -25,6 +25,12 @@ FIXTURE = (
 
 
 class AdapterTest(unittest.TestCase):
+    def test_live_state_initialization_order_and_error_boundary(self) -> None:
+        assert_live_state_initialization(
+            self, adapter, "gov-kr-web",
+            "https://www.gov.kr/page", ('registry', 'select', 'authorize'),
+        )
+
     def test_fixture_is_explicitly_synthetic_and_contains_no_live_receipt(self) -> None:
         result = json.loads(FIXTURE.read_text(encoding="utf-8"))
         self.assertEqual(

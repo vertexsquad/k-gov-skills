@@ -13,10 +13,12 @@ import os
 import re
 import socket
 import ssl
+import time
 import unicodedata
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
 from http.client import HTTPException, HTTPSConnection
+from pathlib import Path
 from typing import Any, Final, Generic, Literal, Protocol, TypeVar
 from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
@@ -34,6 +36,7 @@ from .policy_state import (
     PolicyDigestMismatchError,
     PolicyId,
     PolicyKey,
+    PolicyState,
     PolicyStateUnavailableError,
     RatePolicy,
     RetryAfterError,
@@ -97,6 +100,14 @@ class ReadOnlyHttpError(RuntimeError):
 
     def __str__(self) -> str:
         return self.status
+
+
+def open_policy_state(path: Path) -> PolicyState:
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        return PolicyState(path, clock=time.time, sleeper=time.sleep)
+    except (OSError, PolicyStateUnavailableError) as exc:
+        raise ReadOnlyHttpError("budget-exhausted") from exc
 
 
 @dataclass(frozen=True, slots=True)

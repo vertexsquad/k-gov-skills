@@ -5,10 +5,8 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 import re
 import sys
-import time
 from datetime import date
 from html import unescape
 from pathlib import Path
@@ -25,9 +23,10 @@ from kgov_runtime.http import (  # noqa: E402
     ReadOnlyHttpError,
     SourceRequest,
     TextDocument,
+    open_policy_state,
     policy_failure_status,
 )
-from kgov_runtime.policy_state import PolicyState, PolicyStateUnavailableError  # noqa: E402
+from kgov_runtime.policy_state import policy_state_path as _state_path  # noqa: E402
 from kgov_runtime.source_policy import SourcePolicy, SourcePolicyRegistry  # noqa: E402
 
 OPERATION_ID = "kgov/official-source-research/inspect-page/v1"
@@ -95,14 +94,6 @@ def inspect_source(
     }
 
 
-def _state_path() -> Path:
-    if configured := os.environ.get("KGOV_POLICY_STATE_PATH"):
-        return Path(configured)
-    if xdg_state := os.environ.get("XDG_STATE_HOME"):
-        return Path(xdg_state) / "k-gov-skills" / "policy-state.sqlite3"
-    return Path.home() / ".local" / "state" / "k-gov-skills" / "policy-state.sqlite3"
-
-
 def _live(url: str) -> OfficialSourceResult:
     registry = SourcePolicyRegistry.from_catalog(
         json.loads(CATALOG.read_text(encoding="utf-8")), on_date=date.today()
@@ -112,11 +103,7 @@ def _live(url: str) -> OfficialSourceResult:
     if not decision.allowed:
         raise ReadOnlyHttpError(policy_failure_status(decision.code))
     state_path = _state_path()
-    try:
-        state_path.parent.mkdir(parents=True, exist_ok=True)
-        state = PolicyState(state_path, clock=time.time, sleeper=time.sleep)
-    except (OSError, PolicyStateUnavailableError) as exc:
-        raise ReadOnlyHttpError("budget-exhausted") from exc
+    state = open_policy_state(state_path)
     return inspect_source(url, policy, HttpPolicyEnforcer(registry, state))
 
 

@@ -23,9 +23,9 @@ from urllib.parse import parse_qs, quote, quote_plus, urlsplit
 from unittest.mock import patch
 
 from kgov_runtime.http import HttpPolicyEnforcer, HttpTransport, ReadOnlyHttpError
-from kgov_runtime.policy_state import PolicyState
+from kgov_runtime.policy_state import PolicyState, policy_state_path
 from kgov_runtime.source_policy import SourcePolicyRegistry
-from tests.test_read_only_http import Response
+from tests.test_read_only_http import assert_live_state_initialization, Response
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -1116,8 +1116,8 @@ class AdapterTest(unittest.TestCase):
             with (
                 self.subTest(args=args),
                 patch.object(sys, "argv", [str(ADAPTER_PATH), *args]),
-                patch.object(
-                    self.adapter, "PolicyState", side_effect=AssertionError("state")
+                patch(
+                    "kgov_runtime.http.PolicyState", side_effect=AssertionError("state")
                 ),
                 patch.object(
                     self.adapter, "build_url", side_effect=AssertionError("credential")
@@ -1248,7 +1248,7 @@ class AdapterTest(unittest.TestCase):
                 "argv",
                 [str(ADAPTER_PATH), "--fixture", "--fixture-path", str(path)],
             ),
-            patch.object(self.adapter.os, "environ") as environment,
+            patch.object(os, "environ") as environment,
             redirect_stderr(io.StringIO()) as error,
             redirect_stdout(io.StringIO()) as output,
         ):
@@ -2905,7 +2905,7 @@ finally:
                 environment["LAW_OC"] = "rotated-secret"
             return self.opener(request, timeout)
 
-        with patch.object(self.adapter.os, "environ", environment):
+        with patch.object(os, "environ", environment):
             # When a later source reflects the credential used for that request.
             with self.assertRaises(self.adapter.LegalExecutionError) as raised:
                 self.adapter.verify_citations(payload, runtime=self.runtime(opener))
@@ -3054,7 +3054,7 @@ finally:
 
     def test_fixture_does_not_consult_or_mutate_credentials(self) -> None:
         # Given a fixture execution with all credential access forbidden.
-        with patch.object(self.adapter.os, "environ") as environment:
+        with patch.object(os, "environ") as environment:
             environment.get.side_effect = lambda key, default=None: (
                 self.fail("credential read") if key == "LAW_OC" else default
             )
@@ -3191,30 +3191,38 @@ finally:
         # Then authorization uses execution date, never historical citation date.
         self.assertEqual(today, parse.call_args.kwargs["on_date"])
 
-    def test_state_path_precedence_matches_the_shared_runtime(self) -> None:
-        # Given explicit override, XDG fallback and home fallback configurations.
-        for environment, expected in (
-            (
-                {
-                    "KGOV_POLICY_STATE_PATH": "/synthetic/explicit.sqlite3",
-                    "XDG_STATE_HOME": "/synthetic/xdg",
-                },
-                Path("/synthetic/explicit.sqlite3"),
-            ),
-            (
-                {"XDG_STATE_HOME": "/synthetic/xdg"},
-                Path("/synthetic/xdg/k-gov-skills/policy-state.sqlite3"),
-            ),
-            ({}, Path.home() / ".local/state/k-gov-skills/policy-state.sqlite3"),
+    def test_live_state_initialization_order_and_error_boundary(self) -> None:
+        assert_live_state_initialization(
+            self, self.adapter, "law-go-kr-drf-api",
+            "https://www.law.go.kr/DRF/lawSearch.do", ('registry', 'authorize', 'select'),
+        )
+
+    def test_state_path_is_the_shared_alias(self) -> None:
+        self.assertIs(policy_state_path, self.adapter._state_path)
+
+    def test_fixture_keeps_its_explicit_state_constructor(self) -> None:
+        with (
+            patch.object(self.adapter, "PolicyState", wraps=PolicyState) as constructor,
+            patch.object(self.adapter, "_state_path", side_effect=self.fail) as resolve,
+            patch.object(self.adapter, "open_policy_state", side_effect=self.fail) as open_state,
+            patch("socket.getaddrinfo", side_effect=self.fail) as dns,
+            patch("kgov_runtime.http._policy_urlopen", side_effect=self.fail) as opener,
+            patch.object(os.environ, "get", side_effect=self.fail) as credential,
         ):
-            with (
-                self.subTest(environment=environment),
-                patch.dict(os.environ, environment, clear=True),
-            ):
-                # When the capability resolves its state location.
-                result = self.adapter._state_path()
-                # Then precedence is identical across capabilities.
-                self.assertEqual(expected, result)
+            result = self.adapter._fixture_result(FIXTURE_PATH)
+        constructor.assert_called_once()
+        self.assertEqual(1000.0, constructor.call_args.kwargs["clock"]())
+        with self.assertRaises(ReadOnlyHttpError) as raised:
+            constructor.call_args.kwargs["sleeper"](1.0)
+        self.assertEqual("budget-exhausted", raised.exception.status)
+        self.assertFalse(constructor.call_args.args[0].exists())
+        self.assertTrue(result["fixture_contract_passed"])
+        self.assertEqual("synthetic-fixture", result["verification_mode"])
+        resolve.assert_not_called()
+        open_state.assert_not_called()
+        dns.assert_not_called()
+        opener.assert_not_called()
+        credential.assert_not_called()
 
     def test_fixture_cli_is_deterministic(self) -> None:
         command = [sys.executable, str(ADAPTER_PATH), "--fixture"]

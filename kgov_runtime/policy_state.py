@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import sqlite3
 from collections.abc import Callable, Iterator
 from contextlib import closing, contextmanager
@@ -89,6 +90,14 @@ class PolicyStateUnavailableError(RuntimeError):
 
 
 Result = TypeVar("Result")
+
+
+def policy_state_path() -> Path:
+    if configured := os.environ.get("KGOV_POLICY_STATE_PATH"):
+        return Path(configured)
+    if xdg_state := os.environ.get("XDG_STATE_HOME"):
+        return Path(xdg_state) / "k-gov-skills/policy-state.sqlite3"
+    return Path.home() / ".local/state/k-gov-skills/policy-state.sqlite3"
 
 
 class PolicyState:

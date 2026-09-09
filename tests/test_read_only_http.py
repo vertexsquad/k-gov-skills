@@ -9,15 +9,19 @@ from __future__ import annotations
 import json
 import os
 import socket
+import sqlite3
 import ssl
 import subprocess
 import sys
+import tempfile
+import time
 import unittest
 from collections.abc import Iterator
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from dataclasses import replace
 from datetime import date
 from http.client import HTTPResponse, IncompleteRead
+from pathlib import Path
 from typing import Any, TypedDict
 from urllib.error import URLError
 from urllib.request import ProxyHandler, Request
@@ -40,9 +44,11 @@ from kgov_runtime.http import (
     build_url,
     fetch_json,
     fetch_text,
+    open_policy_state,
     safe_urlopen,
     validate_public_https_url,
 )
+from kgov_runtime.policy_state import PolicyState, PolicyStateUnavailableError, policy_state_path
 from kgov_runtime.source_policy import SourcePolicyRegistry
 
 OPERATION = "kgov/example/inspect/v1"
@@ -197,7 +203,230 @@ class FakeState:
         return float(value)
 
 
+def assert_live_state_initialization(test, adapter, policy_id, url, expected_order):
+    """Exercise caller-local ordering with real policy parsing and temporary state."""
+    test.assertIs(policy_state_path, adapter._state_path)
+    catalog = reviewed_catalog()
+    slug = adapter.OPERATION_ID.split("/")[1]
+    policy = catalog["source_policies"][0]
+    policy["id"] = policy_id
+    policy["scope"]["origins"] = [url.rsplit("/", 1)[0]]
+    if policy_id == "law-go-kr-drf-api":
+        policy["scope"]["origins"] = ["https://www.law.go.kr"]
+    contract = catalog["runtime_contracts"][0]
+    contract.update(id=f"kgov/{slug}/v1", capability_slug=slug,
+                    module=f"kgov_runtime.capabilities.{slug.replace('-', '_')}",
+                    default_operation_id=adapter.OPERATION_ID)
+    contract["operations"][0].update(id=adapter.OPERATION_ID, source_policy_ids=[policy_id])
+    catalog["shared_capabilities"][0].update(
+        slug=slug, source_policy_ids=[policy_id], runtime_contract_id=contract["id"]
+    )
+    parse = SourcePolicyRegistry.from_catalog
+    with tempfile.TemporaryDirectory() as directory:
+        path = Path(directory) / "nested/state.sqlite3"
+        catalog_path = Path(directory) / "catalog.json"
+        catalog_path.write_text(json.dumps(catalog), encoding="utf-8")
+        registry = parse(catalog, on_date=date(2026, 9, 6))
+        for fault in (None, "path", "mkdir", "state", "untranslated", "enforcer", "denied"):
+            events = []
+            error = PolicyStateUnavailableError(path) if fault == "state" else OSError("synthetic")
+            if fault == "untranslated":
+                error = ValueError("synthetic")
+
+            class TracedRegistry:
+                @property
+                def policies(self):
+                    events.append("select")
+                    return registry.policies
+
+                def authorize(self, *args):
+                    events.append("authorize")
+                    test.assertEqual((url.replace("/%70age", "/page"), adapter.OPERATION_ID), args)
+                    return registry.authorize(*args)
+
+            traced = TracedRegistry()
+
+            def from_catalog(value, **kwargs):
+                events.append("registry")
+                test.assertEqual(catalog, value)
+                test.assertEqual({"on_date": date(2026, 9, 6)}, kwargs)
+                return traced
+
+            def state_path():
+                events.append("path")
+                if fault == "path":
+                    raise error
+                return path
+
+            mkdir_original = Path.mkdir
+
+            def mkdir(parent, **kwargs):
+                events.append("mkdir")
+                test.assertEqual(path.parent, parent)
+                test.assertEqual({"parents": True, "exist_ok": True}, kwargs)
+                if fault == "mkdir":
+                    raise error
+                with patch.object(Path, "mkdir", mkdir_original):
+                    mkdir_original(parent, **kwargs)
+
+            clock, sleeper = Mock(return_value=1000.0), Mock(side_effect=test.fail)
+
+            def construct(selected, **kwargs):
+                events.append("state")
+                test.assertEqual(path, selected)
+                test.assertEqual({"clock": clock, "sleeper": sleeper}, kwargs)
+                if fault in {"state", "untranslated"}:
+                    raise error
+                return PolicyState(selected, **kwargs)
+
+            def enforcer(*args):
+                events.append("enforcer")
+                if fault == "enforcer":
+                    raise error
+                return HttpPolicyEnforcer(*args)
+
+            validate = getattr(adapter, "_validated_lookup_url", None)
+            runtime_type = getattr(adapter, "LegalRuntime", None)
+
+            def canonicalize(value):
+                events.append("canonicalize")
+                return validate(value)
+
+            def runtime(*args):
+                events.append("runtime")
+                return runtime_type(*args)
+
+            if fault == "denied":
+                catalog["source_policies"][0]["enabled"] = False
+                registry = parse(catalog, on_date=date(2026, 9, 6))
+                catalog_path.write_text(json.dumps(catalog), encoding="utf-8")
+            with (
+                patch.object(adapter, "_validated_lookup_url", side_effect=canonicalize) if validate else nullcontext(),
+                patch.object(adapter, "LegalRuntime", side_effect=runtime) if runtime_type else nullcontext(),
+                patch.object(adapter, "CATALOG", catalog_path),
+                patch.object(adapter, "date", **{"today.return_value": date(2026, 9, 6)}),
+                patch.object(SourcePolicyRegistry, "from_catalog", side_effect=from_catalog),
+                patch.object(adapter, "_state_path", side_effect=state_path) as resolve,
+                patch.object(Path, "mkdir", mkdir),
+                patch("kgov_runtime.http.PolicyState", side_effect=construct) as constructor,
+                patch.object(adapter, "open_policy_state", wraps=open_policy_state) as open_state,
+                patch.object(time, "time", clock),
+                patch.object(time, "sleep", sleeper),
+                patch.object(adapter, "HttpPolicyEnforcer", side_effect=enforcer),
+                patch("kgov_runtime.http._network_resolver", return_value=["1.1.1.1"]) as dns,
+                patch("socket.getaddrinfo", side_effect=test.fail) as system_dns,
+                patch("kgov_runtime.http._policy_urlopen", side_effect=[
+                    Response(b"User-agent: *\nAllow: /\n", media_type="text/plain"),
+                    Response(b"<title>Synthetic</title>"),
+                ]) as opener,
+                patch.object(os.environ, "get", side_effect=test.fail) as credential,
+            ):
+                try:
+                    result = adapter._live_runtime() if policy_id == "law-go-kr-drf-api" else adapter._live(url)
+                except (OSError, ValueError, RuntimeError) as caught:
+                    test.assertIsNotNone(fault)
+                    if fault in {"mkdir", "state"}:
+                        test.assertIs(type(caught), ReadOnlyHttpError)
+                        test.assertEqual("budget-exhausted", caught.status)
+                        test.assertIs(error, caught.__cause__)
+                        test.assertIs(error, caught.__context__)
+                        test.assertTrue(caught.__suppress_context__)
+                    elif fault == "denied":
+                        test.assertIs(type(caught), ReadOnlyHttpError)
+                        test.assertEqual("policy-disabled", caught.status)
+                    else:
+                        test.assertIs(error, caught)
+                        test.assertIsNone(caught.__cause__)
+                else:
+                    test.assertIsNone(fault)
+                    test.assertTrue(path.is_file())
+                    if policy_id == "law-go-kr-drf-api":
+                        test.assertEqual("official-live", result.execution_mode)
+                    else:
+                        test.assertEqual("allowed", result["source_receipt"]["outcome"])
+                order = list(expected_order)
+                if fault == "denied":
+                    order = order[:order.index("authorize") + 1]
+                    resolve.assert_not_called()
+                    open_state.assert_not_called()
+                    constructor.assert_not_called()
+                else:
+                    order += ["path"]
+                    resolve.assert_called_once_with()
+                    if fault != "path":
+                        open_state.assert_called_once_with(path)
+                        order += ["mkdir"]
+                        if fault != "mkdir":
+                            order += ["state"]
+                            constructor.assert_called_once_with(path, clock=clock, sleeper=sleeper)
+                            if fault not in {"state", "untranslated"}:
+                                order += ["enforcer"]
+                                if fault is None and runtime_type:
+                                    order += ["runtime"]
+                        else:
+                            constructor.assert_not_called()
+                    else:
+                        open_state.assert_not_called()
+                        constructor.assert_not_called()
+                test.assertEqual(order, events[:len(order)])
+                if fault is not None:
+                    test.assertEqual(order, events)
+                    dns.assert_not_called()
+                    opener.assert_not_called()
+                system_dns.assert_not_called()
+                credential.assert_not_called()
+                sleeper.assert_not_called()
+
+
 class ReadOnlyHttpTest(unittest.TestCase):
+    def test_open_policy_state_error_boundary(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "nested/state.sqlite3"
+            for _ in range(2):
+                clock, sleeper = Mock(return_value=1000.0), Mock(side_effect=self.fail)
+                with (
+                    patch("kgov_runtime.http.time.time", clock),
+                    patch("kgov_runtime.http.time.sleep", sleeper),
+                    patch("kgov_runtime.http.PolicyState", wraps=PolicyState) as constructor,
+                ):
+                    state = open_policy_state(path)
+                constructor.assert_called_once_with(path, clock=clock, sleeper=sleeper)
+                self.assertIs(clock, state._clock)
+                self.assertIs(sleeper, state._sleeper)
+                self.assertTrue(path.is_file())
+                self.assertEqual(0, state.purge())
+                sleeper.assert_not_called()
+            for stage in ("mkdir", "state"):
+                for error in (OSError("synthetic"), PolicyStateUnavailableError(path), ValueError("synthetic")):
+                    with (
+                        self.subTest(stage=stage, error=type(error)),
+                        patch.object(Path, "mkdir", side_effect=error if stage == "mkdir" else None) as mkdir,
+                        patch("kgov_runtime.http.PolicyState", side_effect=error) as constructor,
+                        self.assertRaises((ReadOnlyHttpError, ValueError)) as raised,
+                    ):
+                        open_policy_state(path)
+                    mkdir.assert_called_once_with(parents=True, exist_ok=True)
+                    if stage == "mkdir":
+                        constructor.assert_not_called()
+                    else:
+                        constructor.assert_called_once_with(path, clock=time.time, sleeper=time.sleep)
+                    if isinstance(error, ValueError):
+                        self.assertIs(error, raised.exception)
+                        self.assertIsNone(raised.exception.__cause__)
+                    else:
+                        self.assertIs(type(raised.exception), ReadOnlyHttpError)
+                        self.assertEqual("budget-exhausted", raised.exception.status)
+                        self.assertIs(error, raised.exception.__cause__)
+                        self.assertIs(error, raised.exception.__context__)
+                        self.assertTrue(raised.exception.__suppress_context__)
+            corrupt = Path(directory) / "corrupt.sqlite3"
+            corrupt.write_bytes(b"synthetic-corrupt-sqlite")
+            with self.assertRaises(ReadOnlyHttpError) as raised:
+                open_policy_state(corrupt)
+            self.assertEqual("budget-exhausted", raised.exception.status)
+            self.assertIs(type(raised.exception.__cause__), PolicyStateUnavailableError)
+            self.assertIsInstance(raised.exception.__cause__.__cause__, sqlite3.Error)
+
     def registry(self, **kwargs) -> SourcePolicyRegistry:
         return SourcePolicyRegistry.from_catalog(
             reviewed_catalog(**kwargs), on_date=date(2026, 9, 6)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import multiprocessing
+import os
 import sqlite3
 import tempfile
 import threading
@@ -15,7 +16,7 @@ from unittest.mock import patch
 from urllib.request import Request
 
 from kgov_runtime.http import HttpPolicyEnforcer, HttpTransport, ReadOnlyHttpError, SourceRequest
-from kgov_runtime.policy_state import (PolicyDigest, PolicyDigestMismatchError, PolicyConfigurationError, PolicyId, PolicyKey, PolicyState, PolicyStateUnavailableError, RatePolicy, RetryAfterError, RobotsEntry, WaitLimitExceededError)
+from kgov_runtime.policy_state import (PolicyDigest, PolicyDigestMismatchError, PolicyConfigurationError, PolicyId, PolicyKey, PolicyState, PolicyStateUnavailableError, RatePolicy, RetryAfterError, RobotsEntry, WaitLimitExceededError, policy_state_path)
 from kgov_runtime.source_policy import SourcePolicyRegistry
 from tests.test_read_only_http import OPERATION, Response, reviewed_catalog
 
@@ -66,6 +67,37 @@ class PolicyStateContractTest(unittest.TestCase):
         self.path = Path(self.temporary_directory.name) / "policy.sqlite3"
         self.time = FakeTime(100.0)
         self.state = PolicyState(self.path, clock=self.time.clock, sleeper=self.time.sleep)
+
+    def test_policy_state_path_precedence_is_evaluated_each_call(self) -> None:
+        home = Path(self.temporary_directory.name) / "home"
+        fallback = home / ".local/state/k-gov-skills/policy-state.sqlite3"
+        for environment, expected, home_calls in (
+            ({"KGOV_POLICY_STATE_PATH": "/synthetic/explicit.sqlite3", "XDG_STATE_HOME": "/synthetic/xdg"}, Path("/synthetic/explicit.sqlite3"), 0),
+            ({"XDG_STATE_HOME": "/synthetic/xdg"}, Path("/synthetic/xdg/k-gov-skills/policy-state.sqlite3"), 0),
+            ({}, fallback, 1),
+            ({"KGOV_POLICY_STATE_PATH": "", "XDG_STATE_HOME": "/synthetic/xdg"}, Path("/synthetic/xdg/k-gov-skills/policy-state.sqlite3"), 0),
+            ({"KGOV_POLICY_STATE_PATH": "", "XDG_STATE_HOME": ""}, fallback, 1),
+            ({"KGOV_POLICY_STATE_PATH": "relative/state.sqlite3"}, Path("relative/state.sqlite3"), 0),
+            ({"KGOV_POLICY_STATE_PATH": " "}, Path(" "), 0),
+            ({"XDG_STATE_HOME": "relative"}, Path("relative/k-gov-skills/policy-state.sqlite3"), 0),
+            ({"XDG_STATE_HOME": " "}, Path(" /k-gov-skills/policy-state.sqlite3"), 0),
+        ):
+            with (
+                self.subTest(environment=environment),
+                patch.dict(os.environ, environment, clear=True),
+                patch.object(Path, "home", return_value=home) as resolve_home,
+            ):
+                self.assertEqual(expected, policy_state_path())
+                self.assertEqual(home_calls, resolve_home.call_count)
+        for error in (OSError("synthetic-home"), RuntimeError("synthetic-home")):
+            with (
+                patch.dict(os.environ, {}, clear=True),
+                patch.object(Path, "home", side_effect=error),
+                self.assertRaises(type(error)) as raised,
+            ):
+                policy_state_path()
+            self.assertIs(error, raised.exception)
+            self.assertIsNone(raised.exception.__cause__)
 
     def test_gcra_reserves_exact_wait_for_two_per_minute_with_burst_one(self) -> None:
         # Given: a fresh 2 requests / 60 seconds, burst 1 budget
