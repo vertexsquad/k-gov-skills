@@ -227,22 +227,12 @@ class AdapterTest(unittest.TestCase):
                         self.assertEqual("", result.stdout)
                         self.assertTrue(result.stderr)
 
-    def test_arbitrary_legacy_config_and_raw_param_are_rejected_before_network(self) -> None:
-        from kgov_runtime.json_adapter import JsonAdapterConfig
-
-        arbitrary = JsonAdapterConfig(slug="arbitrary", default_endpoint="https://example.com/data", allowed_hosts=frozenset({"example.com"}))
-        legal = JsonAdapterConfig(
-            slug="korean-legal-citation-law-search",
-            default_endpoint="https://www.law.go.kr/DRF/lawSearch.do",
-            allowed_hosts=frozenset({"law.go.kr"}),
-            default_params={"target": "eflaw", "type": "JSON"},
-            credential_env="LAW_OC",
-            credential_param="OC",
-        )
+    def test_unregistered_operation_and_raw_param_are_rejected_before_network(self) -> None:
+        arbitrary = replace(adapter.OPERATION, id="kgov/unregistered/search/v1")
         calls = []
-        for config, params in ((arbitrary, {}), (legal, {"raw": "yes"})):
-            with self.subTest(slug=config.slug), self.assertRaises(ValueError):
-                query_json(config, params=params, opener=lambda *_a, **_k: calls.append(True), resolver=lambda _host: calls.append(True))
+        for operation, params in ((arbitrary, {"query": "법"}), (adapter.OPERATION, {"query": "법", "raw": "yes"})):
+            with self.subTest(operation=operation.id), self.assertRaises(ValueError):
+                query_json(operation, params=params, opener=lambda *_a, **_k: calls.append(True), resolver=lambda _host: calls.append(True))
         self.assertEqual([], calls)
 
     def test_parameters_and_missing_credential_fail_before_dns(self) -> None:
@@ -270,20 +260,10 @@ class AdapterTest(unittest.TestCase):
             result = adapter.query(params={"query": "법", "display": "1"}, opener=lambda *_a, **_k: Response(encoded(response)), resolver=lambda _: ["1.1.1.1"])
         self.assertEqual(1, result["count"])
 
-    def test_exact_legal_compatibility_uses_strict_bounded_json(self) -> None:
-        from kgov_runtime.json_adapter import JsonAdapterConfig
-
-        config = JsonAdapterConfig(
-            slug="korean-legal-citation-law-search",
-            default_endpoint="https://www.law.go.kr/DRF/lawSearch.do",
-            allowed_hosts=frozenset({"law.go.kr"}),
-            default_params={"target": "eflaw", "type": "JSON"},
-            credential_env="LAW_OC",
-            credential_param="OC",
-        )
+    def test_registered_operation_uses_strict_bounded_json(self) -> None:
         duplicate = b'{"LawSearch":{"totalCnt":"1","totalCnt":"2","law":[]}}'
         with patch.dict(os.environ, {"LAW_OC": "fixture-secret"}, clear=False), self.assertRaisesRegex(ValueError, "duplicate"):
-            query_json(config, params={"query": "법"}, opener=lambda *_a, **_k: Response(duplicate), resolver=lambda _: ["1.1.1.1"])
+            query_json(adapter.OPERATION, params={"query": "법"}, opener=lambda *_a, **_k: Response(duplicate), resolver=lambda _: ["1.1.1.1"])
 
 
     def test_security_contract_mutations_are_rejected_before_network(self) -> None:

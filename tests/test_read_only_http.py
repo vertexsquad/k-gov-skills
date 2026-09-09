@@ -23,7 +23,8 @@ from urllib.request import ProxyHandler, Request
 from unittest.mock import Mock, patch
 
 import kgov_runtime
-from kgov_runtime.json_adapter import JsonAdapterConfig, query_json
+from kgov_runtime.capabilities import korean_law_bill_research
+from kgov_runtime.json_adapter import query_json
 from kgov_runtime.http import (
     HttpPolicyEnforcer,
     HttpTransport,
@@ -773,18 +774,13 @@ class ReadOnlyHttpTest(unittest.TestCase):
 
     def test_json_adapter_default_transport_is_blocked_without_dns(self) -> None:
         opened: list[bool] = []
-        config = JsonAdapterConfig(
-            slug="korean-legal-citation-law-search",
-            default_endpoint="https://www.law.go.kr/DRF/lawSearch.do",
-            allowed_hosts=frozenset({"law.go.kr"}),
-            credential_env="LAW_OC",
-            credential_param="OC",
-            default_params={"target": "eflaw", "type": "JSON"},
-        )
 
         def opener(*_args, **_kwargs):
             opened.append(True)
-            return Response(b"[]", media_type="application/json")
+            return Response(
+                b'{"LawSearch":{"totalCnt":"0","law":[]}}',
+                media_type="application/json",
+            )
 
         with patch.dict(os.environ, {"LAW_OC": "fixture-key"}, clear=False):
             with (
@@ -792,16 +788,31 @@ class ReadOnlyHttpTest(unittest.TestCase):
                 patch("kgov_runtime.http.build_opener") as network,
                 self.assertRaisesRegex(ReadOnlyHttpError, "^policy-disabled$"),
             ):
-                query_json(config, params={"query": "synthetic"})
+                query_json(korean_law_bill_research.OPERATION, params={"query": "synthetic"})
             dns.assert_not_called()
             network.assert_not_called()
             result = query_json(
-                config,
+                korean_law_bill_research.OPERATION,
                 params={"query": "synthetic"},
                 opener=opener,
             )
         self.assertEqual([True], opened)
-        self.assertEqual({"count": 0, "records": []}, result)
+        self.assertEqual(
+            {
+                "contract_id": "kgov/korean-law-bill-research/v1",
+                "execution_mode": "official-live",
+                "status": "records-retrieved",
+                "count": 0,
+                "records": [],
+                "source_receipt": {
+                    "operation_id": "kgov/korean-law-bill-research/search-laws/v1",
+                    "policy_id": "law-go-kr-drf-api",
+                    "endpoint": "https://www.law.go.kr/DRF/lawSearch.do",
+                },
+                "manual_review_required": True,
+            },
+            result,
+        )
 
     def test_forbidden_output_keys_are_unicode_canonicalized_without_reflection(
         self,
