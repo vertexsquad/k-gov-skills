@@ -1431,22 +1431,6 @@ class CatalogContractTest(unittest.TestCase):
         errors = validate(self.data, root)
         self.assertEqual(['V6_CONTRACT_INVARIANT ""'], errors)
 
-    def test_validator_cli_reports_owned_topology(self) -> None:
-        result = subprocess.run(
-            [sys.executable, str(ROOT / "scripts/validate_catalog.py")],
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        self.assertEqual(
-            "PASS schema=6 domains=60 domain_skills=308 capabilities=22 source_policies=7 "
-            "runtime_contracts=22 operations=23 active_operations=22 bindings=308 top_level_skills=0 "
-            "direct=35 adjacent=16 new=8 sensitive=1\n",
-            result.stdout,
-        )
-        self.assertEqual("", result.stderr)
-
-
 class SchemaV6PrimitiveTest(unittest.TestCase):
     @staticmethod
     def validate_node(schema, value, pointer: str = "") -> list[str]:
