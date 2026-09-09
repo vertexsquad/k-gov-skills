@@ -35,10 +35,6 @@ def load_catalog(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def module_name(capability: str) -> str:
-    return capability.replace("-", "_")
-
-
 @cache
 def fixture_receipt(
     module: str, argv: tuple[str, ...]
