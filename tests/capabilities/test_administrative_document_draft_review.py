@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import importlib.util
 import json
 import subprocess
 import sys
@@ -8,24 +7,17 @@ import unittest
 from pathlib import Path
 from urllib.parse import urlsplit
 
+from kgov_runtime.capabilities import administrative_document_draft_review as adapter
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ADAPTER_PATH = REPO_ROOT / "kgov_runtime" / "capabilities" / "administrative_document_draft_review.py"
 FIXTURE_PATH = REPO_ROOT / "tests" / "fixtures" / "capabilities" / "administrative-document-draft-review.json"
 
 
-def load_adapter():
-    spec = importlib.util.spec_from_file_location("administrative_document_adapter", ADAPTER_PATH)
-    if spec is None or spec.loader is None:
-        raise RuntimeError("adapter import spec is unavailable")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
 class AdapterTest(unittest.TestCase):
     def setUp(self) -> None:
-        self.adapter = load_adapter()
+        self.adapter = adapter
         self.valid = {
             "document_type": "report",
             "title": "공원 시설 개선 검토 보고",
