@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 import os
@@ -18,7 +17,7 @@ import unicodedata
 from datetime import date
 from html import unescape
 from pathlib import Path
-from typing import Any, Final, Literal, Mapping, NoReturn, TypedDict, assert_never
+from typing import Any, Final, Literal, Mapping, TypedDict, assert_never
 from urllib.parse import parse_qsl, quote, unquote_to_bytes, urlsplit
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -36,6 +35,7 @@ from kgov_runtime.http import (  # noqa: E402
     UnsafeEndpointError,
     policy_failure_status,
 )
+from kgov_runtime.cli import SafeArgumentParser  # noqa: E402
 from kgov_runtime.policy_state import PolicyState, PolicyStateUnavailableError  # noqa: E402
 from kgov_runtime.source_policy import SourcePolicy, SourcePolicyRegistry  # noqa: E402
 from kgov_runtime.redaction import contains_direct_identifier  # noqa: E402
@@ -261,15 +261,8 @@ def _live(url: str) -> PatentLookupResult:
     return inspect_patent_source(validated, policy, HttpPolicyEnforcer(registry, state))
 
 
-class _ArgumentParser(argparse.ArgumentParser):
-    """Keep argparse's validation without reflecting rejected argument values."""
-
-    def error(self, _message: str) -> NoReturn:
-        self.exit(2, "ERROR invalid command-line arguments\n")
-
-
 def main() -> int:
-    parser = _ArgumentParser(
+    parser = SafeArgumentParser(
         description="Read an official patent page or validate a redacted prior-art evidence-pack draft"
     )
     parser.add_argument("path", nargs="?", type=Path)
