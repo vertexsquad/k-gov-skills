@@ -800,6 +800,10 @@ class CatalogContractTest(unittest.TestCase):
                 "traffic-safety-statistics-brief",
             ),
         }
+        self.assertEqual(66, self.assert_skill_contract_mutations(protected))
+
+    def assert_skill_contract_mutations(self, protected) -> int:
+        mutation_count = 0
         for domain_name, skill_names in protected.items():
             for skill_name in skill_names:
                 for mutation in (
@@ -814,6 +818,7 @@ class CatalogContractTest(unittest.TestCase):
                     "task-check-reorder",
                     "task-check-empty",
                 ):
+                    mutation_count += 1
                     with self.subTest(domain=domain_name, skill=skill_name, mutation=mutation):
                         changed = copy.deepcopy(self.data)
                         by_domain = {item["domain"]: item for item in changed["domains"]}
@@ -860,6 +865,7 @@ class CatalogContractTest(unittest.TestCase):
 
         for domain_name, skill_names in protected.items():
             for skill_name in skill_names:
+                mutation_count += 1
                 with self.subTest(domain=domain_name, skill=skill_name, mutation="cross-domain"):
                     changed = copy.deepcopy(self.data)
                     by_domain = {item["domain"]: item for item in changed["domains"]}
@@ -874,6 +880,7 @@ class CatalogContractTest(unittest.TestCase):
                     self.assert_cross_domain_move_errors(
                         changed, domain_name, "세무", errors,
                     )
+        return mutation_count
 
     def test_domain_minimum_three_wave_four_contract(self) -> None:
         expected = {
@@ -970,80 +977,7 @@ class CatalogContractTest(unittest.TestCase):
                 "regulatory-notice-comparison-review",
             ),
         }
-        for domain_name, skill_names in protected.items():
-            for skill_name in skill_names:
-                for mutation in (
-                    "title",
-                    "capability",
-                    "role",
-                    "references",
-                    "boundary",
-                    "task-check-replacement",
-                    "task-check-delete",
-                    "task-check-append",
-                    "task-check-reorder",
-                    "task-check-empty",
-                ):
-                    with self.subTest(domain=domain_name, skill=skill_name, mutation=mutation):
-                        changed = copy.deepcopy(self.data)
-                        by_domain = {item["domain"]: item for item in changed["domains"]}
-                        skill = next(
-                            item for item in by_domain[domain_name]["skills"] if item["name"] == skill_name
-                        )
-                        if mutation == "title":
-                            skill["title"] = "다른 제목"
-                        elif mutation == "capability":
-                            skill["capability"] = "official-source-research"
-                        elif mutation == "role":
-                            skill["role"] = "primary"
-                        elif mutation == "references":
-                            skill["reference_skills"] = ["korean-law-search"]
-                        elif mutation == "boundary":
-                            skill["boundary"] = "manual-review-only"
-                        elif mutation == "task-check-replacement":
-                            skill["task_checks"][0] = "자동 판단을 허용"
-                        elif mutation == "task-check-delete":
-                            skill["task_checks"].pop(0)
-                        elif mutation == "task-check-append":
-                            skill["task_checks"].append("자동 제출")
-                        elif mutation == "task-check-reorder":
-                            skill["task_checks"].reverse()
-                        else:
-                            skill["task_checks"] = []
-                        errors = validate(changed, ROOT)
-                        if mutation == "task-check-empty":
-                            skill_index = by_domain[domain_name]["skills"].index(skill)
-                            self.assertEqual(
-                                [f'V6_INVALID_VALUE "/domains/{list(by_domain).index(domain_name)}/skills/{skill_index}/task_checks"'],
-                                errors,
-                            )
-                        elif mutation == "role":
-                            domain_index = list(by_domain).index(domain_name)
-                            self.assertEqual(
-                                [f'V6_INVALID_VALUE "/domains/{domain_index}/skills"'],
-                                errors,
-                            )
-                        else:
-                            self.assert_skill_contract_field_error(
-                                domain_name, skill_name, self.contract_field_for_mutation(mutation), errors,
-                            )
-
-        for domain_name, skill_names in protected.items():
-            for skill_name in skill_names:
-                with self.subTest(domain=domain_name, skill=skill_name, mutation="cross-domain"):
-                    changed = copy.deepcopy(self.data)
-                    by_domain = {item["domain"]: item for item in changed["domains"]}
-                    index = next(
-                        index
-                        for index, item in enumerate(by_domain[domain_name]["skills"])
-                        if item["name"] == skill_name
-                    )
-                    moved = by_domain[domain_name]["skills"].pop(index)
-                    by_domain["세무"]["skills"].append(moved)
-                    errors = validate(changed, ROOT)
-                    self.assert_cross_domain_move_errors(
-                        changed, domain_name, "세무", errors,
-                    )
+        self.assertEqual(66, self.assert_skill_contract_mutations(protected))
 
     def test_domain_minimum_three_wave_five_contract(self) -> None:
         expected = {
@@ -1137,80 +1071,7 @@ class CatalogContractTest(unittest.TestCase):
             "소방": ("fire-safety-standard-evidence-pack", "fire-response-statistics-brief"),
             "과학기술": ("national-rd-program-evidence-brief", "technology-impact-evidence-pack"),
         }
-        for domain_name, skill_names in protected.items():
-            for skill_name in skill_names:
-                for mutation in (
-                    "title",
-                    "capability",
-                    "role",
-                    "references",
-                    "boundary",
-                    "task-check-replacement",
-                    "task-check-delete",
-                    "task-check-append",
-                    "task-check-reorder",
-                    "task-check-empty",
-                ):
-                    with self.subTest(domain=domain_name, skill=skill_name, mutation=mutation):
-                        changed = copy.deepcopy(self.data)
-                        by_domain = {item["domain"]: item for item in changed["domains"]}
-                        skill = next(
-                            item for item in by_domain[domain_name]["skills"] if item["name"] == skill_name
-                        )
-                        if mutation == "title":
-                            skill["title"] = "다른 제목"
-                        elif mutation == "capability":
-                            skill["capability"] = "official-source-research"
-                        elif mutation == "role":
-                            skill["role"] = "primary"
-                        elif mutation == "references":
-                            skill["reference_skills"] = ["korean-law-search"]
-                        elif mutation == "boundary":
-                            skill["boundary"] = "manual-review-only"
-                        elif mutation == "task-check-replacement":
-                            skill["task_checks"][0] = "자동 판단을 허용"
-                        elif mutation == "task-check-delete":
-                            skill["task_checks"].pop(0)
-                        elif mutation == "task-check-append":
-                            skill["task_checks"].append("자동 제출")
-                        elif mutation == "task-check-reorder":
-                            skill["task_checks"].reverse()
-                        else:
-                            skill["task_checks"] = []
-                        errors = validate(changed, ROOT)
-                        if mutation == "task-check-empty":
-                            skill_index = by_domain[domain_name]["skills"].index(skill)
-                            self.assertEqual(
-                                [f'V6_INVALID_VALUE "/domains/{list(by_domain).index(domain_name)}/skills/{skill_index}/task_checks"'],
-                                errors,
-                            )
-                        elif mutation == "role":
-                            domain_index = list(by_domain).index(domain_name)
-                            self.assertEqual(
-                                [f'V6_INVALID_VALUE "/domains/{domain_index}/skills"'],
-                                errors,
-                            )
-                        else:
-                            self.assert_skill_contract_field_error(
-                                domain_name, skill_name, self.contract_field_for_mutation(mutation), errors,
-                            )
-
-        for domain_name, skill_names in protected.items():
-            for skill_name in skill_names:
-                with self.subTest(domain=domain_name, skill=skill_name, mutation="cross-domain"):
-                    changed = copy.deepcopy(self.data)
-                    by_domain = {item["domain"]: item for item in changed["domains"]}
-                    index = next(
-                        index
-                        for index, item in enumerate(by_domain[domain_name]["skills"])
-                        if item["name"] == skill_name
-                    )
-                    moved = by_domain[domain_name]["skills"].pop(index)
-                    by_domain["세무"]["skills"].append(moved)
-                    errors = validate(changed, ROOT)
-                    self.assert_cross_domain_move_errors(
-                        changed, domain_name, "세무", errors,
-                    )
+        self.assertEqual(66, self.assert_skill_contract_mutations(protected))
 
     def test_domain_minimum_three_wave_six_contract(self) -> None:
         expected = {
@@ -1310,83 +1171,7 @@ class CatalogContractTest(unittest.TestCase):
                 "cyber-incident-response-plan-evidence-review",
             ),
         }
-        mutation_count = 0
-        for domain_name, skill_names in protected.items():
-            for skill_name in skill_names:
-                for mutation in (
-                    "title",
-                    "capability",
-                    "role",
-                    "references",
-                    "boundary",
-                    "task-check-replacement",
-                    "task-check-delete",
-                    "task-check-append",
-                    "task-check-reorder",
-                    "task-check-empty",
-                ):
-                    mutation_count += 1
-                    with self.subTest(domain=domain_name, skill=skill_name, mutation=mutation):
-                        changed = copy.deepcopy(self.data)
-                        by_domain = {item["domain"]: item for item in changed["domains"]}
-                        skill = next(
-                            item for item in by_domain[domain_name]["skills"] if item["name"] == skill_name
-                        )
-                        if mutation == "title":
-                            skill["title"] = "다른 제목"
-                        elif mutation == "capability":
-                            skill["capability"] = "official-source-research"
-                        elif mutation == "role":
-                            skill["role"] = "primary"
-                        elif mutation == "references":
-                            skill["reference_skills"] = ["korean-law-search"]
-                        elif mutation == "boundary":
-                            skill["boundary"] = "manual-review-only"
-                        elif mutation == "task-check-replacement":
-                            skill["task_checks"][0] = "자동 판단을 허용"
-                        elif mutation == "task-check-delete":
-                            skill["task_checks"].pop(0)
-                        elif mutation == "task-check-append":
-                            skill["task_checks"].append("자동 제출")
-                        elif mutation == "task-check-reorder":
-                            skill["task_checks"].reverse()
-                        else:
-                            skill["task_checks"] = []
-                        errors = validate(changed, ROOT)
-                        if mutation == "task-check-empty":
-                            skill_index = by_domain[domain_name]["skills"].index(skill)
-                            self.assertEqual(
-                                [f'V6_INVALID_VALUE "/domains/{list(by_domain).index(domain_name)}/skills/{skill_index}/task_checks"'],
-                                errors,
-                            )
-                        elif mutation == "role":
-                            domain_index = list(by_domain).index(domain_name)
-                            self.assertEqual(
-                                [f'V6_INVALID_VALUE "/domains/{domain_index}/skills"'],
-                                errors,
-                            )
-                        else:
-                            self.assert_skill_contract_field_error(
-                                domain_name, skill_name, self.contract_field_for_mutation(mutation), errors,
-                            )
-
-        for domain_name, skill_names in protected.items():
-            for skill_name in skill_names:
-                mutation_count += 1
-                with self.subTest(domain=domain_name, skill=skill_name, mutation="cross-domain"):
-                    changed = copy.deepcopy(self.data)
-                    by_domain = {item["domain"]: item for item in changed["domains"]}
-                    index = next(
-                        index
-                        for index, item in enumerate(by_domain[domain_name]["skills"])
-                        if item["name"] == skill_name
-                    )
-                    moved = by_domain[domain_name]["skills"].pop(index)
-                    by_domain["세무"]["skills"].append(moved)
-                    errors = validate(changed, ROOT)
-                    self.assert_cross_domain_move_errors(
-                        changed, domain_name, "세무", errors,
-                    )
+        mutation_count = self.assert_skill_contract_mutations(protected)
         self.assertEqual(66, mutation_count)
 
     def test_domain_minimum_three_wave_seven_contract(self) -> None:
@@ -1487,83 +1272,8 @@ class CatalogContractTest(unittest.TestCase):
                 "dmz-policy-source-brief",
             ),
         }
-        mutation_count = 0
-        for domain_name, skill_names in protected.items():
-            for skill_name in skill_names:
-                for mutation in (
-                    "title",
-                    "capability",
-                    "role",
-                    "references",
-                    "boundary",
-                    "task-check-replacement",
-                    "task-check-delete",
-                    "task-check-append",
-                    "task-check-reorder",
-                    "task-check-empty",
-                ):
-                    mutation_count += 1
-                    with self.subTest(domain=domain_name, skill=skill_name, mutation=mutation):
-                        changed = copy.deepcopy(self.data)
-                        by_domain = {item["domain"]: item for item in changed["domains"]}
-                        skill = next(
-                            item for item in by_domain[domain_name]["skills"] if item["name"] == skill_name
-                        )
-                        if mutation == "title":
-                            skill["title"] = "다른 제목"
-                        elif mutation == "capability":
-                            skill["capability"] = "official-source-research"
-                        elif mutation == "role":
-                            skill["role"] = "primary"
-                        elif mutation == "references":
-                            skill["reference_skills"] = ["korean-law-search"]
-                        elif mutation == "boundary":
-                            skill["boundary"] = "manual-review-only"
-                        elif mutation == "task-check-replacement":
-                            skill["task_checks"][0] = "자동 판단을 허용"
-                        elif mutation == "task-check-delete":
-                            skill["task_checks"].pop(0)
-                        elif mutation == "task-check-append":
-                            skill["task_checks"].append("자동 제출")
-                        elif mutation == "task-check-reorder":
-                            skill["task_checks"].reverse()
-                        else:
-                            skill["task_checks"] = []
-                        errors = validate(changed, ROOT)
-                        if mutation == "task-check-empty":
-                            skill_index = by_domain[domain_name]["skills"].index(skill)
-                            self.assertEqual(
-                                [f'V6_INVALID_VALUE "/domains/{list(by_domain).index(domain_name)}/skills/{skill_index}/task_checks"'],
-                                errors,
-                            )
-                        elif mutation == "role":
-                            domain_index = list(by_domain).index(domain_name)
-                            self.assertEqual(
-                                [f'V6_INVALID_VALUE "/domains/{domain_index}/skills"'],
-                                errors,
-                            )
-                        else:
-                            self.assert_skill_contract_field_error(
-                                domain_name, skill_name, self.contract_field_for_mutation(mutation), errors,
-                            )
-
-        for domain_name, skill_names in protected.items():
-            for skill_name in skill_names:
-                mutation_count += 1
-                with self.subTest(domain=domain_name, skill=skill_name, mutation="cross-domain"):
-                    changed = copy.deepcopy(self.data)
-                    by_domain = {item["domain"]: item for item in changed["domains"]}
-                    index = next(
-                        index
-                        for index, item in enumerate(by_domain[domain_name]["skills"])
-                        if item["name"] == skill_name
-                    )
-                    moved = by_domain[domain_name]["skills"].pop(index)
-                    by_domain["세무"]["skills"].append(moved)
-                    errors = validate(changed, ROOT)
-                    self.assert_cross_domain_move_errors(
-                        changed, domain_name, "세무", errors,
-                    )
+        mutation_count = self.assert_skill_contract_mutations(protected)
+        self.assertEqual(66, mutation_count)
         for mutation in (
             "service",
             "credential_class",
