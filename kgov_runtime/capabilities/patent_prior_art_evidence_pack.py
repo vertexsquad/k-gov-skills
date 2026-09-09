@@ -9,10 +9,8 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 import re
 import sys
-import time
 import unicodedata
 from datetime import date
 from html import unescape
@@ -33,10 +31,11 @@ from kgov_runtime.http import (  # noqa: E402
     SourceRequest,
     TextDocument,
     UnsafeEndpointError,
+    open_policy_state,
     policy_failure_status,
 )
 from kgov_runtime.cli import SafeArgumentParser  # noqa: E402
-from kgov_runtime.policy_state import PolicyState, PolicyStateUnavailableError  # noqa: E402
+from kgov_runtime.policy_state import policy_state_path as _state_path  # noqa: E402
 from kgov_runtime.source_policy import SourcePolicy, SourcePolicyRegistry  # noqa: E402
 from kgov_runtime.redaction import contains_direct_identifier  # noqa: E402
 from kgov_runtime.review_admission import (  # noqa: E402
@@ -235,14 +234,6 @@ def inspect_patent_source(
     }
 
 
-def _state_path() -> Path:
-    if configured := os.environ.get("KGOV_POLICY_STATE_PATH"):
-        return Path(configured)
-    if xdg_state := os.environ.get("XDG_STATE_HOME"):
-        return Path(xdg_state) / "k-gov-skills/policy-state.sqlite3"
-    return Path.home() / ".local/state/k-gov-skills/policy-state.sqlite3"
-
-
 def _live(url: str) -> PatentLookupResult:
     validated = _validated_lookup_url(url)
     registry = SourcePolicyRegistry.from_catalog(
@@ -253,11 +244,7 @@ def _live(url: str) -> PatentLookupResult:
         raise ReadOnlyHttpError(policy_failure_status(decision.code))
     policy = next(item for item in registry.policies if item.id == decision.policy_id)
     path = _state_path()
-    try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        state = PolicyState(path, clock=time.time, sleeper=time.sleep)
-    except (OSError, PolicyStateUnavailableError) as exc:
-        raise ReadOnlyHttpError("budget-exhausted") from exc
+    state = open_policy_state(path)
     return inspect_patent_source(validated, policy, HttpPolicyEnforcer(registry, state))
 
 

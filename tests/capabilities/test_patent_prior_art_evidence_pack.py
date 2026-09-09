@@ -24,7 +24,7 @@ from kgov_runtime.http import HttpPolicyEnforcer, HttpTransport, ReadOnlyHttpErr
 from kgov_runtime.policy_state import PolicyState
 from kgov_runtime.source_policy import canonical_policy_digest
 from tests.capabilities.test_korean_legal_citation_verification import reviewed_registry
-from tests.test_read_only_http import Response
+from tests.test_read_only_http import assert_live_state_initialization, Response
 
 from kgov_runtime.capabilities import patent_prior_art_evidence_pack as adapter
 from tests.capabilities import review_admission_contract
@@ -68,6 +68,12 @@ class AdapterTest(ReviewAdmissionContractMixin, unittest.TestCase):
         cls.adapter = adapter
         cls.adapter_path = ADAPTER_PATH
         cls.valid = json.loads(FIXTURE_PATH.read_text(encoding="utf-8"))
+
+    def test_live_state_initialization_order_and_error_boundary(self) -> None:
+        assert_live_state_initialization(
+            self, adapter, "kipo-web",
+            "https://www.kipo.go.kr/%70age", ('canonicalize', 'registry', 'authorize', 'select'),
+        )
 
     def test_current_kipo_attribution_requires_a_fresh_receipt(self) -> None:
         catalog = json.loads(adapter.CATALOG.read_text(encoding="utf-8"))
@@ -228,8 +234,8 @@ class AdapterTest(ReviewAdmissionContractMixin, unittest.TestCase):
                     "from_catalog",
                     side_effect=AssertionError("policy"),
                 ),
-                patch.object(
-                    adapter, "PolicyState", side_effect=AssertionError("state")
+                patch(
+                    "kgov_runtime.http.PolicyState", side_effect=AssertionError("state")
                 ),
                 patch("socket.getaddrinfo", side_effect=AssertionError("DNS")),
             ):
@@ -287,7 +293,7 @@ class AdapterTest(ReviewAdmissionContractMixin, unittest.TestCase):
         # Given local source declarations and forbidden infrastructure seams.
         with (
             patch.object(adapter, "_live", side_effect=AssertionError("network")),
-            patch.object(adapter, "PolicyState", side_effect=AssertionError("state")),
+            patch("kgov_runtime.http.PolicyState", side_effect=AssertionError("state")),
             patch("socket.getaddrinfo", side_effect=AssertionError("DNS")),
         ):
             # When the local review is evaluated.
@@ -471,7 +477,7 @@ class AdapterTest(ReviewAdmissionContractMixin, unittest.TestCase):
                             "_state_path",
                             return_value=Path(directory) / "state.sqlite3",
                         ),
-                        patch.object(adapter, "PolicyState", return_value=state),
+                        patch("kgov_runtime.http.PolicyState", return_value=state) as constructor,
                         patch.object(
                             adapter, "HttpPolicyEnforcer", return_value=enforcer
                         ),
@@ -480,6 +486,7 @@ class AdapterTest(ReviewAdmissionContractMixin, unittest.TestCase):
                     ):
                         # When the public CLI tries to emit the page metadata.
                         code = adapter.main()
+                        constructor.assert_called_once()
                     # Then neither encoded nor decoded identifiers or receipts can escape.
                     self.assertEqual(4, code)
                     self.assertEqual("", output.getvalue())
@@ -567,7 +574,7 @@ class AdapterTest(ReviewAdmissionContractMixin, unittest.TestCase):
                             "_state_path",
                             return_value=Path(directory) / "state.sqlite3",
                         ),
-                        patch.object(adapter, "PolicyState", return_value=state),
+                        patch("kgov_runtime.http.PolicyState", return_value=state) as constructor,
                         patch.object(
                             adapter, "HttpPolicyEnforcer", return_value=cli_enforcer
                         ),
@@ -576,6 +583,7 @@ class AdapterTest(ReviewAdmissionContractMixin, unittest.TestCase):
                     ):
                         # When the same title reaches the real CLI.
                         code = adapter.main()
+                        constructor.assert_called_once()
                     # Then no metadata or authentic allowed receipt is emitted.
                     self.assertEqual(4, code)
                     self.assertEqual("", output.getvalue())
@@ -840,8 +848,8 @@ class AdapterTest(ReviewAdmissionContractMixin, unittest.TestCase):
                 patch.object(
                     sys, "argv", [str(ADAPTER_PATH), "--lookup-url", f"https://{host}/"]
                 ),
-                patch.object(
-                    adapter, "PolicyState", side_effect=AssertionError("state")
+                patch(
+                    "kgov_runtime.http.PolicyState", side_effect=AssertionError("state")
                 ),
                 patch("socket.getaddrinfo", side_effect=AssertionError("DNS")),
                 redirect_stderr(io.StringIO()) as error,
@@ -886,13 +894,14 @@ class AdapterTest(ReviewAdmissionContractMixin, unittest.TestCase):
                     "_state_path",
                     return_value=Path(directory) / "state.sqlite3",
                 ),
-                patch.object(adapter, "PolicyState", return_value=state),
+                patch("kgov_runtime.http.PolicyState", return_value=state) as constructor,
                 patch.object(adapter, "HttpPolicyEnforcer", return_value=enforcer),
                 redirect_stderr(io.StringIO()) as error,
                 redirect_stdout(io.StringIO()) as output,
             ):
                 # When the real CLI lookup reaches the offline source.
                 exit_code = adapter.main()
+                constructor.assert_called_once()
             # Then upstream denial is not confused with input or policy failure.
             self.assertEqual(4, exit_code)
             self.assertEqual("", output.getvalue())

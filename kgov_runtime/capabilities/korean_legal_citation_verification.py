@@ -8,10 +8,8 @@ from __future__ import annotations
 
 import html
 import json
-import os
 import re
 import sys
-import time
 import unicodedata
 from copy import deepcopy
 from dataclasses import dataclass
@@ -45,9 +43,11 @@ from kgov_runtime.http import (  # noqa: E402
     ReadOnlyHttpError,
     SourceRequest,
     build_url,
+    open_policy_state,
     policy_failure_status,
 )
-from kgov_runtime.policy_state import PolicyState, PolicyStateUnavailableError  # noqa: E402
+from kgov_runtime.policy_state import PolicyState  # noqa: E402
+from kgov_runtime.policy_state import policy_state_path as _state_path  # noqa: E402
 from kgov_runtime.source_policy import JSONValue, SourcePolicy, SourcePolicyRegistry  # noqa: E402
 from kgov_runtime.redaction import contains_direct_identifier  # noqa: E402
 
@@ -181,14 +181,6 @@ class LegalExecutionError(ReadOnlyHttpError):
         self.source_receipts, self.failed_call = trace
 
 
-def _state_path() -> Path:
-    if configured := os.environ.get("KGOV_POLICY_STATE_PATH"):
-        return Path(configured)
-    if xdg_state := os.environ.get("XDG_STATE_HOME"):
-        return Path(xdg_state) / "k-gov-skills/policy-state.sqlite3"
-    return Path.home() / ".local/state/k-gov-skills/policy-state.sqlite3"
-
-
 def _live_runtime() -> LegalRuntime:
     registry = SourcePolicyRegistry.from_catalog(
         json.loads(CATALOG.read_text(encoding="utf-8")), on_date=date.today()
@@ -198,11 +190,7 @@ def _live_runtime() -> LegalRuntime:
         raise ReadOnlyHttpError(policy_failure_status(decision.code))
     policy = next(item for item in registry.policies if item.id == POLICY_ID)
     path = _state_path()
-    try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        state = PolicyState(path, clock=time.time, sleeper=time.sleep)
-    except (OSError, PolicyStateUnavailableError) as exc:
-        raise ReadOnlyHttpError("budget-exhausted") from exc
+    state = open_policy_state(path)
     return LegalRuntime(policy, HttpPolicyEnforcer(registry, state))
 
 
