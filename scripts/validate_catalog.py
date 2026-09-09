@@ -3461,71 +3461,26 @@ def validate(
                 if not _skill_contract_matches(actual, wave_two_contract):
                     skill_pointer = _pointer_child(_pointer_child(domain_pointer, "skills"), skills.index(actual))
                     _append_skill_contract_errors(actual, wave_two_contract, skill_pointer, errors)
-        for wave_three_contract in WAVE_THREE_SKILL_CONTRACTS.get(domain, ()):
-            expected_name = wave_three_contract["name"]
-            matches = [
-                skill
-                for skill in skills
-                if isinstance(skill, dict) and skill.get("name") == expected_name
-            ]
-            if len(matches) != 1:
-                _append_error(errors, "V6_CONTRACT_INVARIANT", _pointer_child(domain_pointer, "skills"))
-            elif not _skill_contract_matches(matches[0], wave_three_contract):
-                actual = matches[0]
-                skill_pointer = _pointer_child(_pointer_child(domain_pointer, "skills"), skills.index(actual))
-                _append_skill_contract_errors(actual, wave_three_contract, skill_pointer, errors)
-        for wave_four_contract in WAVE_FOUR_SKILL_CONTRACTS.get(domain, ()):
-            expected_name = wave_four_contract["name"]
-            matches = [
-                skill
-                for skill in skills
-                if isinstance(skill, dict) and skill.get("name") == expected_name
-            ]
-            if len(matches) != 1:
-                _append_error(errors, "V6_CONTRACT_INVARIANT", _pointer_child(domain_pointer, "skills"))
-            elif not _skill_contract_matches(matches[0], wave_four_contract):
-                actual = matches[0]
-                skill_pointer = _pointer_child(_pointer_child(domain_pointer, "skills"), skills.index(actual))
-                _append_skill_contract_errors(actual, wave_four_contract, skill_pointer, errors)
-        for wave_five_contract in WAVE_FIVE_SKILL_CONTRACTS.get(domain, ()):
-            expected_name = wave_five_contract["name"]
-            matches = [
-                skill
-                for skill in skills
-                if isinstance(skill, dict) and skill.get("name") == expected_name
-            ]
-            if len(matches) != 1:
-                _append_error(errors, "V6_CONTRACT_INVARIANT", _pointer_child(domain_pointer, "skills"))
-            elif not _skill_contract_matches(matches[0], wave_five_contract):
-                actual = matches[0]
-                skill_pointer = _pointer_child(_pointer_child(domain_pointer, "skills"), skills.index(actual))
-                _append_skill_contract_errors(actual, wave_five_contract, skill_pointer, errors)
-        for wave_six_contract in WAVE_SIX_SKILL_CONTRACTS.get(domain, ()):
-            expected_name = wave_six_contract["name"]
-            matches = [
-                skill
-                for skill in skills
-                if isinstance(skill, dict) and skill.get("name") == expected_name
-            ]
-            if len(matches) != 1:
-                _append_error(errors, "V6_CONTRACT_INVARIANT", _pointer_child(domain_pointer, "skills"))
-            elif not _skill_contract_matches(matches[0], wave_six_contract):
-                actual = matches[0]
-                skill_pointer = _pointer_child(_pointer_child(domain_pointer, "skills"), skills.index(actual))
-                _append_skill_contract_errors(actual, wave_six_contract, skill_pointer, errors)
-        for wave_seven_contract in WAVE_SEVEN_SKILL_CONTRACTS.get(domain, ()):
-            expected_name = wave_seven_contract["name"]
-            matches = [
-                skill
-                for skill in skills
-                if isinstance(skill, dict) and skill.get("name") == expected_name
-            ]
-            if len(matches) != 1:
-                _append_error(errors, "V6_CONTRACT_INVARIANT", _pointer_child(domain_pointer, "skills"))
-            elif not _skill_contract_matches(matches[0], wave_seven_contract):
-                actual = matches[0]
-                skill_pointer = _pointer_child(_pointer_child(domain_pointer, "skills"), skills.index(actual))
-                _append_skill_contract_errors(actual, wave_seven_contract, skill_pointer, errors)
+        for wave_contracts in (
+            WAVE_THREE_SKILL_CONTRACTS,
+            WAVE_FOUR_SKILL_CONTRACTS,
+            WAVE_FIVE_SKILL_CONTRACTS,
+            WAVE_SIX_SKILL_CONTRACTS,
+            WAVE_SEVEN_SKILL_CONTRACTS,
+        ):
+            for contract in wave_contracts.get(domain, ()):
+                expected_name = contract["name"]
+                matches = [
+                    skill
+                    for skill in skills
+                    if isinstance(skill, dict) and skill.get("name") == expected_name
+                ]
+                if len(matches) != 1:
+                    _append_error(errors, "V6_CONTRACT_INVARIANT", _pointer_child(domain_pointer, "skills"))
+                elif not _skill_contract_matches(matches[0], contract):
+                    actual = matches[0]
+                    skill_pointer = _pointer_child(_pointer_child(domain_pointer, "skills"), skills.index(actual))
+                    _append_skill_contract_errors(actual, contract, skill_pointer, errors)
         total_skills += len(skills)
         primary_count = sum(isinstance(skill, dict) and skill.get("role") == "primary" for skill in skills)
         if primary_count != 1:
