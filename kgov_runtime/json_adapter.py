@@ -19,12 +19,6 @@ from .cli import SafeArgumentParser
 from .http import DEFAULT_MAX_BYTES, DEFAULT_TIMEOUT, USER_AGENT, _default_resolver as default_resolver, build_url, safe_urlopen, validate_public_https_url
 from .redaction import contains_direct_identifier
 
-LEGAL_PROFILES = {
-    "korean-legal-citation-law-search": ("https://www.law.go.kr/DRF/lawSearch.do", "eflaw", frozenset({"query", "search", "LID", "display", "page"})),
-    "korean-legal-citation-law-detail": ("https://www.law.go.kr/DRF/lawService.do", "eflawjosub", frozenset({"MST", "efYd", "JO", "HANG", "HO", "MOK"})),
-    "korean-legal-citation-precedent-search": ("https://www.law.go.kr/DRF/lawSearch.do", "prec", frozenset({"query", "search", "display", "page", "sort", "date", "prncYd", "nb", "curt", "org", "JO"})),
-    "korean-legal-citation-precedent-detail": ("https://www.law.go.kr/DRF/lawService.do", "prec", frozenset({"ID"})),
-}
 OPERATION_PROFILES = MappingProxyType({
     "kgov/korean-law-bill-research/search-laws/v1": ("kgov/korean-law-bill-research/v1", "https://www.law.go.kr/DRF/lawSearch.do", "law-go-kr-drf-api", frozenset({"query", "search", "LID", "display", "page"}), frozenset({"query"}), "LAW_OC", "OC", 100, (("display", "20"), ("page", "1"), ("target", "law"), ("type", "JSON")), ("kgov_runtime.capabilities.korean_law_bill_research", "_project"), ("kgov_runtime.capabilities.korean_law_bill_research", "_validate_params")),
     "kgov/kosis-official-statistics/query-statistics/v1": ("kgov/kosis-official-statistics/v1", "https://kosis.kr/openapi/Param/statisticsParameterData.do", "kosis-statistics-api", frozenset({"orgId", "tblId", "itmId", "objL1", "prdSe", "startPrdDe", "endPrdDe", "newEstPrdCnt"}), frozenset({"orgId", "tblId", "itmId", "objL1", "prdSe", "startPrdDe", "endPrdDe"}), "KOSIS_API_KEY", "apiKey", 100, (("format", "json"), ("jsonVD", "Y"), ("method", "getList")), ("kgov_runtime.capabilities.kosis_official_statistics", "_project"), ("kgov_runtime.capabilities.kosis_official_statistics", "_validate_params")),
@@ -43,16 +37,6 @@ class JsonTransportError(RuntimeError):
 
 class BlockedOperationError(RuntimeError):
     """Raised when no exact live dataset operation has been approved."""
-
-
-@dataclass(frozen=True, slots=True)
-class JsonAdapterConfig:
-    slug: str
-    default_endpoint: str
-    allowed_hosts: frozenset[str]
-    credential_env: str | None = None
-    credential_param: str | None = None
-    default_params: Mapping[str, Any] | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -229,16 +213,6 @@ def load_fixture(operation: JsonOperation, path: Path) -> dict[str, Any]:
     return _result(operation, strict_json_loads(path.read_bytes()), "synthetic-fixture", _parameter_strings(operation.default_params or {}))
 
 
-def _legal_profile(config: JsonAdapterConfig) -> tuple[str, frozenset[str]]:
-    profile = LEGAL_PROFILES.get(config.slug)
-    if profile is None:
-        raise JsonContractError("unsupported compatibility config")
-    endpoint, target, allowed = profile
-    if (config.default_endpoint, config.allowed_hosts, config.credential_env, config.credential_param, dict(config.default_params or {})) != (endpoint, frozenset({"law.go.kr"}), "LAW_OC", "OC", {"target": target, "type": "JSON"}):
-        raise JsonContractError("unsupported compatibility config")
-    return endpoint, allowed
-
-
 def _verify_operation(operation: JsonOperation) -> None:
     signature = (operation.contract_id, operation.endpoint, operation.policy_id, operation.allowed_params, operation.required_params, operation.credential_env, operation.credential_param, operation.max_records, tuple(sorted((operation.default_params or {}).items())), (operation.projector.__module__, operation.projector.__qualname__), (operation.parameter_validator.__module__, operation.parameter_validator.__qualname__))
     if OPERATION_PROFILES.get(operation.id) is None or type(operation.allowed_params) is not frozenset or type(operation.required_params) is not frozenset or type(operation.default_params) is not dict or signature != OPERATION_PROFILES.get(operation.id):
@@ -246,7 +220,7 @@ def _verify_operation(operation: JsonOperation) -> None:
 
 
 def query_json(
-    operation: JsonOperation | JsonAdapterConfig,
+    operation: JsonOperation,
     *,
     endpoint: str | None = None,
     params: Mapping[str, Any] | None = None,
@@ -255,19 +229,10 @@ def query_json(
 ) -> dict[str, Any]:
     if endpoint is not None:
         raise JsonContractError("endpoint override is forbidden")
-    if isinstance(operation, JsonOperation):
-        _verify_operation(operation)
+    _verify_operation(operation)
     supplied = _parameter_strings(params or {})
     active_opener = opener or safe_urlopen
     active_resolver = resolver or default_resolver
-    if isinstance(operation, JsonAdapterConfig):
-        legal_endpoint, allowed = _legal_profile(operation)
-        unknown = set(supplied) - allowed
-        if unknown:
-            raise JsonContractError("unknown parameter is forbidden")
-        merged = _parameter_strings(operation.default_params or {}) | supplied
-        payload = _request_json((legal_endpoint, {"law.go.kr"}, merged, ("LAW_OC", "OC")), active_opener, active_resolver)
-        return {"count": len(payload) if isinstance(payload, list) else 1, "records": payload if isinstance(payload, list) else [payload]}
     unknown = set(supplied) - operation.allowed_params
     if unknown:
         raise JsonContractError("unknown parameter is forbidden")
