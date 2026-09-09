@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-import argparse
 import html
 import json
 import os
@@ -27,7 +26,6 @@ from typing import (
     Iterable,
     Literal,
     Mapping,
-    NoReturn,
     TypedDict,
     TypeVar,
     assert_never,
@@ -38,6 +36,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from kgov_runtime.cli import SafeArgumentParser  # noqa: E402
 from kgov_runtime.json_adapter import JsonContractError, parse_params, strict_json_loads  # noqa: E402
 from kgov_runtime.http import (  # noqa: E402
     HttpFailureStatus,
@@ -1815,15 +1814,8 @@ def _fixture_result(path: Path) -> dict[str, Any]:
         )
 
 
-class _ArgumentParser(argparse.ArgumentParser):
-    """Keep argparse's validation without reflecting rejected argument values."""
-
-    def error(self, _message: str) -> NoReturn:
-        self.exit(2, "ERROR invalid command-line arguments\n")
-
-
 def main() -> int:
-    parser = _ArgumentParser(description="Search and verify Korean legal citations")
+    parser = SafeArgumentParser(description="Search and verify Korean legal citations")
     parser.add_argument("path", nargs="?", type=Path)
     parser.add_argument("--fixture", action="store_true")
     parser.add_argument("--fixture-path", type=Path)
