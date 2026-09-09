@@ -10,6 +10,8 @@ import json
 import os
 import socket
 import ssl
+import subprocess
+import sys
 import unittest
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -24,7 +26,7 @@ from unittest.mock import Mock, patch
 
 import kgov_runtime
 from kgov_runtime.capabilities import korean_law_bill_research
-from kgov_runtime.json_adapter import query_json
+from kgov_runtime.json_adapter import query_json, strict_json_loads
 from kgov_runtime.http import (
     HttpPolicyEnforcer,
     HttpTransport,
@@ -34,6 +36,7 @@ from kgov_runtime.http import (
     SourceRequest,
     UnsafeEndpointError,
     _policy_urlopen,
+    _strict_json,
     build_url,
     fetch_json,
     fetch_text,
@@ -715,6 +718,123 @@ class ReadOnlyHttpTest(unittest.TestCase):
                     ),
                     projector,
                 )
+
+    def test_shared_json_guard_error_contract(self) -> None:
+        nested = []
+        for _ in range(20):
+            nested = [nested]
+        text = "\u00e9" * 20_000
+        valid = (
+            (b'{"a":[null,true,1,1.5]}', {"a": [None, True, 1, 1.5]}),
+            (b'[' * 21 + b']' * 21, nested),
+            (json.dumps([0] * 19_999).encode(), [0] * 19_999),
+            (json.dumps({"a": [0] * 19_997}).encode(), {"a": [0] * 19_997}),
+            (json.dumps(text, ensure_ascii=False).encode(), text),
+            (json.dumps({text: 0}, ensure_ascii=False).encode(), {text: 0}),
+            (b'"\\ud83d\\ude00"', "\U0001f600"),
+        )
+        invalid = (
+            ("depth", b'[' * 22 + b']' * 22),
+            ("key-depth", b'[' * 20 + b'{"a":0}' + b']' * 20),
+            ("list-nodes", json.dumps([0] * 20_000).encode()),
+            ("mapping-nodes", json.dumps({"a": [0] * 19_998}).encode()),
+            ("string", json.dumps(text + "x", ensure_ascii=False).encode()),
+            ("key", json.dumps({text + "x": 0}, ensure_ascii=False).encode()),
+            ("duplicate", b'{"a":1,"\\u0061":2}'),
+            ("nan", b'NaN'),
+            ("infinity", b'Infinity'),
+            ("negative-infinity", b'-Infinity'),
+            ("float-overflow", b'1e309'),
+            ("high-surrogate", b'"\\ud800"'),
+            ("low-surrogate", b'"\\udfff"'),
+            ("surrogate-key", b'{"\\ud800":0}'),
+            ("duplicate-before-walk", b'{"x":' + json.dumps(text + "x").encode() + b',"a":1,"\\u0061":2}'),
+        )
+        for turn in range(2):
+            for index, (body, expected) in enumerate(valid):
+                with self.subTest(turn=turn, valid=index):
+                    self.assertEqual(expected, _strict_json(body))
+            for label, body in invalid:
+                with self.subTest(turn=turn, invalid=label):
+                    with self.assertRaises(ValueError) as caught:
+                        _strict_json(body)
+                    error = caught.exception
+                    self.assertIs(type(error), ValueError)
+                    self.assertEqual("builtins", type(error).__module__)
+                    self.assertEqual((), error.args)
+                    self.assertIsNone(error.__cause__)
+                    self.assertIsNone(error.__context__)
+                    self.assertFalse(error.__suppress_context__)
+
+    def test_shared_json_native_error_chain(self) -> None:
+        for parser in (_strict_json, strict_json_loads):
+            for body, start, end, reason in (
+                (b'"\xff"', 1, 2, "invalid start byte"),
+                (b'{"a":1,"a":2}\xff', 13, 14, "invalid start byte"),
+                (b'"\xc3', 1, 2, "unexpected end of data"),
+            ):
+                with self.subTest(parser=parser.__name__, unicode_start=start, reason=reason):
+                    with self.assertRaises(UnicodeDecodeError) as caught:
+                        parser(body)
+                    error = caught.exception
+                    self.assertIs(type(error), UnicodeDecodeError)
+                    self.assertEqual("builtins", type(error).__module__)
+                    self.assertEqual(("utf-8", body, start, end, reason), error.args)
+                    self.assertEqual(("utf-8", body, start, end, reason), (error.encoding, error.object, error.start, error.end, error.reason))
+                    self.assertIsNone(error.__cause__)
+                    self.assertIsNone(error.__context__)
+                    self.assertFalse(error.__suppress_context__)
+            for body, message, position, line, column, context_position in (
+                (b'', "Expecting value", 0, 1, 1, 0),
+                (b'\xef\xbb\xbf{}', "Unexpected UTF-8 BOM (decode using utf-8-sig)", 0, 1, 1, None),
+                (b'{\n"a":}', "Expecting value", 6, 2, 5, 6),
+            ):
+                with self.subTest(parser=parser.__name__, json_position=position, message=message):
+                    with self.assertRaises(json.JSONDecodeError) as caught:
+                        parser(body)
+                    error = caught.exception
+                    self.assertIs(type(error), json.JSONDecodeError)
+                    self.assertEqual("json.decoder", type(error).__module__)
+                    self.assertEqual((f"{message}: line {line} column {column} (char {position})",), error.args)
+                    self.assertEqual((message, body.decode("utf-8"), position, line, column), (error.msg, error.doc, error.pos, error.lineno, error.colno))
+                    self.assertIsNone(error.__cause__)
+                    self.assertEqual(context_position is not None, error.__suppress_context__)
+                    if context_position is None:
+                        self.assertIsNone(error.__context__)
+                    else:
+                        context = error.__context__
+                        self.assertIs(type(context), StopIteration)
+                        self.assertEqual("builtins", type(context).__module__)
+                        self.assertEqual((context_position,), context.args)
+                        self.assertIsNone(context.__cause__)
+                        self.assertIsNone(context.__context__)
+                        self.assertFalse(context.__suppress_context__)
+        result = subprocess.run(
+            [sys.executable, "-c", '''
+import sys
+from kgov_runtime.http import _strict_json
+from kgov_runtime.json_adapter import strict_json_loads
+sys.set_int_max_str_digits(640)
+for parser in (_strict_json, strict_json_loads):
+    assert parser(b"1" * 640) == int("1" * 640)
+    try:
+        parser(b"1" * 641)
+    except ValueError as error:
+        assert type(error) is ValueError
+        assert type(error).__module__ == "builtins"
+        assert error.args == ("Exceeds the limit (640 digits) for integer string conversion: value has 641 digits; use sys.set_int_max_str_digits() to increase the limit",)
+        assert error.__cause__ is None
+        assert error.__context__ is None
+        assert not error.__suppress_context__
+    else:
+        raise AssertionError("oversized integer accepted")
+print("native-integer-contract")
+'''],
+            cwd=korean_law_bill_research.ROOT,
+            env={"PYTHONDONTWRITEBYTECODE": "1"},
+            capture_output=True, text=True, timeout=10, check=False,
+        )
+        self.assertEqual((0, "native-integer-contract\n", ""), (result.returncode, result.stdout, result.stderr))
 
     def test_json_rejects_duplicate_keys_and_non_finite_numbers(self) -> None:
         for body in (b'{"a":1,"a":2}', b'{"a":NaN}'):

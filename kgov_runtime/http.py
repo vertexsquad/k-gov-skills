@@ -325,17 +325,27 @@ def _read(response: Any, maximum: int) -> bytes:
     return body
 
 
-def _strict_json(body: bytes) -> Any:
+def _load_strict_json(
+    body: bytes, *, contract_error: type[ValueError] | None = None
+) -> Any:
     def pairs(items: list[tuple[str, Any]]) -> dict[str, Any]:
         result: dict[str, Any] = {}
         for key, value in items:
             if key in result:
-                raise ValueError
+                raise (
+                    contract_error("duplicate JSON key is forbidden")
+                    if contract_error is not None
+                    else ValueError()
+                )
             result[key] = value
         return result
 
     def constant(_value: str) -> None:
-        raise ValueError
+        raise (
+            contract_error("non-finite JSON number is forbidden")
+            if contract_error is not None
+            else ValueError()
+        )
 
     value = json.loads(
         body.decode("utf-8", errors="strict"),
@@ -348,15 +358,27 @@ def _strict_json(body: bytes) -> Any:
         nonlocal nodes
         nodes += 1
         if depth > 20 or nodes > 20_000:
-            raise ValueError
+            raise (
+                contract_error("JSON structural limit exceeded")
+                if contract_error is not None
+                else ValueError()
+            )
         if isinstance(item, str):
             if len(item) > 20_000 or any(
                 0xD800 <= ord(character) <= 0xDFFF for character in item
             ):
-                raise ValueError
+                raise (
+                    contract_error("JSON string limit or Unicode contract violated")
+                    if contract_error is not None
+                    else ValueError()
+                )
             return
         if isinstance(item, float) and not math.isfinite(item):
-            raise ValueError
+            raise (
+                contract_error("non-finite JSON number is forbidden")
+                if contract_error is not None
+                else ValueError()
+            )
         if isinstance(item, dict):
             for key, child in item.items():
                 visit(key, depth + 1)
@@ -368,6 +390,10 @@ def _strict_json(body: bytes) -> Any:
 
     visit(value, 0)
     return value
+
+
+def _strict_json(body: bytes) -> Any:
+    return _load_strict_json(body)
 
 
 def _safe_projection(value: Any) -> None:

@@ -16,7 +16,7 @@ from urllib.parse import quote, quote_plus, urlsplit
 from urllib.request import Request
 
 from .cli import SafeArgumentParser
-from .http import DEFAULT_MAX_BYTES, DEFAULT_TIMEOUT, USER_AGENT, _default_resolver as default_resolver, build_url, safe_urlopen, validate_public_https_url
+from .http import DEFAULT_MAX_BYTES, DEFAULT_TIMEOUT, USER_AGENT, _default_resolver as default_resolver, _load_strict_json, build_url, safe_urlopen, validate_public_https_url
 from .redaction import contains_direct_identifier
 
 OPERATION_PROFILES = MappingProxyType({
@@ -69,44 +69,8 @@ def parse_params(values: list[str]) -> dict[str, str]:
     return params
 
 
-def _reject_duplicate(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
-    result: dict[str, Any] = {}
-    for key, value in pairs:
-        if key in result:
-            raise JsonContractError("duplicate JSON key is forbidden")
-        result[key] = value
-    return result
-
-
-def _reject_constant(_value: str) -> None:
-    raise JsonContractError("non-finite JSON number is forbidden")
-
-
-def _walk_json(value: Any, depth: int = 0, nodes: list[int] | None = None) -> None:
-    counter = [0] if nodes is None else nodes
-    counter[0] += 1
-    if depth > 20 or counter[0] > 20_000:
-        raise JsonContractError("JSON structural limit exceeded")
-    if isinstance(value, str):
-        if len(value) > 20_000 or any(0xD800 <= ord(char) <= 0xDFFF for char in value):
-            raise JsonContractError("JSON string limit or Unicode contract violated")
-        return
-    if isinstance(value, float) and not math.isfinite(value):
-        raise JsonContractError("non-finite JSON number is forbidden")
-    if isinstance(value, Mapping):
-        for key, child in value.items():
-            _walk_json(key, depth + 1, counter)
-            _walk_json(child, depth + 1, counter)
-        return
-    if isinstance(value, list):
-        for child in value:
-            _walk_json(child, depth + 1, counter)
-
-
 def strict_json_loads(body: bytes) -> Any:
-    value = json.loads(body.decode("utf-8", errors="strict"), object_pairs_hook=_reject_duplicate, parse_constant=_reject_constant)
-    _walk_json(value)
-    return value
+    return _load_strict_json(body, contract_error=JsonContractError)
 
 
 def _parameter_strings(params: Mapping[str, Any]) -> dict[str, str]:
