@@ -13,7 +13,7 @@ from dataclasses import replace
 from unittest.mock import patch
 
 from kgov_runtime.capabilities import korean_law_bill_research as adapter
-from kgov_runtime.json_adapter import JsonContractError, _ensure_safe_output, _result, query_json
+from kgov_runtime.json_adapter import JsonContractError, _ensure_safe_output, _result, query_json, strict_json_loads
 
 
 SYNTHETIC_CREDENTIAL = "Fixture/ÿ+ Key"
@@ -108,6 +108,54 @@ class AdapterTest(unittest.TestCase):
             for value in invalid:
                 with self.subTest(value=list(value)), self.assertRaises(ValueError):
                     adapter.query(params={"query": "법"}, opener=lambda *_a, value=value, **_k: Response(encoded(value)), resolver=lambda _: ["1.1.1.1"])
+
+    def test_shared_json_adapter_error_contract(self) -> None:
+        nested = []
+        for _ in range(20):
+            nested = [nested]
+        text = "\u00e9" * 20_000
+        valid = (
+            (b'{"a":[null,true,1,1.5]}', {"a": [None, True, 1, 1.5]}),
+            (b'[' * 21 + b']' * 21, nested),
+            (json.dumps([0] * 19_999).encode(), [0] * 19_999),
+            (json.dumps({"a": [0] * 19_997}).encode(), {"a": [0] * 19_997}),
+            (json.dumps(text, ensure_ascii=False).encode(), text),
+            (json.dumps({text: 0}, ensure_ascii=False).encode(), {text: 0}),
+            (b'"\\ud83d\\ude00"', "\U0001f600"),
+        )
+        invalid = (
+            (b'[' * 22 + b']' * 22, "JSON structural limit exceeded"),
+            (b'[' * 20 + b'{"a":0}' + b']' * 20, "JSON structural limit exceeded"),
+            (json.dumps([0] * 20_000).encode(), "JSON structural limit exceeded"),
+            (json.dumps({"a": [0] * 19_998}).encode(), "JSON structural limit exceeded"),
+            (json.dumps(text + "x", ensure_ascii=False).encode(), "JSON string limit or Unicode contract violated"),
+            (json.dumps({text + "x": 0}, ensure_ascii=False).encode(), "JSON string limit or Unicode contract violated"),
+            (b'{"a":1,"\\u0061":2}', "duplicate JSON key is forbidden"),
+            (b'NaN', "non-finite JSON number is forbidden"),
+            (b'Infinity', "non-finite JSON number is forbidden"),
+            (b'-Infinity', "non-finite JSON number is forbidden"),
+            (b'1e309', "non-finite JSON number is forbidden"),
+            (b'"\\ud800"', "JSON string limit or Unicode contract violated"),
+            (b'"\\udfff"', "JSON string limit or Unicode contract violated"),
+            (b'{"\\ud800":0}', "JSON string limit or Unicode contract violated"),
+            (b'{"x":' + json.dumps(text + "x").encode() + b',"a":1,"\\u0061":2}', "duplicate JSON key is forbidden"),
+            (b'{"a":NaN,"a":2}', "non-finite JSON number is forbidden"),
+        )
+        for turn in range(2):
+            for index, (body, expected) in enumerate(valid):
+                with self.subTest(turn=turn, valid=index):
+                    self.assertEqual(expected, strict_json_loads(body))
+            for index, (body, message) in enumerate(invalid):
+                with self.subTest(turn=turn, invalid=index):
+                    with self.assertRaises(JsonContractError) as caught:
+                        strict_json_loads(body)
+                    error = caught.exception
+                    self.assertIs(type(error), JsonContractError)
+                    self.assertEqual(("kgov_runtime.json_adapter", "JsonContractError"), (type(error).__module__, type(error).__name__))
+                    self.assertEqual((message,), error.args)
+                    self.assertIsNone(error.__cause__)
+                    self.assertIsNone(error.__context__)
+                    self.assertFalse(error.__suppress_context__)
 
     def test_strict_json_rejects_duplicate_nonfinite_depth_string_and_utf8(self) -> None:
         bodies = [
